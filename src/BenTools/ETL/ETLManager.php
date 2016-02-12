@@ -54,6 +54,10 @@ class ETLManager implements LoggerAwareInterface, EventDispatcherInterface {
         $this->name            = $name;
     }
 
+    /**
+     * Run the ETLs.
+     * @return $this
+     */
     public function run() {
 
         $this->logger->info('Starting ETL.');
@@ -64,6 +68,7 @@ class ETLManager implements LoggerAwareInterface, EventDispatcherInterface {
         foreach ($this->etlBags AS $etlBag) {
 
             $this->setCurrentEtl($etlBag);
+            $context = $etlBag->getContext();
 
             while ($input   =   $etlBag->getExtractor()->extract($etlBag->getContext())) {
 
@@ -75,18 +80,18 @@ class ETLManager implements LoggerAwareInterface, EventDispatcherInterface {
                 $this->dispatch(ETLEvent::AFTER_EXTRACT, new ETLEvent($etlBag));
 
                 # Should we skip this row ?
-                if ($etlBag->getContext()->shouldSkip()) {
+                if ($context->shouldSkip()) {
                     $this->logger->debug('Skipping...', is_array($input) ? $input : []);
-                    $etlBag->getContext()->shouldSkip(false);
+                    $context->shouldSkip(false);
                     continue;
                 }
                 # Should we stop the ETL ?
-                elseif ($etlBag->getContext()->shouldBreak()) {
+                elseif ($context->shouldBreak()) {
                     $this->logger->debug('Breaking...', is_array($input) ? $input : []);
                     break;
                 }
                 # Should we stop everything ?
-                elseif ($etlBag->getContext()->shouldHalt()) {
+                elseif ($context->shouldHalt()) {
                     $this->logger->debug('Aborting...', is_array($input) ? $input : []);
                     break 2;
                 }
@@ -97,62 +102,62 @@ class ETLManager implements LoggerAwareInterface, EventDispatcherInterface {
                 #   TRANSFORM   #
                 #################
 
-                $this->logger->info(sprintf('Transforming data%s...', $etlBag->getContext()->getIdentifier() ? ' for ' . $etlBag->getContext()->getIdentifier() : ''));
+                $this->logger->info(sprintf('Transforming data %s...', $context->getIdentifier() ? ' for ' . $context->getIdentifier() : ''));
 
                 $this       ->  dispatch(ETLEvent::BEFORE_TRANSFORM, new ETLEvent($etlBag));
                 $etlBag        ->  getTransformer()->transform($input, $etlBag->getContext());
                 $this       ->  dispatch(ETLEvent::AFTER_TRANSFORM, new ETLEvent($etlBag));
 
                 # Should we skip this row ?
-                if ($etlBag->getContext()->shouldSkip()) {
-                    $this->logger->debug('Skipping...', is_array($this->getOutput()) ? $this->getOutput() : []);
-                    $etlBag->getContext()->shouldSkip(false);
+                if ($context->shouldSkip()) {
+                    $this->logger->debug('Skipping...', is_array($context->getTransformedData()) ? $context->getTransformedData() : []);
+                    $context->shouldSkip(false);
                     continue;
                 }
                 # Should we stop the ETL ?
-                elseif ($etlBag->getContext()->shouldBreak()) {
-                    $this->logger->debug('Breaking...', is_array($this->getOutput()) ? $this->getOutput() : []);
+                elseif ($context->shouldBreak()) {
+                    $this->logger->debug('Breaking...', is_array($context->getTransformedData()) ? $context->getTransformedData() : []);
                     break;
                 }
                 # Should we stop everything ?
-                elseif ($etlBag->getContext()->shouldHalt()) {
-                    $this->logger->debug('Aborting...', is_array($this->getOutput()) ? $this->getOutput() : []);
+                elseif ($context->shouldHalt()) {
+                    $this->logger->debug('Aborting...', is_array($context->getTransformedData()) ? $context->getTransformedData() : []);
                     break 2;
                 }
-                $this->logger->debug('Data transformed.', is_array($this->getOutput()) ? $this->getOutput() : []);
+                $this->logger->debug('Data transformed.', is_array($context->getTransformedData()) ? $context->getTransformedData() : []);
 
                 #################
                 #     LOAD      #
                 #################
 
-                $this   ->  logger->info(sprintf('Loading data%s...', $etlBag->getContext()->getIdentifier() ? ' for ' . $etlBag->getContext()->getIdentifier() : ''));
+                $this   ->  logger->info(sprintf('Loading data%s...', $context->getIdentifier() ? ' for ' . $context->getIdentifier() : ''));
                 $this   ->  dispatch(ETLEvent::BEFORE_LOAD, new ETLEvent($etlBag));
-                $etlBag    ->  getLoader()->load($this->getOutput(), $etlBag->getContext());
+                $etlBag    ->  getLoader()->load($context->getTransformedData(), $etlBag->getContext());
                 $this   ->  dispatch(ETLEvent::AFTER_LOAD, new ETLEvent($etlBag));
 
                 # Should we skip this row ?
-                if ($etlBag->getContext()->shouldSkip()) {
-                    $this->logger->debug('Skipping...', is_array($this->getOutput()) ? $this->getOutput() : []);
-                    $etlBag->getContext()->shouldSkip(false);
+                if ($context->shouldSkip()) {
+                    $this->logger->debug('Skipping...', is_array($context->getTransformedData()) ? $context->getTransformedData() : []);
+                    $context->shouldSkip(false);
                     continue;
                 }
                 # Should we stop the ETL ?
-                elseif ($etlBag->getContext()->shouldBreak()) {
-                    $this->logger->debug('Breaking...', is_array($this->getOutput()) ? $this->getOutput() : []);
+                elseif ($context->shouldBreak()) {
+                    $this->logger->debug('Breaking...', is_array($context->getTransformedData()) ? $context->getTransformedData() : []);
                     break;
                 }
                 # Should we stop everything ?
-                elseif ($etlBag->getContext()->shouldHalt()) {
-                    $this->logger->debug('Aborting...', is_array($this->getOutput()) ? $this->getOutput() : []);
+                elseif ($context->shouldHalt()) {
+                    $this->logger->debug('Aborting...', is_array($context->getTransformedData()) ? $context->getTransformedData() : []);
                     break 2;
                 }
 
                 # Should we flush the buffered records ?
-                if ($etlBag->getContext()->shouldFlush()) {
+                if ($context->shouldFlush()) {
                     $this->dispatch(ETLEvent::BEFORE_FLUSH, new ETLEvent($etlBag));
-                    $this->logger->debug('Flushing...', $this->getOutput());
+                    $this->logger->debug('Flushing...', $context->getTransformedData());
                     $etlBag->getLoader()->flush($etlBag->getContext());
-                    $etlBag->getContext()->shouldFlush(false);
+                    $context->shouldFlush(false);
                     $this->dispatch(ETLEvent::AFTER_FLUSH, new ETLEvent($etlBag));
                 }
             }
@@ -162,7 +167,7 @@ class ETLManager implements LoggerAwareInterface, EventDispatcherInterface {
             #################
 
             # Should we halt without flushing ?
-            if ($etlBag->getContext()->shouldHalt()) {
+            if ($context->shouldHalt()) {
                 $this->logger->debug('Data won\'t be flushed.');
             }
             # Default behaviour : flush buffered records
@@ -181,13 +186,6 @@ class ETLManager implements LoggerAwareInterface, EventDispatcherInterface {
         $this->logger   ->  info(sprintf("ETL completed in %ss.", $this->getDuration()));
 
         return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    private function getOutput() {
-        return $this->getCurrentEtl()->getContext()->getTransformedData();
     }
 
     /**
