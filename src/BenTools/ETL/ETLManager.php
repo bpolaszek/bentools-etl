@@ -70,6 +70,8 @@ class ETLManager implements LoggerAwareInterface, EventDispatcherInterface {
             $this->setCurrentEtl($etlBag);
             $context = $etlBag->getContext();
 
+            $this->dispatch(ETLEvent::ETLBAG_START, new ETLEvent($etlBag));
+
             while ($input   =   $etlBag->getExtractor()->extract($etlBag->getContext())) {
 
                 #################
@@ -181,6 +183,7 @@ class ETLManager implements LoggerAwareInterface, EventDispatcherInterface {
                 $this->dispatch(ETLEvent::AFTER_FLUSH, new ETLEvent($etlBag));
             }
 
+            $this->dispatch(ETLEvent::ETLBAG_END, new ETLEvent($etlBag));
         }
 
         # Over.

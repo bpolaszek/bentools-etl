@@ -6,6 +6,7 @@ use Symfony\Component\EventDispatcher\Event;
 class ETLEvent extends Event {
 
     const   ETL_START        = 'etl.start';
+    const   ETLBAG_START     = 'etlbag.start';
     const   AFTER_EXTRACT    = 'etl.after.extract';
     const   BEFORE_TRANSFORM = 'etl.before.transform';
     const   AFTER_TRANSFORM  = 'etl.after.transform';
@@ -13,6 +14,7 @@ class ETLEvent extends Event {
     const   AFTER_LOAD       = 'etl.after.load';
     const   BEFORE_FLUSH     = 'etl.before.flush';
     const   AFTER_FLUSH      = 'etl.after.flush';
+    const   ETLBAG_END       = 'etlbag.end';
     const   ETL_END          = 'etl.end';
 
     /**
