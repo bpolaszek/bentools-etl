@@ -12,11 +12,16 @@ class IteratorExtractor implements ExtractorInterface, \IteratorAggregate, \Coun
     /**
      * @var Iterator
      */
-    protected   $iterator;
+    protected $iterator;
 
     /**
-     * @param Iterator                 $iterator
-     * @param LoggerInterface          $logger
+     * @var bool
+     */
+    protected $init = false;
+
+    /**
+     * @param Iterator $iterator
+     * @param LoggerInterface $logger
      * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(Iterator $iterator) {
@@ -29,8 +34,11 @@ class IteratorExtractor implements ExtractorInterface, \IteratorAggregate, \Coun
      * @return array
      */
     public function extract(ContextInterface $context) {
+        if ($this->init === false) {
+            $this->iterator->rewind();
+            $this->init = true;
+        }
         $data = $this->iterator->current();
-        $context->setExtractedData($data);
         $this->iterator->next();
         return $data;
     }
