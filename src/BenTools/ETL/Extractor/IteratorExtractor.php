@@ -1,9 +1,9 @@
 <?php
 namespace BenTools\ETL\Extractor;
 
+use BenTools\ETL\Interfaces\ContextInterface;
+use BenTools\ETL\Interfaces\ExtractorInterface;
 use Iterator;
-use Knp\ETL\ContextInterface;
-use Knp\ETL\ExtractorInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 

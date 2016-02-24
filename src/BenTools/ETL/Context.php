@@ -1,17 +1,20 @@
 <?php
 namespace BenTools\ETL;
 
+use BenTools\ETL\Interfaces\ContextInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 
-class Context extends \Knp\ETL\Context\Context implements LoggerAwareInterface, \ArrayAccess {
+class Context implements LoggerAwareInterface, ContextInterface, \ArrayAccess {
 
     use LoggerAwareTrait;
 
     /**
      * @var ETLBag
      */
+    protected $extractedData;
+    protected $transformedData;
     protected $currentETL;
     protected $shouldSkip  =   false;
     protected $shouldBreak =   false;
@@ -27,6 +30,20 @@ class Context extends \Knp\ETL\Context\Context implements LoggerAwareInterface, 
      */
     public function __construct(LoggerInterface $logger) {
         $this->setLogger($logger);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getExtractedData() {
+        return $this->extractedData;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getTransformedData() {
+        return $this->transformedData;
     }
 
     /**
@@ -144,7 +161,7 @@ class Context extends \Knp\ETL\Context\Context implements LoggerAwareInterface, 
      * @inheritDoc
      */
     public function setExtractedData($data) {
-        parent::setExtractedData($data);
+        $this->extractedData = $data;
         if ($data && is_callable($this->getExtractorIdentifierCallable()))
             $this->setIdentifier(call_user_func($this->getExtractorIdentifierCallable(), $data));
     }
@@ -153,7 +170,7 @@ class Context extends \Knp\ETL\Context\Context implements LoggerAwareInterface, 
      * @inheritDoc
      */
     public function setTransformedData($data) {
-        parent::setTransformedData($data);
+        $this->transformedData = $data;
         if ($data && is_callable($this->getTransformedData()))
             $this->setIdentifier(call_user_func($this->getTransformerIdentifierCallable(), $data));
     }

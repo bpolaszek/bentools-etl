@@ -1,8 +1,8 @@
 <?php
 namespace BenTools\ETL\Loader;
 
-use Knp\ETL\ContextInterface;
-use Knp\ETL\LoaderInterface;
+use BenTools\ETL\Interfaces\ContextInterface;
+use BenTools\ETL\Interfaces\LoaderInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -21,12 +21,8 @@ class JsonFileLoader implements LoaderInterface, LoggerAwareInterface {
     }
 
     /**
-     * loads data into some other persistence service
-     *
-     * @param mixed            $data    the data to load
-     * @param Context $context the shared context for current iteration / row / whatever
-     *
-     * @return mixed
+     * @param mixed $data
+     * @param ContextInterface $context
      */
     public function load($data, ContextInterface $context) {
         if (is_array($data) && $data && array_values($data)[0])
@@ -36,10 +32,9 @@ class JsonFileLoader implements LoaderInterface, LoggerAwareInterface {
     }
 
     /**
-     * Flush the loader
-     *
-     * @param Context $context the shared context for current iteration / row / whatever
-     **/
+     * @param ContextInterface $context
+     * @throws FileException
+     */
     public function flush(ContextInterface $context) {
 
         if (!$this->data) {
@@ -58,10 +53,8 @@ class JsonFileLoader implements LoaderInterface, LoggerAwareInterface {
     }
 
     /**
-     * Reset the loader
-     *
-     * @param ContextInterface $context the shared context for current iteration / row / whatever
-     **/
+     * @param ContextInterface $context
+     */
     public function clear(ContextInterface $context) {
 
     }

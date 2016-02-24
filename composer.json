@@ -1,21 +1,24 @@
 {
-  "name"             : "bentools/etl",
-  "description"      : "Some classes to implement the ETL pattern, with the ability to hook on each event.",
+  "name": "bentools/etl",
+  "description": "Some classes to implement the ETL pattern, with the ability to hook on each event.",
   "minimum-stability": "dev",
-  "license"          : "MIT",
-  "authors"          : [
+  "license": "MIT",
+  "authors": [
     {
       "name": "Beno!t POLASZEK"
     }
   ],
-  "require"          : {
-    "php"                     : ">=5.4",
+  "require": {
+    "php": ">=5.4",
     "symfony/event-dispatcher": "~2.7|^3.0",
-    "knplabs/etl"             : "^1.1"
+    "psr/log": "1.0.*"
   },
-  "autoload"         : {
+  "autoload": {
     "psr-4": {
       "BenTools\\": "src/BenTools"
     }
+  },
+  "require-dev": {
+    "doctrine/orm": "^2.5"
   }
 }

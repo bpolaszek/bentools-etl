@@ -1,9 +1,8 @@
 <?php
 namespace BenTools\ETL\Loader;
 
-use Knp\ETL\ContextInterface;
-use Knp\ETL\LoaderInterface;
-
+use BenTools\ETL\Interfaces\ContextInterface;
+use BenTools\ETL\Interfaces\LoaderInterface;
 
 class ArrayLoader implements LoaderInterface {
 
@@ -18,21 +17,21 @@ class ArrayLoader implements LoaderInterface {
     /**
      * loads data into some other persistence service
      *
-     * @param mixed            $data    the data to load
+     * @param mixed            $entity    the data to load
      * @param ContextInterface $context the shared context for current iteration / row / whatever
      *
      * @return mixed
      */
-    public function load($data, ContextInterface $context) {
+    public function load($entity, ContextInterface $context) {
         if (is_callable($this->key)) {
-            $key = call_user_func($this->key, $data);
+            $key = call_user_func($this->key, $entity);
             if (array_key_exists($key, $this->array))
-                $this->array[$key] = array_merge($this->array[$key], $data);
+                $this->array[$key] = array_merge($this->array[$key], $entity);
             else
-                $this->array[$key] = $data;
+                $this->array[$key] = $entity;
         }
         else
-            $this->array[] = $data;
+            $this->array[] = $entity;
     }
 
     /**

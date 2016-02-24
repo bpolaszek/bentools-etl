@@ -1,9 +1,9 @@
 <?php
 namespace BenTools\ETL;
 
-use Knp\ETL\ExtractorInterface;
-use Knp\ETL\LoaderInterface;
-use Knp\ETL\TransformerInterface;
+use BenTools\ETL\Interfaces\ExtractorInterface;
+use BenTools\ETL\Interfaces\LoaderInterface;
+use BenTools\ETL\Interfaces\TransformerInterface;
 
 class ETLBag {
 
