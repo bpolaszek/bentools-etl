@@ -10,7 +10,7 @@
   ],
   "require"          : {
     "php"                     : ">=5.4",
-    "symfony/event-dispatcher": "^3.0",
+    "symfony/event-dispatcher": "~2.7|^3.0",
     "knplabs/etl"             : "^1.1"
   },
   "autoload"         : {
