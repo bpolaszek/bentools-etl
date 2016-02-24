@@ -77,6 +77,8 @@ class ETLManager implements LoggerAwareInterface, EventDispatcherInterface {
                 #################
 
                 $this->logger->info('Extracting data...');
+                $etlBag->getContext()->setExtractedData($input);
+
                 $this->dispatch(ETLEvent::AFTER_EXTRACT, new ETLEvent($etlBag));
 
                 # Should we skip this row ?
@@ -104,9 +106,10 @@ class ETLManager implements LoggerAwareInterface, EventDispatcherInterface {
 
                 $this->logger->info(sprintf('Transforming data %s...', $context->getIdentifier() ? ' for ' . $context->getIdentifier() : ''));
 
-                $this       ->  dispatch(ETLEvent::BEFORE_TRANSFORM, new ETLEvent($etlBag));
-                $etlBag        ->  getTransformer()->transform($input, $etlBag->getContext());
-                $this       ->  dispatch(ETLEvent::AFTER_TRANSFORM, new ETLEvent($etlBag));
+                $this                   ->  dispatch(ETLEvent::BEFORE_TRANSFORM, new ETLEvent($etlBag));
+                $output                 =   $etlBag->getTransformer()->transform($input, $etlBag->getContext());
+                $etlBag->getContext()   ->  setTransformedData($output);
+                $this                   ->  dispatch(ETLEvent::AFTER_TRANSFORM, new ETLEvent($etlBag));
 
                 # Should we skip this row ?
                 if ($context->shouldSkip()) {
@@ -132,7 +135,7 @@ class ETLManager implements LoggerAwareInterface, EventDispatcherInterface {
 
                 $this   ->  logger->info(sprintf('Loading data%s...', $context->getIdentifier() ? ' for ' . $context->getIdentifier() : ''));
                 $this   ->  dispatch(ETLEvent::BEFORE_LOAD, new ETLEvent($etlBag));
-                $etlBag    ->  getLoader()->load($context->getTransformedData(), $etlBag->getContext());
+                $etlBag ->  getLoader()->load($context->getTransformedData(), $etlBag->getContext());
                 $this   ->  dispatch(ETLEvent::AFTER_LOAD, new ETLEvent($etlBag));
 
                 # Should we skip this row ?
