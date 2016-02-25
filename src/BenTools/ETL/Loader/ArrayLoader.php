@@ -7,11 +7,11 @@ use BenTools\ETL\Interfaces\LoaderInterface;
 class ArrayLoader implements LoaderInterface {
 
     protected $array = [];
-    protected $key;
+    protected $keyFn;
 
-    public function __construct(array &$array = [], callable $key = null) {
+    public function __construct(array &$array = [], callable $keyFn = null) {
         $this->array = &$array;
-        $this->key = $key;
+        $this->keyFn = $keyFn;
     }
 
     /**
@@ -22,16 +22,17 @@ class ArrayLoader implements LoaderInterface {
      *
      * @return mixed
      */
-    public function load($entity, ContextInterface $context) {
-        if (is_callable($this->key)) {
-            $key = call_user_func($this->key, $entity);
+    public function load($data, ContextInterface $context) {
+        if (is_callable($this->keyFn)) {
+            $key = call_user_func($this->keyFn, $data);
             if (array_key_exists($key, $this->array))
-                $this->array[$key] = array_merge($this->array[$key], $entity);
+                $this->array[$key] = array_merge($this->array[$key], $data);
             else
-                $this->array[$key] = $entity;
+                $this->array[$key] = $data;
         }
-        else
-            $this->array[] = $entity;
+        else {
+            $this->array[] = $data;
+        }
     }
 
     /**
@@ -71,16 +72,16 @@ class ArrayLoader implements LoaderInterface {
     /**
      * @return callable
      */
-    public function getKey() {
-        return $this->key;
+    public function getKeyFn() {
+        return $this->keyFn;
     }
 
     /**
-     * @param callable $key
+     * @param callable $keyFn
      * @return $this - Provides Fluent Interface
      */
-    public function setKey(callable $key) {
-        $this->key = $key;
+    public function setKeyFn(callable $keyFn) {
+        $this->keyFn = $keyFn;
         return $this;
     }
 
