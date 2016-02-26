@@ -16,10 +16,10 @@ class Context implements LoggerAwareInterface, ContextInterface, \ArrayAccess {
     protected $extractedData;
     protected $transformedData;
     protected $currentETL;
-    protected $shouldSkip  =   false;
-    protected $shouldBreak =   false;
-    protected $shouldHalt  =   false;
-    protected $shouldFlush =   false;
+    protected $shouldSkip  = false;
+    protected $shouldBreak = false;
+    protected $shouldHalt  = false;
+    protected $shouldFlush = false;
     protected $identifier;
     protected $extractorIdentifierCallable;
     protected $transformerIdentifierCallable;
@@ -27,9 +27,13 @@ class Context implements LoggerAwareInterface, ContextInterface, \ArrayAccess {
 
     /**
      * @param LoggerInterface $logger
+     * @param callable $extractorIdentifierCallable
+     * @param callable $transformerIdentifierCallable
      */
-    public function __construct(LoggerInterface $logger) {
+    public function __construct(LoggerInterface $logger, callable $extractorIdentifierCallable = null, callable $transformerIdentifierCallable = null) {
         $this->setLogger($logger);
+        $this->extractorIdentifierCallable   = $extractorIdentifierCallable;
+        $this->transformerIdentifierCallable = $transformerIdentifierCallable;
     }
 
     /**
@@ -68,7 +72,7 @@ class Context implements LoggerAwareInterface, ContextInterface, \ArrayAccess {
      */
     public function shouldSkip($value = null) {
         if (func_num_args() > 0)
-            $this->shouldSkip   =   $value;
+            $this->shouldSkip = $value;
         return $this->shouldSkip;
     }
 
@@ -78,7 +82,7 @@ class Context implements LoggerAwareInterface, ContextInterface, \ArrayAccess {
      */
     public function shouldBreak($value = null) {
         if (func_num_args() > 0)
-            $this->shouldBreak  =   $value;
+            $this->shouldBreak = $value;
         return $this->shouldBreak;
     }
 
@@ -88,7 +92,7 @@ class Context implements LoggerAwareInterface, ContextInterface, \ArrayAccess {
      */
     public function shouldHalt($value = null) {
         if (func_num_args() > 0)
-            $this->shouldHalt   =   $value;
+            $this->shouldHalt = $value;
         return $this->shouldHalt;
     }
 
@@ -98,7 +102,7 @@ class Context implements LoggerAwareInterface, ContextInterface, \ArrayAccess {
      */
     public function shouldFlush($value = null) {
         if (func_num_args() > 0)
-            $this->shouldFlush   =   $value;
+            $this->shouldFlush = $value;
         return $this->shouldFlush;
     }
 
