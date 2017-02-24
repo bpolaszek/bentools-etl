@@ -7,9 +7,7 @@ use BenTools\ETL\Context\ContextElementInterface;
 interface TransformerInterface {
 
     /**
-     * Retrieves extracted data from the context
-     * Transforms data
-     * Hydrates context with transformed data
+     * Transforms data and hydrates element (setTransformedData)
      * @param ContextElementInterface $element
      */
     public function __invoke(ContextElementInterface $element): void;

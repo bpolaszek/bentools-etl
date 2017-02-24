@@ -7,7 +7,7 @@ use BenTools\ETL\Context\ContextElementInterface;
 interface LoaderInterface {
 
     /**
-     * Loads the element
+     * Loads the element transformed - $element->getTransformedData()
      * @param ContextElementInterface $element
      * @return mixed
      */
