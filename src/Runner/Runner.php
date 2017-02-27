@@ -2,14 +2,15 @@
 
 namespace BenTools\ETL\Runner;
 
-use BenTools\ETL\Context\ContextElementFactoryInterface;
 use BenTools\ETL\Context\ContextElementInterface;
-use BenTools\ETL\Context\KeyValueFactory;
 use BenTools\ETL\Event\ETLEvent;
 use BenTools\ETL\Event\EventDispatcher\EventDispatcherInterface;
 use BenTools\ETL\Event\EventDispatcher\NullEventDispatcher;
-use BenTools\ETL\Event\Events;
+use BenTools\ETL\Event\ETLEvents;
+use BenTools\ETL\Extractor\ExtractorInterface;
 use BenTools\ETL\Loader\FlushableLoaderInterface;
+use BenTools\ETL\Loader\LoaderInterface;
+use BenTools\ETL\Transformer\TransformerInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -24,57 +25,32 @@ class Runner implements RunnerInterface {
     private $flush = true;
 
     /**
-     * @var ContextElementFactoryInterface
-     */
-    protected $factory;
-    /**
      * @var EventDispatcherInterface
      */
     private $eventDispatcher;
 
     /**
      * Runner constructor.
-     * @param ContextElementFactoryInterface|null $factory
      * @param LoggerInterface $logger
      * @param EventDispatcherInterface|null $eventDispatcher
      */
-    public function __construct(ContextElementFactoryInterface $factory = null,
-                                LoggerInterface $logger = null,
+    public function __construct(LoggerInterface $logger = null,
                                 EventDispatcherInterface $eventDispatcher = null) {
-        $this->factory = $factory;
         $this->logger = $logger ?? new NullLogger();
         $this->eventDispatcher = $eventDispatcher ?? new NullEventDispatcher();
     }
 
     /**
-     * @return ContextElementFactoryInterface
-     */
-    public function getFactory(): ContextElementFactoryInterface {
-        return $this->factory ?? new KeyValueFactory();
-    }
-
-    /**
-     * @param ContextElementFactoryInterface $factory
-     * @return $this - Provides Fluent Interface
-     */
-    public function setFactory(ContextElementFactoryInterface $factory) {
-        $this->factory = $factory;
-        return $this;
-    }
-
-    /**
      * @inheritDoc
      */
-    public function __invoke($extractor, $transformer, $loader) {
+    public function __invoke(iterable $items, callable $extractor, callable $transformer, callable $loader) {
 
-        $this->validateExtractor($extractor);
-        $this->validateTransformer($transformer);
-        $this->validateLoader($loader);
+        $this->validateIterator($items);
 
-        foreach ($extractor AS $key => $value) {
+        foreach ($items AS $key => $value) {
 
             // Extract and create element
-            $element = $this->extract($key, $value);
+            $element = $this->extract($extractor, $key, $value);
 
             if ($element->shouldSkip()) {
                 $this->skip($key);
@@ -100,6 +76,8 @@ class Runner implements RunnerInterface {
             // Load element
             $this->load($loader, $element);
 
+            //break;
+
         }
 
         // Flush remaining data
@@ -108,58 +86,60 @@ class Runner implements RunnerInterface {
     }
 
     /**
+     * @param callable|ExtractorInterface $extract
      * @param $key
      * @param $value
      * @return ContextElementInterface
      */
-    private function extract($key, $value): ContextElementInterface {
+    private function extract(callable $extract, $key, $value): ContextElementInterface {
         $this->logger->info(sprintf('Extracting key %s...', $key));
-        $element = $this->getFactory()->createContext($key, $value);
+        /** @var ContextElementInterface $element */
+        $element = $extract($key, $value);
         $this->logger->debug(sprintf('Key %s extracted.', $key), [
-            'id'   => $element->getIdentifier(),
+            'id'   => $element->getId(),
             'data' => $element->getExtractedData(),
         ]);
-        $this->eventDispatcher->trigger(new ETLEvent(Events::AFTER_EXTRACT, $element));
+        $this->eventDispatcher->trigger(new ETLEvent(ETLEvents::AFTER_EXTRACT, $element));
         return $element;
     }
 
     /**
-     * @param $transform
+     * @param callable|TransformerInterface $transform
      * @param ContextElementInterface $element
      */
-    private function transform($transform, ContextElementInterface $element) {
-        $identifier = $element->getIdentifier();
+    private function transform(callable $transform, ContextElementInterface $element): void {
+        $identifier = $element->getId();
         $this->logger->info(sprintf('Transforming key %s...', $identifier));
         $transform($element);
         $this->logger->debug(sprintf('Key %s transformed.', $identifier), [
-            'id'   => $element->getIdentifier(),
+            'id'   => $element->getId(),
             'data' => $element->getExtractedData(),
         ]);
-        $this->eventDispatcher->trigger(new ETLEvent(Events::AFTER_TRANSFORM, $element));
+        $this->eventDispatcher->trigger(new ETLEvent(ETLEvents::AFTER_TRANSFORM, $element));
     }
 
     /**
-     * @param $load
+     * @param callable|LoaderInterface $load
      * @param ContextElementInterface $element
      */
-    private function load($load, ContextElementInterface $element) {
-        $identifier = $element->getIdentifier();
+    private function load(callable $load, ContextElementInterface $element): void {
+        $identifier = $element->getId();
         $this->logger->info(sprintf('Loading key %s...', $identifier));
         $load($element);
         $this->logger->debug(sprintf('Key %s loaded.', $identifier), [
-            'id'   => $element->getIdentifier(),
+            'id'   => $element->getId(),
         ]);
-        $this->eventDispatcher->trigger(new ETLEvent(Events::AFTER_LOAD, $element));
+        $this->eventDispatcher->trigger(new ETLEvent(ETLEvents::AFTER_LOAD, $element));
     }
 
     /**
      * @param $loader
      */
-    private function flush($loader) {
+    private function flush($loader): void {
         if ($this->shouldFlush() && $loader instanceof FlushableLoaderInterface) {
             $loader->flush();
         }
-        $this->eventDispatcher->trigger(new ETLEvent(Events::AFTER_FLUSH));
+        $this->eventDispatcher->trigger(new ETLEvent(ETLEvents::AFTER_FLUSH));
     }
 
     /**
@@ -185,29 +165,11 @@ class Runner implements RunnerInterface {
     }
 
     /**
-     * @param iterable|\Generator|\Traversable|array $extractor
+     * @param iterable|\Generator|\Traversable|array $iterator
      */
-    private function validateExtractor($extractor) {
-        if (!is_array($extractor) && !$extractor instanceof \Traversable && !$extractor instanceof \Generator) {
-            throw new \InvalidArgumentException("The extractor should be iterable.");
-        }
-    }
-
-    /**
-     * @param callable $transformer
-     */
-    private function validateTransformer($transformer) {
-        if (!is_callable($transformer)) {
-            throw new \InvalidArgumentException("The transformer should be callable.");
-        }
-    }
-
-    /**
-     * @param callable $loader
-     */
-    private function validateLoader($loader) {
-        if (!is_callable($loader)) {
-            throw new \InvalidArgumentException("The loader should be callable.");
+    private function validateIterator($iterator) {
+        if (!is_array($iterator) && !$iterator instanceof \Traversable && !$iterator instanceof \Generator) {
+            throw new \InvalidArgumentException("The iterator should be iterable.");
         }
     }
 

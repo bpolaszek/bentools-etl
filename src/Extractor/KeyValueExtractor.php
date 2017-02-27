@@ -1,15 +1,22 @@
 <?php
 
-namespace BenTools\ETL\Context;
+namespace BenTools\ETL\Extractor;
 
-class KeyValueFactory implements ContextElementFactoryInterface {
+use BenTools\ETL\Context\ContextElement;
+use BenTools\ETL\Context\ContextElementInterface;
+
+/**
+ * Class KeyValueExtractor
+ * Default extractor: sets the identifier from the key => value iterator (=> the key)
+ */
+class KeyValueExtractor implements ExtractorInterface {
 
     const DEFAULT_CLASS = ContextElement::class;
 
     protected $class = self::DEFAULT_CLASS;
 
     /**
-     * KeyValueFactory constructor.
+     * KeyValueExtractor constructor.
      * @param string $class
      */
     public function __construct(string $class = self::DEFAULT_CLASS) {
@@ -35,14 +42,14 @@ class KeyValueFactory implements ContextElementFactoryInterface {
     /**
      * @inheritDoc
      */
-    public function createContext($identifier, $extractedData): ContextElementInterface {
+    public function __invoke($key, $value): ContextElementInterface {
         $class = $this->getClass();
         if (!is_a($class, ContextElementInterface::class, true)) {
             throw new \RuntimeException(sprintf('%s should implement %s.', $class, ContextElementInterface::class));
         }
-        $element = new ContextElement();
-        $element->setIdentifier($identifier);
-        $element->setExtractedData($extractedData);
+        $element = new $class;
+        $element->setId($key);
+        $element->setExtractedData($value);
         return $element;
     }
 }

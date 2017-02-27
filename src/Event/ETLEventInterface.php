@@ -9,5 +9,5 @@ interface ETLEventInterface {
     /**
      * @return ContextElementInterface
      */
-    public function getElement(): ContextElementInterface;
+    public function getElement(): ?ContextElementInterface;
 }

@@ -40,7 +40,7 @@ class ETLEvent implements EventInterface, ETLEventInterface {
     /**
      * @return ContextElementInterface
      */
-    public function getElement(): ContextElementInterface {
+    public function getElement(): ?ContextElementInterface {
         return $this->element;
     }
 

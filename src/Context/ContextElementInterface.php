@@ -7,12 +7,12 @@ interface ContextElementInterface {
     /**
      * @param int|string the identifier value of current data
      */
-    public function setIdentifier($identifier): void;
+    public function setId($id): void;
 
     /**
      * @return int|string
      */
-    public function getIdentifier();
+    public function getId();
 
     /**
      * @param $data

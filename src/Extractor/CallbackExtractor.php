@@ -1,8 +1,14 @@
 <?php
 
-namespace BenTools\ETL\Context;
+namespace BenTools\ETL\Extractor;
 
-class CallbackFactory extends KeyValueFactory implements ContextElementFactoryInterface {
+use BenTools\ETL\Context\ContextElementInterface;
+
+/**
+ * Class CallbackExtractor
+ * Sets the identifier via a callback
+ */
+class CallbackExtractor extends KeyValueExtractor implements ExtractorInterface {
 
     /**
      * @var callable
@@ -10,7 +16,7 @@ class CallbackFactory extends KeyValueFactory implements ContextElementFactoryIn
     private $callback;
 
     /**
-     * CallbackFactory constructor.
+     * CallbackExtractor constructor.
      * @param callable $callback
      * @param string $class
      */
@@ -22,8 +28,8 @@ class CallbackFactory extends KeyValueFactory implements ContextElementFactoryIn
     /**
      * @inheritDoc
      */
-    public function createContext($identifier, $extractedData): ContextElementInterface {
-        $element = parent::createContext($identifier, $extractedData);
+    public function __invoke($key, $value): ContextElementInterface {
+        $element = parent::__invoke($key, $value);
         $callback = $this->callback;
         $result = $callback($element);
         if (null !== $result) {

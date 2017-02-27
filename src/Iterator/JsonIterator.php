@@ -1,8 +1,8 @@
 <?php
 
-namespace BenTools\ETL\Extractor;
+namespace BenTools\ETL\Iterator;
 
-class JsonExtractor implements \IteratorAggregate {
+class JsonIterator implements \IteratorAggregate {
 
     /**
      * @var \ArrayIterator
@@ -10,7 +10,7 @@ class JsonExtractor implements \IteratorAggregate {
     private $json;
 
     /**
-     * JsonExtractor constructor.
+     * JsonIterator constructor.
      * @param $json
      * @param string|null $path
      * @param string|null $columnIdentifier
@@ -26,7 +26,7 @@ class JsonExtractor implements \IteratorAggregate {
             $this->json = new \ArrayIterator((array) $json);
         }
         else {
-            throw new \InvalidArgumentException("Invalid json");
+            throw new \InvalidArgumentException("Invalid json input");
         }
     }
 

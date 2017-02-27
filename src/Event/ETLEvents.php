@@ -2,7 +2,7 @@
 
 namespace BenTools\ETL\Event;
 
-final class Events {
+final class ETLEvents {
 
     const AFTER_EXTRACT   = 'bentools.etl.after_extract';
     const AFTER_TRANSFORM = 'bentools.etl.after_transform';

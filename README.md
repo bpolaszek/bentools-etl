@@ -1,5 +1,5 @@
 bentools/etl
-------------
+============
 
 This 7.1+ library provides a very simple implementation of the `Extract / Transform / Load` pattern. 
 
@@ -7,75 +7,81 @@ It is heavily inspired by the [knplabs/etl](https://github.com/docteurklein/php-
 
 Concept:
 
-* An `Extractor` is an [`iterable`](https://wiki.php.net/rfc/iterable) - i.e an `array`, `\Traversable`, `\Iterator`, `IteratorAggregate` or `\Generator`
-* A `Transformer` is a `callable` responsible to transform each item returned by the `Extractor` to the desired output
-* A `Loader` is a `callable` responsible to send the transformed data in a persistence layer, a HTTP Post, a file, ...
+* You have an [`iterable`](https://wiki.php.net/rfc/iterable) - i.e an `array`, `\Traversable`, `\Iterator`, `IteratorAggregate` or a `\Generator` to loop over.
+* The `Extractor` is a [`callable`](http://php.net/manual/en/language.types.callable.php) which takes the key and the value as arguments - its role is to return a `ContextElement` with the extracted data. 
+* The `Transformer` is a [`callable`](http://php.net/manual/en/language.types.callable.php) that takes the `ContextElement`'s extracted data, transforms it into the desired output, and hydrates back the `ContextElement`.
+* The `Loader` is a [`callable`](http://php.net/manual/en/language.types.callable.php) which takes the `ContextElement` as argument and send the transformed data in a persistence layer, a HTTP Post, a file, ...
 
-Each item should be stored in a `BenTools\ETL\Context\ContextElement` object. This object handles:
 
-* The item identifier
-* The original (_extracted_) data
-* The transformed data
+ 
 
 The `Runner` class
 ----------------
 
-The `\BenTools\ETL\Runner\Runner` class is the implementation of the pattern:
+The `\BenTools\ETL\Runner\Runner` class is the implementation of the ETL pattern:
 
-* For each item of the `extractor`
-* It calls the `transformer` to transform it
-* Then it calls the `loader`
+```php
+$run = new Runner();
+$run($iterable, $extractor, $transformer, $loader);
+```
+
+You can use an EventDispatcher to skip items or even stop the whole loop.
+You can create your own Extractors, Transformers and Loaders by implementing `ExtractorInterface`, `TransformerInterface` and `LoaderInterface` or just use _callables_ that respect the same arguments and return values.
 
 
 A simple example
 ---------
-i.e. Transforming objects to arrays and store them in a variable.
+Input: **JSON** - Output: **CSV**
 
 ```php
-$dictators = [];
+use BenTools\ETL\Context\ContextElementInterface;
+use BenTools\ETL\Extractor\KeyValueExtractor;
+use BenTools\ETL\Runner\Runner;
 
-$extractor = function () {
+require_once __DIR__ . '/vendor/autoload.php';
 
-    $trump = new stdClass();
-    $trump->name = 'Donald Trump';
+$jsonInput = '{
+  "dictators": [
+    {
+      "country": "USA",
+      "name": "Donald Trump"
+    },
+    {
+      "country": "Russia",
+      "name": "Vladimir Poutine"
+    }
+  ]
+}';
 
-    $poutine = new stdClass();
-    $poutine->name = 'Vladimir Poutine';
+// Init CSV output
+$csvOutput = new SplFileObject(__DIR__ . '/output/dictators.csv', 'w');
+$csvOutput->fputcsv(['country', 'name']);
 
-    yield 'usa' => $trump;
-    yield 'russia' => $poutine;
-};
+// We'll iterate over $json
+$json = json_decode($jsonInput, true)['dictators'];
 
+// We'll use the default extractor (key => value)
+$extractor = new KeyValueExtractor();
+
+// Data transformer
 $transformer = function (ContextElementInterface $element) {
     $dictator = $element->getExtractedData();
-    $element->setTransformedData((array) $dictator);
+    $element->setTransformedData(array_values($dictator));
 };
 
-$loader = function (ContextElementInterface $element) use (&$dictators) {
-    $id = $element->getIdentifier();
-    $dictators[$id] = $element->getTransformedData();
-};
+// CSV File loader
+$loader = new \BenTools\ETL\Loader\CsvFileLoader($csvOutput);
 
+// Run the ETL
 $run = new Runner();
-$run($extractor(), $transformer, $loader);
-
-var_dump($dictators);
+$run($json, $extractor, $transformer, $loader);
 ```
 
-Outputs: 
-```php
-array(2) {
-  ["usa"]=>
-  array(1) {
-    ["name"]=>
-    string(12) "Donald Trump"
-  }
-  ["russia"]=>
-  array(1) {
-    ["name"]=>
-    string(16) "Vladimir Poutine"
-  }
-}
+File contents: 
+```csv
+country,name
+USA,"Donald Trump"
+Russia,"Vladimir Poutine"
 ```
 
 Installation
@@ -88,8 +94,8 @@ composer require  bentools/etl
 Advanced usage
 --------------
 
-This is not documented yet but if you look further, you'll know how to skip items, and abort an ETL operation.
-You can also use a `Logger` to check what's going on and a framework-agnostic `EventDispatcher` (Symfony bridge provided)  to hook into the ETL process.
+This is not documented yet but if you dive into the code, you'll easily figure out how to skip items, and even abort an ETL operation.
+You can also use a `Logger` to check what's going on and a framework-agnostic `EventDispatcher` (Symfony bridge provided) to hook into the ETL process.
 
 License
 -------

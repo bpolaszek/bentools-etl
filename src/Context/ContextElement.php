@@ -4,7 +4,7 @@ namespace BenTools\ETL\Context;
 
 class ContextElement implements ContextElementInterface {
 
-    private $identifier;
+    private $id;
     private $extractedData;
     private $transformedData;
     private $skip = false;
@@ -14,15 +14,15 @@ class ContextElement implements ContextElementInterface {
     /**
      * @inheritDoc
      */
-    public function setIdentifier($identifier): void {
-        $this->identifier = $identifier;
+    public function setId($id): void {
+        $this->id = $id;
     }
 
     /**
      * @inheritDoc
      */
-    public function getIdentifier() {
-        return $this->identifier;
+    public function getId() {
+        return $this->id;
     }
 
     /**

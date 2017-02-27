@@ -1,8 +1,15 @@
 <?php
 
-namespace BenTools\ETL\Context;
+namespace BenTools\ETL\Extractor;
 
-class PropertyFactory extends KeyValueFactory implements ContextElementFactoryInterface {
+use BenTools\ETL\Context\ContextElement;
+use BenTools\ETL\Context\ContextElementInterface;
+
+/**
+ * Class PropertyExtractor
+ * Sets the identifier based on a property of the item (it can be an array or an object).
+ */
+class PropertyExtractor extends KeyValueExtractor implements ExtractorInterface {
 
     /**
      * @var string
@@ -10,7 +17,7 @@ class PropertyFactory extends KeyValueFactory implements ContextElementFactoryIn
     protected $property;
 
     /**
-     * PropertyFactory constructor.
+     * PropertyExtractor constructor.
      * @param string $property
      * @param string $class
      */
@@ -22,7 +29,7 @@ class PropertyFactory extends KeyValueFactory implements ContextElementFactoryIn
     /**
      * @inheritdoc
      */
-    public function createContext($identifier, $extractedData): ContextElementInterface {
+    public function __invoke($key, $value): ContextElementInterface {
         $class = $this->getClass();
         if (!is_a($class, ContextElementInterface::class, true)) {
             throw new \RuntimeException(sprintf('%s should implement %s.', $class, ContextElementInterface::class));
@@ -30,20 +37,20 @@ class PropertyFactory extends KeyValueFactory implements ContextElementFactoryIn
 
         $element = new ContextElement();
 
-        if (is_object($extractedData)) {
-            if (!property_exists($extractedData, $this->property)) {
+        if (is_object($value)) {
+            if (!property_exists($value, $this->property)) {
                 throw new \RuntimeException(sprintf('This object does not contain a \'%s\' property', $this->property));
             }
-            $element->setIdentifier($extractedData->{$this->property});
+            $element->setId($value->{$this->property});
         }
-        elseif (is_array($extractedData)) {
-            if (!array_key_exists($this->property, $extractedData)) {
+        elseif (is_array($value)) {
+            if (!array_key_exists($this->property, $value)) {
                 throw new \RuntimeException(sprintf('This array does not contain a \'%s\' property', $this->property));
             }
-            $element->setIdentifier($extractedData[$this->property]);
+            $element->setId($value[$this->property]);
         }
 
-        $element->setExtractedData($extractedData);
+        $element->setExtractedData($value);
         return $element;
     }
 
