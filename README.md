@@ -1,7 +1,7 @@
 bentools/etl
 ============
 
-This 7.1+ library provides a very simple implementation of the `Extract / Transform / Load` pattern. 
+This **PHP 7.1+** library provides a very simple implementation of the `Extract / Transform / Load` pattern. 
 
 It is heavily inspired by the [knplabs/etl](https://github.com/docteurklein/php-etl) library, with a more generic approach.
 
