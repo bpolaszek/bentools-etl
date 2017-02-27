@@ -49,7 +49,6 @@ class Runner implements RunnerInterface {
      */
     public function __invoke(iterable $items, callable $extractor, callable $transformer, callable $loader) {
 
-        $this->validateIterator($items);
         $this->start();
 
         foreach ($items AS $key => $value) {
@@ -187,15 +186,5 @@ class Runner implements RunnerInterface {
     private function shouldFlush(): bool {
         return $this->flush;
     }
-
-    /**
-     * @param iterable|\Generator|\Traversable|array $iterator
-     */
-    private function validateIterator($iterator) {
-        if (!is_array($iterator) && !$iterator instanceof \Traversable && !$iterator instanceof \Generator) {
-            throw new \InvalidArgumentException("The iterator should be iterable.");
-        }
-    }
-
 
 }

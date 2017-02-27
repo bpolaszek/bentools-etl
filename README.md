@@ -7,7 +7,7 @@ It is heavily inspired by the [knplabs/etl](https://github.com/docteurklein/php-
 
 Concept:
 
-* You have an [`iterable`](https://wiki.php.net/rfc/iterable) - i.e an `array`, `\Traversable`, `\Iterator`, `IteratorAggregate` or a `\Generator` to loop over.
+* You have an [`iterable`](https://wiki.php.net/rfc/iterable) - i.e an `array`, `\Traversable`, `\Iterator`, `\IteratorAggregate` or a `\Generator` to loop over.
 * The `Extractor` is a [`callable`](http://php.net/manual/en/language.types.callable.php) which takes the key and the value as arguments - its role is to return a `ContextElement` with the extracted data. 
 * The `Transformer` is a [`callable`](http://php.net/manual/en/language.types.callable.php) that takes the `ContextElement`'s extracted data, transforms it into the desired output, and hydrates back the `ContextElement`.
 * The `Loader` is a [`callable`](http://php.net/manual/en/language.types.callable.php) which takes the `ContextElement` as argument and send the transformed data in a persistence layer, a HTTP Post, a file, ...
