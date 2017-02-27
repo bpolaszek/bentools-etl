@@ -57,6 +57,13 @@ class DoctrineORMLoader implements FlushableLoaderInterface {
     /**
      * @inheritDoc
      */
+    public function shouldFlushAfterLoad(): bool {
+        return 0 === ($this->counter % $this->flushEvery);
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function flush(): void {
         foreach ($this->objectManagers AS $objectManager) {
             $objectManager->flush();
@@ -95,8 +102,5 @@ class DoctrineORMLoader implements FlushableLoaderInterface {
 
         $this->counter++;
 
-        if (($this->counter % $this->flushEvery) === 0) {
-            $this->flush();
-        }
     }
 }

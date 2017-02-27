@@ -3,10 +3,11 @@
 namespace BenTools\ETL\Runner;
 
 use BenTools\ETL\Context\ContextElementInterface;
-use BenTools\ETL\Event\ETLEvent;
+use BenTools\ETL\Event\ContextElementEvent;
 use BenTools\ETL\Event\EventDispatcher\EventDispatcherInterface;
 use BenTools\ETL\Event\EventDispatcher\NullEventDispatcher;
 use BenTools\ETL\Event\ETLEvents;
+use BenTools\ETL\Event\ETLEvent;
 use BenTools\ETL\Extractor\ExtractorInterface;
 use BenTools\ETL\Loader\FlushableLoaderInterface;
 use BenTools\ETL\Loader\LoaderInterface;
@@ -29,6 +30,9 @@ class Runner implements RunnerInterface {
      */
     private $eventDispatcher;
 
+    private $start = 0.0;
+    private $end = 0.0;
+
     /**
      * Runner constructor.
      * @param LoggerInterface $logger
@@ -46,6 +50,7 @@ class Runner implements RunnerInterface {
     public function __invoke(iterable $items, callable $extractor, callable $transformer, callable $loader) {
 
         $this->validateIterator($items);
+        $this->start();
 
         foreach ($items AS $key => $value) {
 
@@ -74,15 +79,32 @@ class Runner implements RunnerInterface {
             }
 
             // Load element
-            $this->load($loader, $element);
-
-            //break;
+            $this->load($loader, $element)->flush($loader, false);
 
         }
 
         // Flush remaining data
-        $this->flush($loader);
+        $this->flush($loader, true);
+        $this->end();
+    }
 
+    private function reset() {
+        $this->start = 0.0;
+        $this->end = 0.0;
+        $this->flush = true;
+    }
+
+    private function start() {
+        $this->reset();
+        $this->start = microtime(true);
+        $this->eventDispatcher->trigger(new ETLEvent(ETLEvents::START));
+        $this->logger->info('Starting ETL...');
+    }
+
+    private function end() {
+        $this->end = microtime(true);
+        $this->eventDispatcher->trigger(new ETLEvent(ETLEvents::END));
+        $this->logger->info(sprintf('ETL completed in %ss', round($this->end - $this->start, 3)));
     }
 
     /**
@@ -99,7 +121,7 @@ class Runner implements RunnerInterface {
             'id'   => $element->getId(),
             'data' => $element->getExtractedData(),
         ]);
-        $this->eventDispatcher->trigger(new ETLEvent(ETLEvents::AFTER_EXTRACT, $element));
+        $this->eventDispatcher->trigger(new ContextElementEvent(ETLEvents::AFTER_EXTRACT, $element));
         return $element;
     }
 
@@ -115,28 +137,30 @@ class Runner implements RunnerInterface {
             'id'   => $element->getId(),
             'data' => $element->getExtractedData(),
         ]);
-        $this->eventDispatcher->trigger(new ETLEvent(ETLEvents::AFTER_TRANSFORM, $element));
+        $this->eventDispatcher->trigger(new ContextElementEvent(ETLEvents::AFTER_TRANSFORM, $element));
     }
 
     /**
      * @param callable|LoaderInterface $load
      * @param ContextElementInterface $element
+     * @return $this
      */
-    private function load(callable $load, ContextElementInterface $element): void {
+    private function load(callable $load, ContextElementInterface $element): self {
         $identifier = $element->getId();
         $this->logger->info(sprintf('Loading key %s...', $identifier));
         $load($element);
         $this->logger->debug(sprintf('Key %s loaded.', $identifier), [
             'id'   => $element->getId(),
         ]);
-        $this->eventDispatcher->trigger(new ETLEvent(ETLEvents::AFTER_LOAD, $element));
+        $this->eventDispatcher->trigger(new ContextElementEvent(ETLEvents::AFTER_LOAD, $element));
+        return $this;
     }
 
     /**
      * @param $loader
      */
-    private function flush($loader): void {
-        if ($this->shouldFlush() && $loader instanceof FlushableLoaderInterface) {
+    private function flush($loader, bool $forceFlush = false): void {
+        if ($this->shouldFlush() && ($loader instanceof FlushableLoaderInterface && (true === $forceFlush || $loader->shouldFlushAfterLoad()))) {
             $loader->flush();
         }
         $this->eventDispatcher->trigger(new ETLEvent(ETLEvents::AFTER_FLUSH));

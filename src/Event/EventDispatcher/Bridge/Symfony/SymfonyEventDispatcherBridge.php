@@ -25,8 +25,9 @@ class SymfonyEventDispatcherBridge implements EventDispatcherInterface {
     /**
      * @inheritdoc
      */
-    public function trigger(EventInterface $event) {
-        $this->wrappedDispatcher->dispatch($event->getName(), new SymfonyEvent($event));
+    public function trigger(EventInterface $event): void {
+        $symfonyEvent = new SymfonyEvent($event);
+        $this->wrappedDispatcher->dispatch($event->getName(), $symfonyEvent);
     }
 
     /**

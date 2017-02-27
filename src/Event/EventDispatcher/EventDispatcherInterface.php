@@ -4,6 +4,6 @@ namespace BenTools\ETL\Event\EventDispatcher;
 
 interface EventDispatcherInterface {
 
-    public function trigger(EventInterface $event);
+    public function trigger(EventInterface $event): void;
 
 }

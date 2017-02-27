@@ -51,12 +51,16 @@ class RunnerTest extends TestCase {
 
             private $tmp     = [];
             private $output  = [];
-            private $nbLoad  = 0;
+            private $counter = 0;
             private $nbFlush = 0;
             private $flushEvery;
 
             public function __construct(int $flushEvery) {
                 $this->flushEvery = $flushEvery;
+            }
+
+            public function shouldFlushAfterLoad(): bool {
+                return 0 === ($this->counter % $this->flushEvery);
             }
 
             public function flush(): void {
@@ -65,26 +69,17 @@ class RunnerTest extends TestCase {
                 $this->nbFlush++;
             }
 
-            /**
-             * @return array
-             */
             public function getOutput() {
                 return $this->output;
             }
 
-            /**
-             * @return int
-             */
             public function getNbFlush() {
                 return $this->nbFlush;
             }
 
             public function __invoke(ContextElementInterface $element): void {
                 $this->tmp[$element->getId()] = $element->getTransformedData();
-                $this->nbLoad++;
-                if (($this->nbLoad % $this->flushEvery) === 0) {
-                    $this->flush();
-                }
+                $this->counter++;
             }
         };
         $run         = new Runner();
@@ -120,7 +115,7 @@ class RunnerTest extends TestCase {
 
             private $tmp     = [];
             private $output  = [];
-            private $nbLoad  = 0;
+            private $counter = 0;
             private $nbFlush = 0;
             private $flushEvery;
 
@@ -134,26 +129,21 @@ class RunnerTest extends TestCase {
                 $this->nbFlush++;
             }
 
-            /**
-             * @return array
-             */
+            public function shouldFlushAfterLoad(): bool {
+                return 0 === ($this->counter % $this->flushEvery);
+            }
+
             public function getOutput() {
                 return $this->output;
             }
 
-            /**
-             * @return int
-             */
             public function getNbFlush() {
                 return $this->nbFlush;
             }
 
             public function __invoke(ContextElementInterface $element): void {
                 $this->tmp[$element->getId()] = $element->getTransformedData();
-                $this->nbLoad++;
-                if (($this->nbLoad % $this->flushEvery) === 0) {
-                    $this->flush();
-                }
+                $this->counter++;
             }
         };
         $run         = new Runner();
@@ -188,7 +178,7 @@ class RunnerTest extends TestCase {
 
             private $tmp     = [];
             private $output  = [];
-            private $nbLoad  = 0;
+            private $counter = 0;
             private $nbFlush = 0;
             private $flushEvery;
 
@@ -201,27 +191,21 @@ class RunnerTest extends TestCase {
                 $this->tmp    = [];
                 $this->nbFlush++;
             }
+            public function shouldFlushAfterLoad(): bool {
+                return 0 === ($this->counter % $this->flushEvery);
+            }
 
-            /**
-             * @return array
-             */
             public function getOutput() {
                 return $this->output;
             }
 
-            /**
-             * @return int
-             */
             public function getNbFlush() {
                 return $this->nbFlush;
             }
 
             public function __invoke(ContextElementInterface $element): void {
                 $this->tmp[$element->getId()] = $element->getTransformedData();
-                $this->nbLoad++;
-                if (($this->nbLoad % $this->flushEvery) === 0) {
-                    $this->flush();
-                }
+                $this->counter++;
             }
         };
         $run         = new Runner();
@@ -253,7 +237,7 @@ class RunnerTest extends TestCase {
 
             private $tmp     = [];
             private $output  = [];
-            private $nbLoad  = 0;
+            private $counter = 0;
             private $nbFlush = 0;
             private $flushEvery;
 
@@ -267,26 +251,21 @@ class RunnerTest extends TestCase {
                 $this->nbFlush++;
             }
 
-            /**
-             * @return array
-             */
+            public function shouldFlushAfterLoad(): bool {
+                return 0 === ($this->counter % $this->flushEvery);
+            }
+
             public function getOutput() {
                 return $this->output;
             }
 
-            /**
-             * @return int
-             */
             public function getNbFlush() {
                 return $this->nbFlush;
             }
 
             public function __invoke(ContextElementInterface $element): void {
                 $this->tmp[$element->getId()] = $element->getTransformedData();
-                $this->nbLoad++;
-                if (($this->nbLoad % $this->flushEvery) === 0) {
-                    $this->flush();
-                }
+                $this->counter++;
             }
         };
         $run         = new Runner();

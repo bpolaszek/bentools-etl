@@ -2,12 +2,10 @@
 
 namespace BenTools\ETL\Event\EventDispatcher\Bridge\Symfony;
 
-use BenTools\ETL\Context\ContextElementInterface;
-use BenTools\ETL\Event\ETLEventInterface;
 use BenTools\ETL\Event\EventDispatcher\EventInterface;
 use Symfony\Component\EventDispatcher\Event;
 
-class SymfonyEvent extends Event implements ETLEventInterface {
+class SymfonyEvent extends Event {
 
     /**
      * @var EventInterface
@@ -18,15 +16,8 @@ class SymfonyEvent extends Event implements ETLEventInterface {
      * SymfonyEvent constructor.
      * @param EventInterface $wrappedEvent
      */
-    public function __construct(ETLEventInterface $wrappedEvent) {
+    public function __construct(EventInterface $wrappedEvent) {
         $this->wrappedEvent = $wrappedEvent;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getElement(): ContextElementInterface {
-        return $this->wrappedEvent->getElement();
     }
 
     /**
@@ -48,5 +39,13 @@ class SymfonyEvent extends Event implements ETLEventInterface {
      */
     public function stopPropagation() {
         $this->wrappedEvent->stopPropagation();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function __call($name, $arguments) {
+        $wrappedEvent = $this->wrappedEvent;
+        return $wrappedEvent->$name(...$arguments);
     }
 }

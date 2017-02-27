@@ -7,7 +7,7 @@ class NullEventDispatcher implements EventDispatcherInterface {
     /**
      * @inheritdoc
      */
-    public function trigger(EventInterface $event) {
+    public function trigger(EventInterface $event): void {
         // nope.
     }
 }

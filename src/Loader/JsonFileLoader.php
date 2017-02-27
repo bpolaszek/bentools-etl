@@ -36,6 +36,13 @@ class JsonFileLoader extends ArrayLoader implements FlushableLoaderInterface {
     /**
      * @inheritDoc
      */
+    public function shouldFlushAfterLoad(): bool {
+        return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function flush(): void {
         $this->file->fwrite(json_encode($this->getArray(), $this->jsonOptions, $this->jsonDepth));
     }

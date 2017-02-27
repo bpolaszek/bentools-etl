@@ -5,6 +5,7 @@ namespace BenTools\ETL\Event\EventDispatcher;
 interface EventInterface {
 
     /**
+     * Returns the event name.
      * @return string
      */
     public function getName(): string;

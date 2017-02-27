@@ -2,14 +2,20 @@
 
 namespace BenTools\ETL\Event;
 
+use BenTools\ETL\Context\ContextElementInterface;
 use BenTools\ETL\Event\EventDispatcher\EventInterface;
 
-class ETLEvent implements EventInterface {
+class ContextElementEvent implements EventInterface {
 
     /**
      * @var string
      */
     private $name;
+
+    /**
+     * @var ContextElementInterface
+     */
+    private $element;
 
     /**
      * @var bool
@@ -19,8 +25,9 @@ class ETLEvent implements EventInterface {
     /**
      * ContextElementEvent constructor.
      */
-    public function __construct(string $name) {
+    public function __construct(string $name, ContextElementInterface $element) {
         $this->name = $name;
+        $this->element = $element;
     }
 
     /**
@@ -28,6 +35,13 @@ class ETLEvent implements EventInterface {
      */
     public function getName(): string {
         return $this->name;
+    }
+
+    /**
+     * @return ContextElementInterface
+     */
+    public function getElement(): ContextElementInterface {
+        return $this->element;
     }
 
     /**
@@ -43,5 +57,4 @@ class ETLEvent implements EventInterface {
     public function stopPropagation(): void {
         $this->running = false;
     }
-
 }
