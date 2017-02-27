@@ -18,8 +18,9 @@
     }
   },
   "require-dev": {
-    "symfony/event-dispatcher": "^3.2",
     "phpunit/phpunit": "^6.0",
-    "doctrine/orm": "^2.5"
+    "symfony/event-dispatcher": "^3.2",
+    "doctrine/orm": "^2.5",
+    "guzzlehttp/promises": "^1.3"
   }
 }

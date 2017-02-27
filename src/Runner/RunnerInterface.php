@@ -12,7 +12,6 @@ interface RunnerInterface {
      * @param callable|ExtractorInterface $extractor
      * @param callable|TransformerInterface $transformer
      * @param callable $loader
-     * @return
      */
     public function __invoke(iterable $items, callable $extractor, callable $transformer, callable $loader);
 }
