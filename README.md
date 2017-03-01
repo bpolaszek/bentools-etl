@@ -1,6 +1,3 @@
-bentools/etl
-============
-
 This **PHP 7.1+** library provides a very simple implementation of the `Extract / Transform / Load` pattern. 
 
 It is heavily inspired by the [knplabs/etl](https://github.com/docteurklein/php-etl) library, with a more generic approach.
@@ -8,12 +5,10 @@ It is heavily inspired by the [knplabs/etl](https://github.com/docteurklein/php-
 Concept:
 
 * You have an [`iterable`](https://wiki.php.net/rfc/iterable) - i.e an `array`, `\Traversable`, `\Iterator`, `\IteratorAggregate` or a `\Generator` to loop over.
-* The `Extractor` is a [`callable`](http://php.net/manual/en/language.types.callable.php) which takes the key and the value as arguments - its role is to return a `ContextElement` with the extracted data. 
+* The `Extractor` is a [`callable`](http://php.net/manual/en/language.types.callable.php) which takes as arguments the key and the value of each element of the loop - its role is to return a new `ContextElement` which contains the extracted data. 
 * The `Transformer` is a [`callable`](http://php.net/manual/en/language.types.callable.php) that takes the `ContextElement`'s extracted data, transforms it into the desired output, and hydrates back the `ContextElement`.
 * The `Loader` is a [`callable`](http://php.net/manual/en/language.types.callable.php) which takes the `ContextElement` as argument and send the transformed data in a persistence layer, a HTTP Post, a file, ...
 
-
- 
 
 The `Runner` class
 ----------------
@@ -36,6 +31,7 @@ Input: **JSON** - Output: **CSV**
 ```php
 use BenTools\ETL\Context\ContextElementInterface;
 use BenTools\ETL\Extractor\KeyValueExtractor;
+use BenTools\ETL\Loader\CsvFileLoader;
 use BenTools\ETL\Runner\Runner;
 
 require_once __DIR__ . '/vendor/autoload.php';
@@ -53,10 +49,6 @@ $jsonInput = '{
   ]
 }';
 
-// Init CSV output
-$csvOutput = new SplFileObject(__DIR__ . '/output/dictators.csv', 'w');
-$csvOutput->fputcsv(['country', 'name']);
-
 // We'll iterate over $json
 $json = json_decode($jsonInput, true)['dictators'];
 
@@ -69,8 +61,12 @@ $transformer = function (ContextElementInterface $element) {
     $element->setTransformedData(array_values($dictator));
 };
 
+// Init CSV output
+$csvOutput = new SplFileObject(__DIR__ . '/output/dictators.csv', 'w');
+$csvOutput->fputcsv(['country', 'name']);
+
 // CSV File loader
-$loader = new \BenTools\ETL\Loader\CsvFileLoader($csvOutput);
+$loader = new CsvFileLoader($csvOutput);
 
 // Run the ETL
 $run = new Runner();
@@ -89,6 +85,13 @@ Installation
 
 ```
 composer require  bentools/etl
+```
+
+Tests
+------------
+
+```
+./vendor/bin/phpunit
 ```
 
 Advanced usage
