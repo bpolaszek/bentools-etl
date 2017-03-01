@@ -5,7 +5,8 @@ namespace BenTools\ETL\Loader;
 use BenTools\ETL\Context\ContextElementInterface;
 use Psr\Log\LoggerInterface;
 
-class CsvFileLoader extends FileLoader {
+class CsvFileLoader extends FileLoader
+{
 
     /**
      * @var string
@@ -24,7 +25,8 @@ class CsvFileLoader extends FileLoader {
     /**
      * @inheritDoc
      */
-    public function __construct(\SplFileObject $file, LoggerInterface $logger = null, $delimiter = ',', $enclosure = '"', $escape = '\\') {
+    public function __construct(\SplFileObject $file, LoggerInterface $logger = null, $delimiter = ',', $enclosure = '"', $escape = '\\')
+    {
         parent::__construct($file, $logger);
         $this->delimiter = $delimiter;
         $this->enclosure = $enclosure;
@@ -34,13 +36,17 @@ class CsvFileLoader extends FileLoader {
     /**
      * @inheritDoc
      */
-    public function __invoke(ContextElementInterface $element): void {
+    public function __invoke(ContextElementInterface $element): void
+    {
         $bytes = $this->file->fputcsv($element->getTransformedData(), $this->delimiter, $this->enclosure, $this->escape);
-        $this->logger->debug('Write a field array as a CSV line', [
+        $this->logger->debug(
+            'Write a field array as a CSV line',
+            [
             'id' => $element->getId(),
             'data' => $element->getTransformedData(),
             'filename' => $this->file->getBasename(),
             'bytes' => $bytes
-        ]);
+            ]
+        );
     }
 }

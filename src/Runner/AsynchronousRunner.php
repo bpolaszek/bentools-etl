@@ -9,15 +9,19 @@ use GuzzleHttp\Promise\PromiseInterface;
  * Asynchronous runner
  * Requires guzzlehttp/promises to work. (cf composer.json)
  */
-class AsynchronousRunner extends Runner {
+class AsynchronousRunner extends Runner
+{
 
     /**
      * @inheritDoc
      */
-    public function __invoke(iterable $items, callable $extractor, callable $transformer, callable $loader): PromiseInterface {
-        $promise = new Promise(function () use (&$promise, &$items, $extractor, $transformer, $loader) {
-            $promise->resolve(parent::__invoke($items, $extractor, $transformer, $loader));
-        });
+    public function __invoke(iterable $items, callable $extractor, callable $transformer, callable $loader): PromiseInterface
+    {
+        $promise = new Promise(
+            function () use (&$promise, &$items, $extractor, $transformer, $loader) {
+                $promise->resolve(parent::__invoke($items, $extractor, $transformer, $loader));
+            }
+        );
         return $promise;
     }
 }

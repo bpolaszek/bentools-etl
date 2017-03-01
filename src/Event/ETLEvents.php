@@ -2,7 +2,8 @@
 
 namespace BenTools\ETL\Event;
 
-final class ETLEvents {
+final class ETLEvents
+{
 
     const START           = 'bentools.etl.start';
     const AFTER_EXTRACT   = 'bentools.etl.after_extract';
@@ -10,5 +11,4 @@ final class ETLEvents {
     const AFTER_LOAD      = 'bentools.etl.after_load';
     const AFTER_FLUSH     = 'bentools.etl.after_flush';
     const END             = 'bentools.etl.end';
-
 }

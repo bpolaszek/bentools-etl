@@ -2,7 +2,8 @@
 
 namespace BenTools\ETL\Iterator;
 
-class CsvFileIterator implements \Iterator, \Countable {
+class CsvFileIterator implements \Iterator, \Countable
+{
 
     private $nbLines;
     private $file;
@@ -10,18 +11,21 @@ class CsvFileIterator implements \Iterator, \Countable {
 
     /**
      * CsvFileIterator constructor.
+     *
      * @param $filename
-     * @param string $delimiter
-     * @param string $enclosure
+     * @param string   $delimiter
+     * @param string   $enclosure
      */
-    public function __construct(\SplFileObject $file, $delimiter = ',', $enclosure = '"') {
+    public function __construct(\SplFileObject $file, $delimiter = ',', $enclosure = '"')
+    {
         $this->file = $file;
     }
 
     /**
      * @inheritdoc
      */
-    public function rewind() {
+    public function rewind()
+    {
         $this->cursor = 0;
         $this->file->rewind();
     }
@@ -29,21 +33,24 @@ class CsvFileIterator implements \Iterator, \Countable {
     /**
      * @inheritdoc
      */
-    public function current() {
+    public function current()
+    {
         return $this->file->current();
     }
 
     /**
      * @inheritdoc
      */
-    public function key() {
+    public function key()
+    {
         return $this->file->key();
     }
 
     /**
      * @inheritdoc
      */
-    public function next() {
+    public function next()
+    {
         $this->cursor++;
         $this->file->next();
         if ($this->valid()) {
@@ -54,15 +61,20 @@ class CsvFileIterator implements \Iterator, \Countable {
     /**
      * @inheritdoc
      */
-    public function valid() {
+    public function valid()
+    {
         // Avoid blank lines
         if (true === $this->file->valid()) {
             $current = $this->file->current();
-            return !empty(array_filter($current, function ($cell) {
-                return null !== $cell;
-            }));
-        }
-        else {
+            return !empty(
+                array_filter(
+                    $current,
+                    function ($cell) {
+                        return null !== $cell;
+                    }
+                )
+            );
+        } else {
             return false;
         }
     }
@@ -70,9 +82,9 @@ class CsvFileIterator implements \Iterator, \Countable {
     /**
      * @inheritdoc
      */
-    public function count() {
+    public function count()
+    {
         if (null === $this->nbLines) {
-
             // Store flags and position
             $flags   = $this->file->getFlags();
             $current = $this->file->key();
@@ -101,14 +113,16 @@ class CsvFileIterator implements \Iterator, \Countable {
     /**
      * @inheritdoc
      */
-    public function seek($position) {
+    public function seek($position)
+    {
         $this->file->seek($position);
     }
 
     /**
      * @return int
      */
-    public function getCursor() {
+    public function getCursor()
+    {
         return $this->cursor;
     }
 }

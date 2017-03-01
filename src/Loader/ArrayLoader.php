@@ -4,7 +4,8 @@ namespace BenTools\ETL\Loader;
 
 use BenTools\ETL\Context\ContextElementInterface;
 
-class ArrayLoader implements LoaderInterface {
+class ArrayLoader implements LoaderInterface
+{
 
     /**
      * @var array
@@ -13,23 +14,27 @@ class ArrayLoader implements LoaderInterface {
 
     /**
      * ArrayLoader constructor.
+     *
      * @param array $array
      */
-    public function __construct(array &$array = []) {
+    public function __construct(array &$array = [])
+    {
         $this->array = &$array;
     }
 
     /**
      * @return array
      */
-    public function getArray() {
+    public function getArray()
+    {
         return $this->array;
     }
 
     /**
      * @inheritDoc
      */
-    public function __invoke(ContextElementInterface $element): void {
+    public function __invoke(ContextElementInterface $element): void
+    {
         $this->array[$element->getId()] = $element->getTransformedData();
     }
 }

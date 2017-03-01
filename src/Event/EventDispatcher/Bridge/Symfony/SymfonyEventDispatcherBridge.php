@@ -7,7 +7,8 @@ use BenTools\ETL\Event\EventDispatcher\EventInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface as SymfonyEventDispatcherInterface;
 
-class SymfonyEventDispatcherBridge implements EventDispatcherInterface {
+class SymfonyEventDispatcherBridge implements EventDispatcherInterface
+{
 
     /**
      * @var SymfonyEventDispatcherInterface
@@ -16,16 +17,19 @@ class SymfonyEventDispatcherBridge implements EventDispatcherInterface {
 
     /**
      * SymfonyEventDispatcherBridge constructor.
+     *
      * @param SymfonyEventDispatcherInterface $eventDispatcher
      */
-    public function __construct(SymfonyEventDispatcherInterface $eventDispatcher = null) {
+    public function __construct(SymfonyEventDispatcherInterface $eventDispatcher = null)
+    {
         $this->wrappedDispatcher = $eventDispatcher ?? new EventDispatcher();
     }
 
     /**
      * @inheritdoc
      */
-    public function trigger(EventInterface $event): void {
+    public function trigger(EventInterface $event): void
+    {
         $symfonyEvent = new SymfonyEvent($event);
         $this->wrappedDispatcher->dispatch($event->getName(), $symfonyEvent);
     }
@@ -33,7 +37,8 @@ class SymfonyEventDispatcherBridge implements EventDispatcherInterface {
     /**
      * @return SymfonyEventDispatcherInterface
      */
-    public function getWrappedDispatcher() {
+    public function getWrappedDispatcher()
+    {
         return $this->wrappedDispatcher;
     }
 }

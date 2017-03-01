@@ -2,10 +2,11 @@
 
 namespace BenTools\ETL\Context;
 
-interface ContextElementInterface {
+interface ContextElementInterface
+{
 
     /**
-     * @param int|string the identifier value of current data
+     * @param int|string $id the identifier value of current data
      */
     public function setId($id): void;
 
@@ -41,32 +42,36 @@ interface ContextElementInterface {
 
     /**
      * This method may be called if no other element should be transformed or loaded.
+     *
      * @param bool $flush
      */
     public function stop(bool $flush = true): void;
 
     /**
      * This method may be called to request the loader to flush immediately.
+     *
      * @param bool $flush
      */
     public function flush(): void;
 
     /**
      * Indicates if the ETL should skip this row.
+     *
      * @return boolean
      */
     public function shouldSkip(): bool;
 
     /**
      * Indicates if the ETL should stop and go flushing.
+     *
      * @return boolean
      */
     public function shouldStop(): bool;
 
     /**
      * Indicates if the ETL should flush.
+     *
      * @return boolean
      */
     public function shouldFlush(): bool;
-
 }

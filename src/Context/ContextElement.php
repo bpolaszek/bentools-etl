@@ -2,7 +2,8 @@
 
 namespace BenTools\ETL\Context;
 
-class ContextElement implements ContextElementInterface {
+class ContextElement implements ContextElementInterface
+{
 
     private $id;
     private $extractedData;
@@ -14,56 +15,64 @@ class ContextElement implements ContextElementInterface {
     /**
      * @inheritDoc
      */
-    public function setId($id): void {
+    public function setId($id): void
+    {
         $this->id = $id;
     }
 
     /**
      * @inheritDoc
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
     /**
      * @inheritDoc
      */
-    public function setExtractedData($data): void {
+    public function setExtractedData($data): void
+    {
         $this->extractedData = $data;
     }
 
     /**
      * @inheritDoc
      */
-    public function getExtractedData() {
+    public function getExtractedData()
+    {
         return $this->extractedData;
     }
 
     /**
      * @inheritDoc
      */
-    public function setTransformedData($data): void {
+    public function setTransformedData($data): void
+    {
         $this->transformedData = $data;
     }
 
     /**
      * @inheritDoc
      */
-    public function getTransformedData() {
+    public function getTransformedData()
+    {
         return $this->transformedData;
     }
 
     /**
      * @inheritDoc
      */
-    public function skip(): void {
+    public function skip(): void
+    {
         $this->skip = true;
     }
 
     /**
      * @inheritDoc
      */
-    public function stop(bool $flush = true): void {
+    public function stop(bool $flush = true): void
+    {
         $this->stop = true;
         $this->flush = $flush;
     }
@@ -71,28 +80,32 @@ class ContextElement implements ContextElementInterface {
     /**
      * @inheritDoc
      */
-    public function flush(): void {
+    public function flush(): void
+    {
         $this->flush = true;
     }
 
     /**
      * @inheritDoc
      */
-    public function shouldSkip(): bool {
+    public function shouldSkip(): bool
+    {
         return $this->skip;
     }
 
     /**
      * @inheritDoc
      */
-    public function shouldStop(): bool {
+    public function shouldStop(): bool
+    {
         return $this->stop;
     }
 
     /**
      * @inheritDoc
      */
-    public function shouldFlush(): bool {
+    public function shouldFlush(): bool
+    {
         return $this->flush;
     }
 }

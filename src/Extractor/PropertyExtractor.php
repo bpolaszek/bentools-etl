@@ -9,7 +9,8 @@ use BenTools\ETL\Context\ContextElementInterface;
  * Class PropertyExtractor
  * Sets the identifier based on a property of the item (it can be an array or an object).
  */
-class PropertyExtractor extends KeyValueExtractor implements ExtractorInterface {
+class PropertyExtractor extends KeyValueExtractor implements ExtractorInterface
+{
 
     /**
      * @var string
@@ -18,10 +19,12 @@ class PropertyExtractor extends KeyValueExtractor implements ExtractorInterface 
 
     /**
      * PropertyExtractor constructor.
+     *
      * @param string $property
      * @param string $class
      */
-    public function __construct(string $property, string $class = self::DEFAULT_CLASS) {
+    public function __construct(string $property, string $class = self::DEFAULT_CLASS)
+    {
         parent::__construct($class);
         $this->property = $property;
     }
@@ -29,7 +32,8 @@ class PropertyExtractor extends KeyValueExtractor implements ExtractorInterface 
     /**
      * @inheritdoc
      */
-    public function __invoke($key, $value): ContextElementInterface {
+    public function __invoke($key, $value): ContextElementInterface
+    {
         $class = $this->getClass();
         if (!is_a($class, ContextElementInterface::class, true)) {
             throw new \RuntimeException(sprintf('%s should implement %s.', $class, ContextElementInterface::class));
@@ -42,8 +46,7 @@ class PropertyExtractor extends KeyValueExtractor implements ExtractorInterface 
                 throw new \RuntimeException(sprintf('This object does not contain a \'%s\' property', $this->property));
             }
             $element->setId($value->{$this->property});
-        }
-        elseif (is_array($value)) {
+        } elseif (is_array($value)) {
             if (!array_key_exists($this->property, $value)) {
                 throw new \RuntimeException(sprintf('This array does not contain a \'%s\' property', $this->property));
             }
@@ -53,5 +56,4 @@ class PropertyExtractor extends KeyValueExtractor implements ExtractorInterface 
         $element->setExtractedData($value);
         return $element;
     }
-
 }

@@ -8,7 +8,8 @@ use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
-class FileLoader implements LoaderInterface, LoggerAwareInterface {
+class FileLoader implements LoaderInterface, LoggerAwareInterface
+{
 
     use LoggerAwareTrait;
 
@@ -19,10 +20,12 @@ class FileLoader implements LoaderInterface, LoggerAwareInterface {
 
     /**
      * FileLoader constructor.
-     * @param \SplFileObject $file
+     *
+     * @param \SplFileObject  $file
      * @param LoggerInterface $logger
      */
-    public function __construct(\SplFileObject $file, LoggerInterface $logger = null) {
+    public function __construct(\SplFileObject $file, LoggerInterface $logger = null)
+    {
         $this->file = $file;
         $this->logger = $logger ?? new NullLogger();
     }
@@ -30,14 +33,17 @@ class FileLoader implements LoaderInterface, LoggerAwareInterface {
     /**
      * @inheritDoc
      */
-    public function __invoke(ContextElementInterface $element): void {
+    public function __invoke(ContextElementInterface $element): void
+    {
         $bytes = $this->file->fwrite($element->getTransformedData());
-        $this->logger->debug('Write to file', [
+        $this->logger->debug(
+            'Write to file',
+            [
             'id' => $element->getId(),
             'data' => $element->getTransformedData(),
             'filename' => $this->file->getBasename(),
             'bytes' => $bytes
-        ]);
+            ]
+        );
     }
-
 }

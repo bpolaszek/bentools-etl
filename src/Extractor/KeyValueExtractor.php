@@ -9,7 +9,8 @@ use BenTools\ETL\Context\ContextElementInterface;
  * Class KeyValueExtractor
  * Default extractor: sets the identifier from the key => value iterator (=> the key)
  */
-class KeyValueExtractor implements ExtractorInterface {
+class KeyValueExtractor implements ExtractorInterface
+{
 
     const DEFAULT_CLASS = ContextElement::class;
 
@@ -17,16 +18,19 @@ class KeyValueExtractor implements ExtractorInterface {
 
     /**
      * KeyValueExtractor constructor.
+     *
      * @param string $class
      */
-    public function __construct(string $class = self::DEFAULT_CLASS) {
+    public function __construct(string $class = self::DEFAULT_CLASS)
+    {
         $this->class = $class;
     }
 
     /**
      * @return string
      */
-    public function getClass() {
+    public function getClass()
+    {
         return $this->class;
     }
 
@@ -34,7 +38,8 @@ class KeyValueExtractor implements ExtractorInterface {
      * @param string $class
      * @return $this - Provides Fluent Interface
      */
-    public function setClass($class) {
+    public function setClass($class)
+    {
         $this->class = $class;
         return $this;
     }
@@ -42,11 +47,15 @@ class KeyValueExtractor implements ExtractorInterface {
     /**
      * @inheritDoc
      */
-    public function __invoke($key, $value): ContextElementInterface {
+    public function __invoke($key, $value): ContextElementInterface
+    {
         $class = $this->getClass();
         if (!is_a($class, ContextElementInterface::class, true)) {
             throw new \RuntimeException(sprintf('%s should implement %s.', $class, ContextElementInterface::class));
         }
+        /**
+         * @var ContextElementInterface $element
+         */
         $element = new $class;
         $element->setId($key);
         $element->setExtractedData($value);

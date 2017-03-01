@@ -16,7 +16,8 @@ use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
-class Runner implements RunnerInterface {
+class Runner implements RunnerInterface
+{
 
     use LoggerAwareTrait;
 
@@ -35,11 +36,14 @@ class Runner implements RunnerInterface {
 
     /**
      * Runner constructor.
-     * @param LoggerInterface $logger
+     *
+     * @param LoggerInterface               $logger
      * @param EventDispatcherInterface|null $eventDispatcher
      */
-    public function __construct(LoggerInterface $logger = null,
-                                EventDispatcherInterface $eventDispatcher = null) {
+    public function __construct(
+        LoggerInterface $logger = null,
+        EventDispatcherInterface $eventDispatcher = null
+    ) {
         $this->logger = $logger ?? new NullLogger();
         $this->eventDispatcher = $eventDispatcher ?? new NullEventDispatcher();
     }
@@ -47,12 +51,12 @@ class Runner implements RunnerInterface {
     /**
      * @inheritDoc
      */
-    public function __invoke(iterable $items, callable $extractor, callable $transformer, callable $loader) {
+    public function __invoke(iterable $items, callable $extractor, callable $transformer, callable $loader)
+    {
 
         $this->start();
 
-        foreach ($items AS $key => $value) {
-
+        foreach ($items as $key => $value) {
             // Extract and create element
             $element = $this->extract($extractor, $key, $value);
 
@@ -79,7 +83,6 @@ class Runner implements RunnerInterface {
 
             // Load element
             $this->load($loader, $element)->flush($loader, false);
-
         }
 
         // Flush remaining data
@@ -87,20 +90,23 @@ class Runner implements RunnerInterface {
         $this->end();
     }
 
-    private function reset() {
+    private function reset()
+    {
         $this->start = 0.0;
         $this->end = 0.0;
         $this->flush = true;
     }
 
-    private function start() {
+    private function start()
+    {
         $this->reset();
         $this->start = microtime(true);
         $this->eventDispatcher->trigger(new ETLEvent(ETLEvents::START));
         $this->logger->info('Starting ETL...');
     }
 
-    private function end() {
+    private function end()
+    {
         $this->end = microtime(true);
         $this->eventDispatcher->trigger(new ETLEvent(ETLEvents::END));
         $this->logger->info(sprintf('ETL completed in %ss', round($this->end - $this->start, 3)));
@@ -112,45 +118,59 @@ class Runner implements RunnerInterface {
      * @param $value
      * @return ContextElementInterface
      */
-    private function extract(callable $extract, $key, $value): ContextElementInterface {
+    private function extract(callable $extract, $key, $value): ContextElementInterface
+    {
         $this->logger->info(sprintf('Extracting key %s...', $key));
-        /** @var ContextElementInterface $element */
+        /**
+         * @var ContextElementInterface $element
+         */
         $element = $extract($key, $value);
-        $this->logger->debug(sprintf('Key %s extracted.', $key), [
+        $this->logger->debug(
+            sprintf('Key %s extracted.', $key),
+            [
             'id'   => $element->getId(),
             'data' => $element->getExtractedData(),
-        ]);
+            ]
+        );
         $this->eventDispatcher->trigger(new ContextElementEvent(ETLEvents::AFTER_EXTRACT, $element));
         return $element;
     }
 
     /**
      * @param callable|TransformerInterface $transform
-     * @param ContextElementInterface $element
+     * @param ContextElementInterface       $element
      */
-    private function transform(callable $transform, ContextElementInterface $element): void {
+    private function transform(callable $transform, ContextElementInterface $element): void
+    {
         $identifier = $element->getId();
         $this->logger->info(sprintf('Transforming key %s...', $identifier));
         $transform($element);
-        $this->logger->debug(sprintf('Key %s transformed.', $identifier), [
+        $this->logger->debug(
+            sprintf('Key %s transformed.', $identifier),
+            [
             'id'   => $element->getId(),
             'data' => $element->getExtractedData(),
-        ]);
+            ]
+        );
         $this->eventDispatcher->trigger(new ContextElementEvent(ETLEvents::AFTER_TRANSFORM, $element));
     }
 
     /**
      * @param callable|LoaderInterface $load
-     * @param ContextElementInterface $element
+     * @param ContextElementInterface  $element
      * @return $this
      */
-    private function load(callable $load, ContextElementInterface $element): self {
+    private function load(callable $load, ContextElementInterface $element): self
+    {
         $identifier = $element->getId();
         $this->logger->info(sprintf('Loading key %s...', $identifier));
         $load($element);
-        $this->logger->debug(sprintf('Key %s loaded.', $identifier), [
+        $this->logger->debug(
+            sprintf('Key %s loaded.', $identifier),
+            [
             'id'   => $element->getId(),
-        ]);
+            ]
+        );
         $this->eventDispatcher->trigger(new ContextElementEvent(ETLEvents::AFTER_LOAD, $element));
         return $this;
     }
@@ -158,7 +178,8 @@ class Runner implements RunnerInterface {
     /**
      * @param $loader
      */
-    private function flush($loader, bool $forceFlush = false): void {
+    private function flush($loader, bool $forceFlush = false): void
+    {
         if ($this->shouldFlush() && ($loader instanceof FlushableLoaderInterface && (true === $forceFlush || $loader->shouldFlushAfterLoad()))) {
             $loader->flush();
         }
@@ -168,14 +189,16 @@ class Runner implements RunnerInterface {
     /**
      * @param $key
      */
-    private function skip($key) {
+    private function skip($key)
+    {
         $this->logger->info(sprintf('Skipping key %s...', $key));
     }
 
     /**
      * @param $key
      */
-    private function stop($key, ContextElementInterface $element) {
+    private function stop($key, ContextElementInterface $element)
+    {
         $this->logger->info(sprintf('Stopping on key %s...', $key));
         $this->flush = $element->shouldFlush();
     }
@@ -183,8 +206,8 @@ class Runner implements RunnerInterface {
     /**
      * @return bool
      */
-    private function shouldFlush(): bool {
+    private function shouldFlush(): bool
+    {
         return $this->flush;
     }
-
 }
