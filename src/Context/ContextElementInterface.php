@@ -16,24 +16,14 @@ interface ContextElementInterface
     public function getId();
 
     /**
-     * @param $data
+     * @param mixed $data
      */
-    public function setExtractedData($data): void;
-
-    /**
-     * @return array
-     */
-    public function getExtractedData();
-
-    /**
-     * @param $data
-     */
-    public function setTransformedData($data): void;
+    public function setData($data): void;
 
     /**
      * @return mixed
      */
-    public function getTransformedData();
+    public function getData();
 
     /**
      * This method may be called if this element should not be transformed or loaded.

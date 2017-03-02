@@ -6,10 +6,10 @@ use BenTools\ETL\Context\ContextElement;
 use BenTools\ETL\Context\ContextElementInterface;
 
 /**
- * Class PropertyExtractor
+ * Class ObjectPropertyExtractor
  * Sets the identifier based on a property of the item (it can be an array or an object).
  */
-class PropertyExtractor extends KeyValueExtractor implements ExtractorInterface
+class ObjectPropertyExtractor extends KeyValueExtractor implements ExtractorInterface
 {
 
     /**
@@ -18,7 +18,7 @@ class PropertyExtractor extends KeyValueExtractor implements ExtractorInterface
     protected $property;
 
     /**
-     * PropertyExtractor constructor.
+     * ObjectPropertyExtractor constructor.
      *
      * @param string $property
      * @param string $class
@@ -39,21 +39,19 @@ class PropertyExtractor extends KeyValueExtractor implements ExtractorInterface
             throw new \RuntimeException(sprintf('%s should implement %s.', $class, ContextElementInterface::class));
         }
 
-        $element = new ContextElement();
+        /**
+         * @var ContextElementInterface $element
+         */
+        $element = new $class;
 
         if (is_object($value)) {
             if (!property_exists($value, $this->property)) {
                 throw new \RuntimeException(sprintf('This object does not contain a \'%s\' property', $this->property));
             }
             $element->setId($value->{$this->property});
-        } elseif (is_array($value)) {
-            if (!array_key_exists($this->property, $value)) {
-                throw new \RuntimeException(sprintf('This array does not contain a \'%s\' property', $this->property));
-            }
-            $element->setId($value[$this->property]);
         }
 
-        $element->setExtractedData($value);
+        $element->setData($value);
         return $element;
     }
 }

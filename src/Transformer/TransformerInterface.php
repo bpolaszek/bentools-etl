@@ -8,7 +8,7 @@ interface TransformerInterface
 {
 
     /**
-     * Transforms data and hydrates element (should call $element->setTransformedData())
+     * Transforms data and hydrates element (should call $element->setData())
      *
      * @param ContextElementInterface $element
      */

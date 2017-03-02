@@ -58,7 +58,7 @@ class KeyValueExtractor implements ExtractorInterface
          */
         $element = new $class;
         $element->setId($key);
-        $element->setExtractedData($value);
+        $element->setData($value);
         return $element;
     }
 }

@@ -35,6 +35,6 @@ class ArrayLoader implements LoaderInterface
      */
     public function __invoke(ContextElementInterface $element): void
     {
-        $this->array[$element->getId()] = $element->getTransformedData();
+        $this->array[$element->getId()] = $element->getData();
     }
 }

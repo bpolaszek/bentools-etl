@@ -22,5 +22,10 @@
     "symfony/event-dispatcher": "^3.2",
     "doctrine/orm": "^2.5",
     "guzzlehttp/promises": "^1.3"
+  },
+  "suggest": {
+    "symfony/event-dispatcher": "An event dispatcher to hook into the ETL process.",
+    "guzzlehttp/promises": "Process Asynchronous ETL",
+    "cocur/slugify": "Generates slugs from strings - useful to create array keys."
   }
 }

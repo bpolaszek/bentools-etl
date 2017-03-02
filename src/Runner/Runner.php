@@ -51,7 +51,7 @@ class Runner implements RunnerInterface
     /**
      * @inheritDoc
      */
-    public function __invoke(iterable $items, callable $extractor, callable $transformer, callable $loader)
+    public function __invoke(iterable $items, callable $extractor, callable $transformer = null, callable $loader)
     {
 
         $this->start();
@@ -129,7 +129,7 @@ class Runner implements RunnerInterface
             sprintf('Key %s extracted.', $key),
             [
             'id'   => $element->getId(),
-            'data' => $element->getExtractedData(),
+            'data' => $element->getData(),
             ]
         );
         $this->eventDispatcher->trigger(new ContextElementEvent(ETLEvents::AFTER_EXTRACT, $element));
@@ -140,19 +140,21 @@ class Runner implements RunnerInterface
      * @param callable|TransformerInterface $transform
      * @param ContextElementInterface       $element
      */
-    private function transform(callable $transform, ContextElementInterface $element): void
+    private function transform(callable $transform = null, ContextElementInterface $element): void
     {
-        $identifier = $element->getId();
-        $this->logger->info(sprintf('Transforming key %s...', $identifier));
-        $transform($element);
-        $this->logger->debug(
-            sprintf('Key %s transformed.', $identifier),
-            [
-            'id'   => $element->getId(),
-            'data' => $element->getExtractedData(),
-            ]
-        );
-        $this->eventDispatcher->trigger(new ContextElementEvent(ETLEvents::AFTER_TRANSFORM, $element));
+        if (null !== $transform) {
+            $identifier = $element->getId();
+            $this->logger->info(sprintf('Transforming key %s...', $identifier));
+            $transform($element);
+            $this->logger->debug(
+                sprintf('Key %s transformed.', $identifier),
+                [
+                    'id'   => $element->getId(),
+                    'data' => $element->getData(),
+                ]
+            );
+            $this->eventDispatcher->trigger(new ContextElementEvent(ETLEvents::AFTER_TRANSFORM, $element));
+        }
     }
 
     /**

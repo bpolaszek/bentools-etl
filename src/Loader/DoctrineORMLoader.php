@@ -84,7 +84,7 @@ class DoctrineORMLoader implements FlushableLoaderInterface
      */
     public function __invoke(ContextElementInterface $element): void
     {
-        $entity = $element->getTransformedData();
+        $entity = $element->getData();
 
         if (!is_object($entity)) {
             throw new \InvalidArgumentException("The transformed data should return an entity object.");
@@ -102,7 +102,7 @@ class DoctrineORMLoader implements FlushableLoaderInterface
             [
             'class' => $className,
             'id' => $element->getId(),
-            'data', $element->getTransformedData()
+            'data', $element->getData()
             ]
         );
 

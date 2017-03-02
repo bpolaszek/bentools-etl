@@ -2,27 +2,30 @@
 
 use BenTools\ETL\Context\ContextElementInterface;
 use BenTools\ETL\Extractor\KeyValueExtractor;
+use BenTools\ETL\Loader\ArrayLoader;
 use BenTools\ETL\Loader\FlushableLoaderInterface;
 use PHPUnit\Framework\TestCase;
 
 use BenTools\ETL\Runner\Runner;
 
-class RunnerTest extends TestCase {
+class RunnerTest extends TestCase
+{
 
-    public function testSimpleETL() {
+    public function testSimpleETL()
+    {
         $output      = [];
         $items       = json_decode(file_get_contents(__DIR__ . '/data/vat.json'), true)['rates'];
         $extractor   = new KeyValueExtractor();
         $transformer = function (ContextElementInterface $element) {
-            $data = $element->getExtractedData();
-            $element->setTransformedData(join('|', [
+            $data = $element->getData();
+            $element->setData(implode('|', [
                 $data['country_code'],
                 $data['periods'][0]['effective_from'],
                 $data['periods'][0]['rates']['standard'],
             ]));
         };
         $loader      = function (ContextElementInterface $element) use (&$output) {
-            $output[$element->getId()] = $element->getTransformedData();
+            $output[$element->getId()] = $element->getData();
         };
 
         $run = new Runner();
@@ -35,19 +38,21 @@ class RunnerTest extends TestCase {
     /**
      * @depends testSimpleETL
      */
-    public function testETLWithFlushableLoader($input) {
+    public function testETLWithFlushableLoader($input)
+    {
         $items       = json_decode(file_get_contents(__DIR__ . '/data/vat.json'), true)['rates'];
         $extractor   = new KeyValueExtractor();
         $transformer = function (ContextElementInterface $element) {
-            $data = $element->getExtractedData();
-            $element->setTransformedData(join('|', [
+            $data = $element->getData();
+            $element->setData(implode('|', [
                 $data['country_code'],
                 $data['periods'][0]['effective_from'],
                 $data['periods'][0]['rates']['standard'],
             ]));
         };
         $flushEvery  = 5;
-        $loader      = new class($flushEvery) implements FlushableLoaderInterface {
+        $loader      = new class($flushEvery) implements FlushableLoaderInterface
+        {
 
             private $tmp     = [];
             private $output  = [];
@@ -55,36 +60,41 @@ class RunnerTest extends TestCase {
             private $nbFlush = 0;
             private $flushEvery;
 
-            public function __construct(int $flushEvery) {
+            public function __construct(int $flushEvery)
+            {
                 $this->flushEvery = $flushEvery;
             }
 
-            public function shouldFlushAfterLoad(): bool {
+            public function shouldFlushAfterLoad(): bool
+            {
                 return 0 === ($this->counter % $this->flushEvery);
             }
 
-            public function flush(): void {
+            public function flush(): void
+            {
                 $this->output = array_replace($this->output, $this->tmp);
                 $this->tmp    = [];
                 $this->nbFlush++;
             }
 
-            public function getOutput() {
+            public function getOutput()
+            {
                 return $this->output;
             }
 
-            public function getNbFlush() {
+            public function getNbFlush()
+            {
                 return $this->nbFlush;
             }
 
-            public function __invoke(ContextElementInterface $element): void {
-                $this->tmp[$element->getId()] = $element->getTransformedData();
+            public function __invoke(ContextElementInterface $element): void
+            {
+                $this->tmp[$element->getId()] = $element->getData();
                 $this->counter++;
             }
         };
         $run         = new Runner();
         $run($items, $extractor, $transformer, $loader);
-
 
         $this->assertCount(count($loader->getOutput()), $items);
         $this->assertSame('HU|0000-01-01|27', $loader->getOutput()[2]);
@@ -96,12 +106,13 @@ class RunnerTest extends TestCase {
      * Skip 1 item
      * @depends testSimpleETL
      */
-    public function testSkip($input) {
+    public function testSkip($input)
+    {
         $items       = json_decode(file_get_contents(__DIR__ . '/data/vat.json'), true)['rates'];
         $extractor   = new KeyValueExtractor();
         $transformer = function (ContextElementInterface $element) {
-            $data = $element->getExtractedData();
-            $element->setTransformedData(join('|', [
+            $data = $element->getData();
+            $element->setData(implode('|', [
                 $data['country_code'],
                 $data['periods'][0]['effective_from'],
                 $data['periods'][0]['rates']['standard'],
@@ -111,7 +122,8 @@ class RunnerTest extends TestCase {
             }
         };
         $flushEvery  = 5;
-        $loader      = new class($flushEvery) implements FlushableLoaderInterface {
+        $loader      = new class($flushEvery) implements FlushableLoaderInterface
+        {
 
             private $tmp     = [];
             private $output  = [];
@@ -119,36 +131,41 @@ class RunnerTest extends TestCase {
             private $nbFlush = 0;
             private $flushEvery;
 
-            public function __construct(int $flushEvery) {
+            public function __construct(int $flushEvery)
+            {
                 $this->flushEvery = $flushEvery;
             }
 
-            public function flush(): void {
+            public function flush(): void
+            {
                 $this->output = array_replace($this->output, $this->tmp);
                 $this->tmp    = [];
                 $this->nbFlush++;
             }
 
-            public function shouldFlushAfterLoad(): bool {
+            public function shouldFlushAfterLoad(): bool
+            {
                 return 0 === ($this->counter % $this->flushEvery);
             }
 
-            public function getOutput() {
+            public function getOutput()
+            {
                 return $this->output;
             }
 
-            public function getNbFlush() {
+            public function getNbFlush()
+            {
                 return $this->nbFlush;
             }
 
-            public function __invoke(ContextElementInterface $element): void {
-                $this->tmp[$element->getId()] = $element->getTransformedData();
+            public function __invoke(ContextElementInterface $element): void
+            {
+                $this->tmp[$element->getId()] = $element->getData();
                 $this->counter++;
             }
         };
         $run         = new Runner();
         $run($items, $extractor, $transformer, $loader);
-
 
         $this->assertSame(count($loader->getOutput()), count($items) - 1);
         $this->assertSame('HU|0000-01-01|27', $loader->getOutput()[2]);
@@ -159,12 +176,13 @@ class RunnerTest extends TestCase {
      * Abort and flush
      * @depends testSimpleETL
      */
-    public function testAbortAndFlush($input) {
+    public function testAbortAndFlush($input)
+    {
         $items       = json_decode(file_get_contents(__DIR__ . '/data/vat.json'), true)['rates'];
         $extractor   = new KeyValueExtractor();
         $transformer = function (ContextElementInterface $element) {
-            $data = $element->getExtractedData();
-            $element->setTransformedData(join('|', [
+            $data = $element->getData();
+            $element->setData(implode('|', [
                 $data['country_code'],
                 $data['periods'][0]['effective_from'],
                 $data['periods'][0]['rates']['standard'],
@@ -174,7 +192,8 @@ class RunnerTest extends TestCase {
             }
         };
         $flushEvery  = 5;
-        $loader      = new class($flushEvery) implements FlushableLoaderInterface {
+        $loader      = new class($flushEvery) implements FlushableLoaderInterface
+        {
 
             private $tmp     = [];
             private $output  = [];
@@ -182,29 +201,36 @@ class RunnerTest extends TestCase {
             private $nbFlush = 0;
             private $flushEvery;
 
-            public function __construct(int $flushEvery) {
+            public function __construct(int $flushEvery)
+            {
                 $this->flushEvery = $flushEvery;
             }
 
-            public function flush(): void {
+            public function flush(): void
+            {
                 $this->output = array_replace($this->output, $this->tmp);
                 $this->tmp    = [];
                 $this->nbFlush++;
             }
-            public function shouldFlushAfterLoad(): bool {
+
+            public function shouldFlushAfterLoad(): bool
+            {
                 return 0 === ($this->counter % $this->flushEvery);
             }
 
-            public function getOutput() {
+            public function getOutput()
+            {
                 return $this->output;
             }
 
-            public function getNbFlush() {
+            public function getNbFlush()
+            {
                 return $this->nbFlush;
             }
 
-            public function __invoke(ContextElementInterface $element): void {
-                $this->tmp[$element->getId()] = $element->getTransformedData();
+            public function __invoke(ContextElementInterface $element): void
+            {
+                $this->tmp[$element->getId()] = $element->getData();
                 $this->counter++;
             }
         };
@@ -218,12 +244,13 @@ class RunnerTest extends TestCase {
      * Abort and flush
      * @depends testSimpleETL
      */
-    public function testAbortAndDoNotFlush($input) {
+    public function testAbortAndDoNotFlush($input)
+    {
         $items       = json_decode(file_get_contents(__DIR__ . '/data/vat.json'), true)['rates'];
         $extractor   = new KeyValueExtractor();
         $transformer = function (ContextElementInterface $element) {
-            $data = $element->getExtractedData();
-            $element->setTransformedData(join('|', [
+            $data = $element->getData();
+            $element->setData(implode('|', [
                 $data['country_code'],
                 $data['periods'][0]['effective_from'],
                 $data['periods'][0]['rates']['standard'],
@@ -233,7 +260,8 @@ class RunnerTest extends TestCase {
             }
         };
         $flushEvery  = 5;
-        $loader      = new class($flushEvery) implements FlushableLoaderInterface {
+        $loader      = new class($flushEvery) implements FlushableLoaderInterface
+        {
 
             private $tmp     = [];
             private $output  = [];
@@ -241,30 +269,36 @@ class RunnerTest extends TestCase {
             private $nbFlush = 0;
             private $flushEvery;
 
-            public function __construct(int $flushEvery) {
+            public function __construct(int $flushEvery)
+            {
                 $this->flushEvery = $flushEvery;
             }
 
-            public function flush(): void {
+            public function flush(): void
+            {
                 $this->output = array_replace($this->output, $this->tmp);
                 $this->tmp    = [];
                 $this->nbFlush++;
             }
 
-            public function shouldFlushAfterLoad(): bool {
+            public function shouldFlushAfterLoad(): bool
+            {
                 return 0 === ($this->counter % $this->flushEvery);
             }
 
-            public function getOutput() {
+            public function getOutput()
+            {
                 return $this->output;
             }
 
-            public function getNbFlush() {
+            public function getNbFlush()
+            {
                 return $this->nbFlush;
             }
 
-            public function __invoke(ContextElementInterface $element): void {
-                $this->tmp[$element->getId()] = $element->getTransformedData();
+            public function __invoke(ContextElementInterface $element): void
+            {
+                $this->tmp[$element->getId()] = $element->getData();
                 $this->counter++;
             }
         };
@@ -272,6 +306,32 @@ class RunnerTest extends TestCase {
         $run($items, $extractor, $transformer, $loader);
 
         $this->assertCount(5, $loader->getOutput());
+    }
+
+    public function testTransformerCanBeOmitted()
+    {
+        $items     = json_decode(file_get_contents(__DIR__ . '/data/vat.json'), true)['rates'];
+        $extractor = new KeyValueExtractor();
+        $loader    = new ArrayLoader();
+        $run       = new Runner();
+        $run($items, $extractor, null, $loader);
+        $result = $loader->getArray();
+        $this->assertCount(count($result), $items);
+        $this->assertArrayHasKey(0, $result);
+        $this->assertSame([
+            'name'         => 'Germany',
+            'code'         => 'DE',
+            'country_code' => 'DE',
+            'periods'      => [
+                [
+                    'effective_from' => '0000-01-01',
+                    'rates'          => [
+                        'reduced'  => 7.0,
+                        'standard' => 19.0,
+                    ]
+                ]
+            ]
+        ], $result[0]);
     }
 
 }

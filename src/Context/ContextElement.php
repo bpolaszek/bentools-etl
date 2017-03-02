@@ -6,8 +6,7 @@ class ContextElement implements ContextElementInterface
 {
 
     private $id;
-    private $extractedData;
-    private $transformedData;
+    private $data;
     private $skip = false;
     private $stop = false;
     private $flush = false;
@@ -31,33 +30,17 @@ class ContextElement implements ContextElementInterface
     /**
      * @inheritDoc
      */
-    public function setExtractedData($data): void
+    public function setData($data): void
     {
-        $this->extractedData = $data;
+        $this->data = $data;
     }
 
     /**
      * @inheritDoc
      */
-    public function getExtractedData()
+    public function getData()
     {
-        return $this->extractedData;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function setTransformedData($data): void
-    {
-        $this->transformedData = $data;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getTransformedData()
-    {
-        return $this->transformedData;
+        return $this->data;
     }
 
     /**

@@ -38,12 +38,12 @@ class CsvFileLoader extends FileLoader
      */
     public function __invoke(ContextElementInterface $element): void
     {
-        $bytes = $this->file->fputcsv($element->getTransformedData(), $this->delimiter, $this->enclosure, $this->escape);
+        $bytes = $this->file->fputcsv($element->getData(), $this->delimiter, $this->enclosure, $this->escape);
         $this->logger->debug(
             'Write a field array as a CSV line',
             [
             'id' => $element->getId(),
-            'data' => $element->getTransformedData(),
+            'data' => $element->getData(),
             'filename' => $this->file->getBasename(),
             'bytes' => $bytes
             ]

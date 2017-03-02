@@ -14,5 +14,5 @@ interface RunnerInterface
      * @param callable|TransformerInterface          $transformer
      * @param callable                               $loader
      */
-    public function __invoke(iterable $items, callable $extractor, callable $transformer, callable $loader);
+    public function __invoke(iterable $items, callable $extractor, callable $transformer = null, callable $loader);
 }

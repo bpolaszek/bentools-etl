@@ -57,8 +57,8 @@ $extractor = new KeyValueExtractor();
 
 // Data transformer
 $transformer = function (ContextElementInterface $element) {
-    $dictator = $element->getExtractedData();
-    $element->setTransformedData(array_values($dictator));
+    $dictator = $element->getData();
+    $element->setData(array_values($dictator));
 };
 
 // Init CSV output
@@ -93,6 +93,11 @@ Tests
 ```
 ./vendor/bin/phpunit
 ```
+
+Recipes
+-------
+[Advanced CSV to JSON conversion](doc/Recipes/AdvancedCSVToJSON.md)
+
 
 Advanced usage
 --------------

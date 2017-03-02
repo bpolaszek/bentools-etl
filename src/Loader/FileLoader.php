@@ -35,12 +35,12 @@ class FileLoader implements LoaderInterface, LoggerAwareInterface
      */
     public function __invoke(ContextElementInterface $element): void
     {
-        $bytes = $this->file->fwrite($element->getTransformedData());
+        $bytes = $this->file->fwrite($element->getData());
         $this->logger->debug(
             'Write to file',
             [
             'id' => $element->getId(),
-            'data' => $element->getTransformedData(),
+            'data' => $element->getData(),
             'filename' => $this->file->getBasename(),
             'bytes' => $bytes
             ]
