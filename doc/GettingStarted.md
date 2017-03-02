@@ -6,7 +6,7 @@ Input: **JSON** - Output: **CSV**
 use BenTools\ETL\Context\ContextElementInterface;
 use BenTools\ETL\Extractor\KeyValueExtractor;
 use BenTools\ETL\Loader\CsvFileLoader;
-use BenTools\ETL\Runner\Runner;
+use BenTools\ETL\Runner\ETLRunner;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
@@ -43,7 +43,7 @@ $csvOutput->fputcsv(['country', 'name']);
 $loader = new CsvFileLoader($csvOutput);
 
 // Run the ETL
-$run = new Runner();
+$run = new ETLRunner();
 $run($json, $extractor, $transformer, $loader);
 ```
 

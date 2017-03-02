@@ -9,7 +9,7 @@ use GuzzleHttp\Promise\PromiseInterface;
  * Asynchronous runner
  * Requires guzzlehttp/promises to work. (cf composer.json)
  */
-class AsynchronousRunner extends Runner
+class AsynchronousRunner extends ETLRunner
 {
 
     /**

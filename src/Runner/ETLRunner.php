@@ -16,7 +16,7 @@ use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
-class Runner implements RunnerInterface
+class ETLRunner implements ETLRunnerInterface
 {
 
     use LoggerAwareTrait;
@@ -35,7 +35,7 @@ class Runner implements RunnerInterface
     private $end = 0.0;
 
     /**
-     * Runner constructor.
+     * ETLRunner constructor.
      *
      * @param LoggerInterface               $logger
      * @param EventDispatcherInterface|null $eventDispatcher
