@@ -37,5 +37,4 @@ class DebugLoader extends ArrayLoader implements FlushableLoaderInterface
         }
         $debugFn($this->array);
     }
-
 }
