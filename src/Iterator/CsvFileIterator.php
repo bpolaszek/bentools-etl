@@ -2,6 +2,8 @@
 
 namespace BenTools\ETL\Iterator;
 
+use SplFileObject;
+
 class CsvFileIterator implements \Iterator, \Countable
 {
 
@@ -16,9 +18,11 @@ class CsvFileIterator implements \Iterator, \Countable
      * @param string   $delimiter
      * @param string   $enclosure
      */
-    public function __construct(\SplFileObject $file, $delimiter = ',', $enclosure = '"')
+    public function __construct(SplFileObject $file, $delimiter = ',', $enclosure = '"', $escapeString = '\\')
     {
         $this->file = $file;
+        $this->file->setCsvControl($delimiter, $enclosure, $escapeString);
+        $this->file->setFlags(SplFileObject::READ_CSV);
     }
 
     /**
@@ -66,6 +70,9 @@ class CsvFileIterator implements \Iterator, \Countable
         // Avoid blank lines
         if (true === $this->file->valid()) {
             $current = $this->file->current();
+            if (!is_array($current)) {
+                throw new \RuntimeException("The current iteration is a string, are you sure you use the correct delimiter?");
+            }
             return !empty(
                 array_filter(
                     $current,
