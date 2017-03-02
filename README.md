@@ -94,16 +94,17 @@ Tests
 ./vendor/bin/phpunit
 ```
 
-Recipes
--------
-[Advanced CSV to JSON conversion](doc/Recipes/AdvancedCSVToJSON.md)
-
 
 Advanced usage
 --------------
 
-This is not documented yet but if you dive into the code, you'll easily figure out how to skip items, and even abort an ETL operation.
-You can also use a `Logger` to check what's going on and a framework-agnostic `EventDispatcher` (Symfony bridge provided) to hook into the ETL process.
+Despite its simple implementation, you can do many things with this library.
+You can use a `Logger` to check what's going on and a framework-agnostic `EventDispatcher` (Symfony bridge provided) to hook into the ETL process.
+Have a look to our [Recipes](#recipes)
+
+Recipes
+-------
+[Advanced CSV to JSON conversion](doc/Recipes/AdvancedCSVToJSON.md)
 
 License
 -------
