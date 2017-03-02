@@ -71,7 +71,7 @@ use BenTools\ETL\Event\EventDispatcher\Bridge\Symfony\SymfonyEventDispatcherBrid
 use BenTools\ETL\Extractor\ArrayPropertyExtractor;
 use BenTools\ETL\Iterator\CsvFileIterator;
 use BenTools\ETL\Loader\JsonFileLoader;
-use BenTools\ETL\Runner\Runner;
+use BenTools\ETL\Runner\ETLRunner;
 use Cocur\Slugify\Slugify;
 
 require_once __DIR__ . '/vendor/autoload.php';
@@ -130,7 +130,7 @@ $eventDispatcher->getWrappedDispatcher()->addListener(ETLEvents::AFTER_EXTRACT, 
     }
 });
 
-$run = new Runner(null, $eventDispatcher);
+$run = new ETLRunner(null, $eventDispatcher);
 $run($csvInput, $extractor, $transformer, $loader);
 
 

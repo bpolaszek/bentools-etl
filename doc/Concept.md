@@ -29,14 +29,14 @@ Because of the very simplicity of each task, feel free to use simple _callables_
 You then need an [`iterable`](https://wiki.php.net/rfc/iterable) - i.e an `array`, `\Traversable`, `\Iterator`, `\IteratorAggregate` or a `\Generator` to loop over.
 
 
-The `Runner` class
+The `ETLRunner` class
 ----------------
 
-The `BenTools\ETL\Runner\Runner` class is the implementation of the ETL pattern:
+The `BenTools\ETL\Runner\ETLRunner` class is the implementation of the ETL pattern:
 
 ```php
-use BenTools\ETL\Runner\Runner;
-$run = new Runner();
+use BenTools\ETL\Runner\ETLRunner;
+$run = new ETLRunner();
 $run($iterable, $extractor, $transformer, $loader);
 ```
 

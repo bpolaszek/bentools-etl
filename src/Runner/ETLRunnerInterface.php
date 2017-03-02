@@ -5,7 +5,7 @@ namespace BenTools\ETL\Runner;
 use BenTools\ETL\Extractor\ExtractorInterface;
 use BenTools\ETL\Transformer\TransformerInterface;
 
-interface RunnerInterface
+interface ETLRunnerInterface
 {
 
     /**

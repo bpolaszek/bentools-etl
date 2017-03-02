@@ -6,7 +6,7 @@ use BenTools\ETL\Loader\ArrayLoader;
 use BenTools\ETL\Loader\FlushableLoaderInterface;
 use PHPUnit\Framework\TestCase;
 
-use BenTools\ETL\Runner\Runner;
+use BenTools\ETL\Runner\ETLRunner;
 
 class RunnerTest extends TestCase
 {
@@ -28,7 +28,7 @@ class RunnerTest extends TestCase
             $output[$element->getId()] = $element->getData();
         };
 
-        $run = new Runner();
+        $run = new ETLRunner();
         $run($items, $extractor, $transformer, $loader);
         $this->assertCount(count($output), $items);
         $this->assertSame('HU|0000-01-01|27', $output[2]);
@@ -93,7 +93,7 @@ class RunnerTest extends TestCase
                 $this->counter++;
             }
         };
-        $run         = new Runner();
+        $run         = new ETLRunner();
         $run($items, $extractor, $transformer, $loader);
 
         $this->assertCount(count($loader->getOutput()), $items);
@@ -164,7 +164,7 @@ class RunnerTest extends TestCase
                 $this->counter++;
             }
         };
-        $run         = new Runner();
+        $run         = new ETLRunner();
         $run($items, $extractor, $transformer, $loader);
 
         $this->assertSame(count($loader->getOutput()), count($items) - 1);
@@ -234,7 +234,7 @@ class RunnerTest extends TestCase
                 $this->counter++;
             }
         };
-        $run         = new Runner();
+        $run         = new ETLRunner();
         $run($items, $extractor, $transformer, $loader);
 
         $this->assertCount(6, $loader->getOutput());
@@ -302,7 +302,7 @@ class RunnerTest extends TestCase
                 $this->counter++;
             }
         };
-        $run         = new Runner();
+        $run         = new ETLRunner();
         $run($items, $extractor, $transformer, $loader);
 
         $this->assertCount(5, $loader->getOutput());
@@ -313,7 +313,7 @@ class RunnerTest extends TestCase
         $items     = json_decode(file_get_contents(__DIR__ . '/data/vat.json'), true)['rates'];
         $extractor = new KeyValueExtractor();
         $loader    = new ArrayLoader();
-        $run       = new Runner();
+        $run       = new ETLRunner();
         $run($items, $extractor, null, $loader);
         $result = $loader->getArray();
         $this->assertCount(count($result), $items);

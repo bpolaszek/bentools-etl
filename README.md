@@ -9,7 +9,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 use BenTools\ETL\Extractor\KeyValueExtractor;
 use BenTools\ETL\Loader\DebugLoader;
-use BenTools\ETL\Runner\Runner;
+use BenTools\ETL\Runner\ETLRunner;
 use BenTools\ETL\Transformer\CallbackTransformer;
 
 $items     = [
@@ -19,7 +19,7 @@ $items     = [
 $extract   = new KeyValueExtractor();
 $transform = new CallbackTransformer('strtolower');
 $load      = new DebugLoader();
-$run       = new Runner();
+$run       = new ETLRunner();
 $run($items, $extract, $transform, $load);
 ```
 
