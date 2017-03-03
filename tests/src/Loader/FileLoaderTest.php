@@ -4,9 +4,9 @@ namespace BenTools\ETL\Tests\Loader;
 
 use BenTools\ETL\Extractor\IncrementorExtractor;
 use BenTools\ETL\Runner\ETLRunner;
-use PHPUnit\Framework\TestCase;
-
 use BenTools\ETL\Loader\FileLoader;
+use PHPUnit\Framework\TestCase;
+use SplTempFileObject;
 
 class FileLoaderTest extends TestCase
 {
@@ -17,7 +17,7 @@ class FileLoaderTest extends TestCase
             'bar' => 'baz'
         ];
         $extractor = new IncrementorExtractor();
-        $file      = new \SplTempFileObject();
+        $file      = new SplTempFileObject();
         $loader    = new FileLoader($file);
         $run       = new ETLRunner();
         $run($items, $extractor, null, $loader);

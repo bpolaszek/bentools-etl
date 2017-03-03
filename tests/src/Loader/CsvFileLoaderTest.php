@@ -3,7 +3,7 @@
 namespace BenTools\ETL\Tests\Loader;
 
 use BenTools\ETL\Context\ContextElementInterface;
-use BenTools\ETL\Extractor\KeyValueExtractor;
+use BenTools\ETL\Extractor\IncrementorExtractor;
 use BenTools\ETL\Iterator\JsonIterator;
 use BenTools\ETL\Runner\ETLRunner;
 use BenTools\ETL\Loader\CsvFileLoader;
@@ -18,7 +18,7 @@ class CsvFileLoaderTest extends TestCase
     {
         $keys        = ['country', 'name'];
         $items       = new JsonIterator(file_get_contents(TestSuite::getDataFile('dictators.json')));
-        $extractor   = new KeyValueExtractor();
+        $extractor   = new IncrementorExtractor();
         $transformer = function (ContextElementInterface $element) {
             $data = array_values($element->getData());
             $element->setData($data);

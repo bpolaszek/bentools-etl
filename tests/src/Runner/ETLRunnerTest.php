@@ -3,7 +3,7 @@
 namespace BenTools\ETL\Tests\Runner;
 
 use BenTools\ETL\Context\ContextElementInterface;
-use BenTools\ETL\Extractor\KeyValueExtractor;
+use BenTools\ETL\Extractor\IncrementorExtractor;
 use BenTools\ETL\Loader\ArrayLoader;
 use BenTools\ETL\Loader\FlushableLoaderInterface;
 use BenTools\ETL\Tests\TestSuite;
@@ -18,7 +18,7 @@ class ETLRunnerTest extends TestCase
     {
         $output      = [];
         $items       = json_decode(file_get_contents(TestSuite::getDataFile('vat.json')), true)['rates'];
-        $extractor   = new KeyValueExtractor();
+        $extractor   = new IncrementorExtractor();
         $transformer = function (ContextElementInterface $element) {
             $data = $element->getData();
             $element->setData(implode('|', [
@@ -44,7 +44,7 @@ class ETLRunnerTest extends TestCase
     public function testETLWithFlushableLoader($input)
     {
         $items       = json_decode(file_get_contents(TestSuite::getDataFile('vat.json')), true)['rates'];
-        $extractor   = new KeyValueExtractor();
+        $extractor   = new IncrementorExtractor();
         $transformer = function (ContextElementInterface $element) {
             $data = $element->getData();
             $element->setData(implode('|', [
@@ -112,7 +112,7 @@ class ETLRunnerTest extends TestCase
     public function testSkip($input)
     {
         $items       = json_decode(file_get_contents(TestSuite::getDataFile('vat.json')), true)['rates'];
-        $extractor   = new KeyValueExtractor();
+        $extractor   = new IncrementorExtractor();
         $transformer = function (ContextElementInterface $element) {
             $data = $element->getData();
             $element->setData(implode('|', [
@@ -182,7 +182,7 @@ class ETLRunnerTest extends TestCase
     public function testAbortAndFlush($input)
     {
         $items       = json_decode(file_get_contents(TestSuite::getDataFile('vat.json')), true)['rates'];
-        $extractor   = new KeyValueExtractor();
+        $extractor   = new IncrementorExtractor();
         $transformer = function (ContextElementInterface $element) {
             $data = $element->getData();
             $element->setData(implode('|', [
@@ -250,7 +250,7 @@ class ETLRunnerTest extends TestCase
     public function testAbortAndDoNotFlush($input)
     {
         $items       = json_decode(file_get_contents(TestSuite::getDataFile('vat.json')), true)['rates'];
-        $extractor   = new KeyValueExtractor();
+        $extractor   = new IncrementorExtractor();
         $transformer = function (ContextElementInterface $element) {
             $data = $element->getData();
             $element->setData(implode('|', [
@@ -314,7 +314,7 @@ class ETLRunnerTest extends TestCase
     public function testTransformerCanBeOmitted()
     {
         $items     = json_decode(file_get_contents(TestSuite::getDataFile('vat.json')), true)['rates'];
-        $extractor = new KeyValueExtractor();
+        $extractor = new IncrementorExtractor();
         $loader    = new ArrayLoader();
         $run       = new ETLRunner();
         $run($items, $extractor, null, $loader);

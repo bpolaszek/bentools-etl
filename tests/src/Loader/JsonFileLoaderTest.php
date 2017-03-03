@@ -6,7 +6,7 @@ use BenTools\ETL\Context\ContextElementInterface;
 use BenTools\ETL\Event\ContextElementEvent;
 use BenTools\ETL\Event\ETLEvents;
 use BenTools\ETL\Event\EventDispatcher\ETLEventDispatcher;
-use BenTools\ETL\Extractor\KeyValueExtractor;
+use BenTools\ETL\Extractor\IncrementorExtractor;
 use BenTools\ETL\Iterator\CsvFileIterator;
 use BenTools\ETL\Loader\JsonFileLoader;
 use BenTools\ETL\Runner\ETLRunner;
@@ -31,7 +31,7 @@ class JsonFileLoaderTest extends TestCase
             }
         });
         $items       = new CsvFileIterator(new SplFileObject(TestSuite::getDataFile('dictators.csv')));
-        $extractor   = new KeyValueExtractor();
+        $extractor   = new IncrementorExtractor();
         $transformer = function (ContextElementInterface $element) use (&$keys) {
             $data = array_combine($keys, $element->getData());
             $element->setData($data);

@@ -7,7 +7,7 @@ Overview
 ```php
 require_once __DIR__ . '/vendor/autoload.php';
 
-use BenTools\ETL\Extractor\KeyValueExtractor;
+use BenTools\ETL\Extractor\IncrementorExtractor;
 use BenTools\ETL\Loader\DebugLoader;
 use BenTools\ETL\Runner\ETLRunner;
 use BenTools\ETL\Transformer\CallbackTransformer;
@@ -16,7 +16,7 @@ $items     = [
     'France',
     'Germany'
 ];
-$extract   = new KeyValueExtractor();
+$extract   = new IncrementorExtractor();
 $transform = new CallbackTransformer('strtolower');
 $load      = new DebugLoader();
 $run       = new ETLRunner();
