@@ -27,5 +27,4 @@ class CsvFileIteratorTest extends TestCase
             ],
         ], array_values(iterator_to_array($iterator)));
     }
-
 }

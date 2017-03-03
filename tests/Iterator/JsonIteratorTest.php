@@ -25,5 +25,4 @@ class JsonIteratorTest extends TestCase
                 ],
         ], iterator_to_array($iterator));
     }
-
 }

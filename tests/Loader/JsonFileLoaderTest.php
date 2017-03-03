@@ -47,5 +47,4 @@ class JsonFileLoaderTest extends TestCase
         $generated = implode(null, iterator_to_array($output));
         $this->assertSame($compared, $generated);
     }
-
 }

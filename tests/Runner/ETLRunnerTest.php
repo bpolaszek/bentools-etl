@@ -1,6 +1,7 @@
 <?php
 
 namespace BenTools\ETL\Tests\Runner;
+
 use BenTools\ETL\Context\ContextElementInterface;
 use BenTools\ETL\Extractor\KeyValueExtractor;
 use BenTools\ETL\Loader\ArrayLoader;
@@ -334,5 +335,4 @@ class ETLRunnerTest extends TestCase
             ]
         ], $result[0]);
     }
-
 }

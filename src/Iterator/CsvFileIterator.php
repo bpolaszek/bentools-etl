@@ -70,6 +70,4 @@ class CsvFileIterator extends FilterIterator implements \Countable
 
         return $this->nbLines;
     }
-
-
 }

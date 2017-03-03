@@ -25,5 +25,4 @@ class ObjectPropertyExtractorTest extends TestCase
             'dolor' => 'sit amet',
         ], $element->getData());
     }
-
 }
