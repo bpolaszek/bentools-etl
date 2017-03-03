@@ -3,9 +3,9 @@
 namespace BenTools\ETL\Tests\Loader;
 
 use BenTools\ETL\Context\ContextElementInterface;
+use BenTools\ETL\Event\ContextElementEvent;
 use BenTools\ETL\Event\ETLEvents;
-use BenTools\ETL\Event\EventDispatcher\Bridge\Symfony\SymfonyEvent;
-use BenTools\ETL\Event\EventDispatcher\Bridge\Symfony\SymfonyEventDispatcherBridge as SymfonyBridge;
+use BenTools\ETL\Event\EventDispatcher\ETLEventDispatcher;
 use BenTools\ETL\Extractor\KeyValueExtractor;
 use BenTools\ETL\Iterator\CsvFileIterator;
 use BenTools\ETL\Loader\JsonFileLoader;
@@ -22,10 +22,10 @@ class JsonFileLoaderTest extends TestCase
     {
 
         $keys            = [];
-        $eventDispatcher = new SymfonyBridge();
-        $eventDispatcher->getWrappedDispatcher()->addListener(ETLEvents::AFTER_EXTRACT, function (SymfonyEvent $event) use (&$keys) {
+        $eventDispatcher = new ETLEventDispatcher();
+        $eventDispatcher->addListener(ETLEvents::AFTER_EXTRACT, function (ContextElementEvent $event) use (&$keys) {
             if (empty($keys)) {
-                $contextElement = $event->getWrappedEvent()->getElement();
+                $contextElement = $event->getElement();
                 $keys           = array_values($contextElement->getData());
                 $contextElement->skip();
             }

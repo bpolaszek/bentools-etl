@@ -2,6 +2,7 @@
 
 namespace BenTools\ETL\Event\EventDispatcher\Bridge\Symfony;
 
+use BenTools\ETL\Event\EventDispatcher\Bridge\WrappedDispatcherTrait;
 use BenTools\ETL\Event\EventDispatcher\EventDispatcherInterface;
 use BenTools\ETL\Event\EventDispatcher\EventInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -10,10 +11,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface as SymfonyEventDi
 class SymfonyEventDispatcherBridge implements EventDispatcherInterface
 {
 
-    /**
-     * @var SymfonyEventDispatcherInterface
-     */
-    private $wrappedDispatcher;
+    use WrappedDispatcherTrait;
 
     /**
      * SymfonyEventDispatcherBridge constructor.
@@ -34,11 +32,4 @@ class SymfonyEventDispatcherBridge implements EventDispatcherInterface
         $this->wrappedDispatcher->dispatch($event->getName(), $symfonyEvent);
     }
 
-    /**
-     * @return SymfonyEventDispatcherInterface
-     */
-    public function getWrappedDispatcher()
-    {
-        return $this->wrappedDispatcher;
-    }
 }
