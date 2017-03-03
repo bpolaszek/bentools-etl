@@ -2,15 +2,16 @@
 
 namespace BenTools\ETL\Tests\Iterator;
 
-use PHPUnit\Framework\TestCase;
 use BenTools\ETL\Iterator\CsvFileIterator;
+use BenTools\ETL\Tests\TestSuite;
+use PHPUnit\Framework\TestCase;
 
 class CsvFileIteratorTest extends TestCase
 {
 
     public function testIterator()
     {
-        $file     = new \SplFileObject(__DIR__ . '/../data/dictators.csv');
+        $file     = new \SplFileObject(TestSuite::getDataFile('dictators.csv'));
         $iterator = new CsvFileIterator($file);
         $this->assertEquals([
             [

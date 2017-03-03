@@ -10,6 +10,7 @@ use BenTools\ETL\Extractor\KeyValueExtractor;
 use BenTools\ETL\Iterator\CsvFileIterator;
 use BenTools\ETL\Loader\JsonFileLoader;
 use BenTools\ETL\Runner\ETLRunner;
+use BenTools\ETL\Tests\TestSuite;
 use PHPUnit\Framework\TestCase;
 use SplFileObject;
 use SplTempFileObject;
@@ -29,7 +30,7 @@ class JsonFileLoaderTest extends TestCase
                 $contextElement->skip();
             }
         });
-        $items       = new CsvFileIterator(new SplFileObject(__DIR__ . '/../data/dictators.csv'));
+        $items       = new CsvFileIterator(new SplFileObject(TestSuite::getDataFile('dictators.csv')));
         $extractor   = new KeyValueExtractor();
         $transformer = function (ContextElementInterface $element) use (&$keys) {
             $data = array_combine($keys, $element->getData());
@@ -41,7 +42,7 @@ class JsonFileLoaderTest extends TestCase
         $run         = new ETLRunner(null, $eventDispatcher);
         $run($items, $extractor, $transformer, $loader);
 
-        $compared = file_get_contents(__DIR__ . '/../data/dictators.json');
+        $compared = file_get_contents(TestSuite::getDataFile('dictators.json'));
 
         $output->rewind();
         $generated = implode(null, iterator_to_array($output));

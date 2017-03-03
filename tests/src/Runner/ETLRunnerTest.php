@@ -6,6 +6,7 @@ use BenTools\ETL\Context\ContextElementInterface;
 use BenTools\ETL\Extractor\KeyValueExtractor;
 use BenTools\ETL\Loader\ArrayLoader;
 use BenTools\ETL\Loader\FlushableLoaderInterface;
+use BenTools\ETL\Tests\TestSuite;
 use PHPUnit\Framework\TestCase;
 
 use BenTools\ETL\Runner\ETLRunner;
@@ -16,7 +17,7 @@ class ETLRunnerTest extends TestCase
     public function testSimpleETL()
     {
         $output      = [];
-        $items       = json_decode(file_get_contents(__DIR__ . '/../data/vat.json'), true)['rates'];
+        $items       = json_decode(file_get_contents(TestSuite::getDataFile('vat.json')), true)['rates'];
         $extractor   = new KeyValueExtractor();
         $transformer = function (ContextElementInterface $element) {
             $data = $element->getData();
@@ -42,7 +43,7 @@ class ETLRunnerTest extends TestCase
      */
     public function testETLWithFlushableLoader($input)
     {
-        $items       = json_decode(file_get_contents(__DIR__ . '/../data/vat.json'), true)['rates'];
+        $items       = json_decode(file_get_contents(TestSuite::getDataFile('vat.json')), true)['rates'];
         $extractor   = new KeyValueExtractor();
         $transformer = function (ContextElementInterface $element) {
             $data = $element->getData();
@@ -110,7 +111,7 @@ class ETLRunnerTest extends TestCase
      */
     public function testSkip($input)
     {
-        $items       = json_decode(file_get_contents(__DIR__ . '/../data/vat.json'), true)['rates'];
+        $items       = json_decode(file_get_contents(TestSuite::getDataFile('vat.json')), true)['rates'];
         $extractor   = new KeyValueExtractor();
         $transformer = function (ContextElementInterface $element) {
             $data = $element->getData();
@@ -180,7 +181,7 @@ class ETLRunnerTest extends TestCase
      */
     public function testAbortAndFlush($input)
     {
-        $items       = json_decode(file_get_contents(__DIR__ . '/../data/vat.json'), true)['rates'];
+        $items       = json_decode(file_get_contents(TestSuite::getDataFile('vat.json')), true)['rates'];
         $extractor   = new KeyValueExtractor();
         $transformer = function (ContextElementInterface $element) {
             $data = $element->getData();
@@ -248,7 +249,7 @@ class ETLRunnerTest extends TestCase
      */
     public function testAbortAndDoNotFlush($input)
     {
-        $items       = json_decode(file_get_contents(__DIR__ . '/../data/vat.json'), true)['rates'];
+        $items       = json_decode(file_get_contents(TestSuite::getDataFile('vat.json')), true)['rates'];
         $extractor   = new KeyValueExtractor();
         $transformer = function (ContextElementInterface $element) {
             $data = $element->getData();
@@ -312,7 +313,7 @@ class ETLRunnerTest extends TestCase
 
     public function testTransformerCanBeOmitted()
     {
-        $items     = json_decode(file_get_contents(__DIR__ . '/../data/vat.json'), true)['rates'];
+        $items     = json_decode(file_get_contents(TestSuite::getDataFile('vat.json')), true)['rates'];
         $extractor = new KeyValueExtractor();
         $loader    = new ArrayLoader();
         $run       = new ETLRunner();

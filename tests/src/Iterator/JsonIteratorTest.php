@@ -2,15 +2,16 @@
 
 namespace BenTools\ETL\Tests\Iterator;
 
-use PHPUnit\Framework\TestCase;
 use BenTools\ETL\Iterator\JsonIterator;
+use BenTools\ETL\Tests\TestSuite;
+use PHPUnit\Framework\TestCase;
 
 class JsonIteratorTest extends TestCase
 {
 
     public function testIterator()
     {
-        $json     = file_get_contents(__DIR__ . '/../data/dictators.json');
+        $json     = file_get_contents(TestSuite::getDataFile('dictators.json'));
         $iterator = new JsonIterator($json);
         $this->assertEquals([
             'usa'    =>
