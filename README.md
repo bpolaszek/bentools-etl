@@ -62,6 +62,12 @@ Documentation and recipes
 
 [Getting started](doc/GettingStarted.md)
 
+[Extractors](doc/Extractors.md)
+
+[Transformers](doc/Transformers.md)
+
+[Loaders](doc/Loaders.md)
+
 [Events](doc/Events.md)
 
 [Advanced CSV to JSON conversion example](doc/Recipes/AdvancedCSVToJSON.md)
