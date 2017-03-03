@@ -182,7 +182,9 @@ class ETLRunner implements ETLRunnerInterface
      */
     private function flush($loader, bool $forceFlush = false): void
     {
-        if ($this->shouldFlush() && ($loader instanceof FlushableLoaderInterface && (true === $forceFlush || $loader->shouldFlushAfterLoad()))) {
+        if ($this->shouldFlush()
+            && ($loader instanceof FlushableLoaderInterface
+                && (true === $forceFlush || $loader->shouldFlushAfterLoad()))) {
             $loader->flush();
         }
         $this->eventDispatcher->trigger(new ETLEvent(ETLEvents::AFTER_FLUSH));

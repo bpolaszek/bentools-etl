@@ -35,8 +35,14 @@ class CsvFileLoader extends FileLoader
     /**
      * @inheritDoc
      */
-    public function __construct(\SplFileObject $file, LoggerInterface $logger = null, $delimiter = ',', $enclosure = '"', $escape = '\\', array $keys = [])
-    {
+    public function __construct(
+        \SplFileObject $file,
+        LoggerInterface $logger = null,
+        $delimiter = ',',
+        $enclosure = '"',
+        $escape = '\\',
+        array $keys = []
+    ) {
         parent::__construct($file, $logger);
         $this->delimiter = $delimiter;
         $this->enclosure = $enclosure;

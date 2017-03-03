@@ -15,8 +15,13 @@ class AsynchronousRunner extends ETLRunner
     /**
      * @inheritDoc
      */
-    public function __invoke(iterable $items, callable $extractor, callable $transformer, callable $loader): PromiseInterface
-    {
+    public function __invoke(
+        iterable $items,
+        callable $extractor,
+        callable $transformer = null,
+        callable $loader
+    ): PromiseInterface {
+    
         $promise = new Promise(
             function () use (&$promise, &$items, $extractor, $transformer, $loader) {
                 $promise->resolve(parent::__invoke($items, $extractor, $transformer, $loader));
