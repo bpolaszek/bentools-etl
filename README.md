@@ -1,7 +1,8 @@
 [![Latest Stable Version](https://poser.pugx.org/bentools/etl/v/stable)](https://packagist.org/packages/bentools/etl)
 [![License](https://poser.pugx.org/bentools/etl/license)](https://packagist.org/packages/bentools/etl)
 [![Build Status](https://img.shields.io/travis/bpolaszek/bentools-etl/master.svg?style=flat-square)](https://travis-ci.org/bpolaszek/bentools-etl)
-[![Code Coverage](https://scrutinizer-ci.com/g/bpolaszek/bentools-etl/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/bpolaszek/bentools-etl/?branch=master)[![Quality Score](https://img.shields.io/scrutinizer/g/bpolaszek/bentools-etl.svg?style=flat-square)](https://scrutinizer-ci.com/g/bpolaszek/bentools-etl)
+[![Code Coverage](https://scrutinizer-ci.com/g/bpolaszek/bentools-etl/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/bpolaszek/bentools-etl/?branch=master)
+[![Quality Score](https://img.shields.io/scrutinizer/g/bpolaszek/bentools-etl.svg?style=flat-square)](https://scrutinizer-ci.com/g/bpolaszek/bentools-etl)
 [![Total Downloads](https://poser.pugx.org/bentools/etl/downloads)](https://packagist.org/packages/bentools/etl)
 
 This **PHP 7.1+** library provides a very simple implementation of the `Extract / Transform / Load` pattern. 
