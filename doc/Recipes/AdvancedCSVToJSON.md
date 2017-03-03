@@ -15,7 +15,7 @@ prevtx_data_available,Latent TB infection,A=No; E= Yes - available from the rout
 
 ```
 
-to this:
+into this:
 ```json
 {
     "bmu": {
