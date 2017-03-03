@@ -13,9 +13,7 @@ class JsonIterator implements \IteratorAggregate
     /**
      * JsonIterator constructor.
      *
-     * @param $json
-     * @param string|null $path
-     * @param string|null $columnIdentifier
+     * @param mixed $json
      */
     public function __construct($json)
     {

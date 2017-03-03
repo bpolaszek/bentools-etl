@@ -39,8 +39,6 @@ interface ContextElementInterface
 
     /**
      * This method may be called to request the loader to flush immediately.
-     *
-     * @param bool $flush
      */
     public function flush(): void;
 
