@@ -1,0 +1,10 @@
+{
+    "usa": {
+        "country": "USA",
+        "name": "Donald Trump"
+    },
+    "russia": {
+        "country": "Russia",
+        "name": "Vladimir Poutine"
+    }
+}

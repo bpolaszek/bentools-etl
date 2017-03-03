@@ -49,6 +49,8 @@ class JsonFileLoader extends ArrayLoader implements FlushableLoaderInterface
      */
     public function flush(): void
     {
-        $this->file->fwrite(json_encode($this->getArray(), $this->jsonOptions, $this->jsonDepth));
+        if (0 === $this->file->fwrite(json_encode($this->getArray(), $this->jsonOptions, $this->jsonDepth))) {
+            throw new \RuntimeException(sprintf('Unable to write to %s', $this->file->getPathname()));
+        }
     }
 }

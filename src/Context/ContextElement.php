@@ -12,6 +12,17 @@ class ContextElement implements ContextElementInterface
     private $flush = false;
 
     /**
+     * ContextElement constructor.
+     * @param $id
+     * @param $data
+     */
+    public function __construct($id = null, $data = null)
+    {
+        $this->id   = $id;
+        $this->data = $data;
+    }
+
+    /**
      * @inheritDoc
      */
     public function setId($id): void

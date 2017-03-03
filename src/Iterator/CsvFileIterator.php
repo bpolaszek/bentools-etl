@@ -2,88 +2,42 @@
 
 namespace BenTools\ETL\Iterator;
 
+use FilterIterator;
 use SplFileObject;
 
-class CsvFileIterator implements \Iterator, \Countable
+class CsvFileIterator extends FilterIterator implements \Countable
 {
 
     private $nbLines;
     private $file;
-    private $cursor = 0;
 
     /**
      * CsvFileIterator constructor.
      *
      * @param $filename
-     * @param string   $delimiter
-     * @param string   $enclosure
+     * @param string $delimiter
+     * @param string $enclosure
      */
     public function __construct(SplFileObject $file, $delimiter = ',', $enclosure = '"', $escapeString = '\\')
     {
         $this->file = $file;
         $this->file->setCsvControl($delimiter, $enclosure, $escapeString);
         $this->file->setFlags(SplFileObject::READ_CSV);
+        parent::__construct($this->file);
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
-    public function rewind()
+    public function accept()
     {
-        $this->cursor = 0;
-        $this->file->rewind();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function current()
-    {
-        return $this->file->current();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function key()
-    {
-        return $this->file->key();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function next()
-    {
-        $this->cursor++;
-        $this->file->next();
-        if ($this->valid()) {
-            $this->cursor++;
-        }
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function valid()
-    {
-        // Avoid blank lines
-        if (true === $this->file->valid()) {
-            $current = $this->file->current();
-            if (!is_array($current)) {
-                throw new \RuntimeException("The current iteration is a string, are you sure you use the correct delimiter?");
+        $current = $this->getInnerIterator()->current();
+        return !empty(array_filter(
+            $current,
+            function ($cell) {
+                return null !== $cell;
             }
-            return !empty(
-                array_filter(
-                    $current,
-                    function ($cell) {
-                        return null !== $cell;
-                    }
-                )
-            );
-        } else {
-            return false;
-        }
+        ));
     }
 
     /**
@@ -117,19 +71,5 @@ class CsvFileIterator implements \Iterator, \Countable
         return $this->nbLines;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function seek($position)
-    {
-        $this->file->seek($position);
-    }
 
-    /**
-     * @return int
-     */
-    public function getCursor()
-    {
-        return $this->cursor;
-    }
 }

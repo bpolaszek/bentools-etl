@@ -17,6 +17,11 @@
       "BenTools\\ETL\\": "src"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "BenTools\\ETL\\Tests\\": "tests"
+    }
+  },
   "require-dev": {
     "phpunit/phpunit": "^6.0",
     "symfony/event-dispatcher": "^3.2",
