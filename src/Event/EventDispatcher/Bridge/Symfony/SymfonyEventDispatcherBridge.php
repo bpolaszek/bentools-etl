@@ -31,5 +31,4 @@ class SymfonyEventDispatcherBridge implements EventDispatcherInterface
         $symfonyEvent = new SymfonyEvent($event);
         $this->wrappedDispatcher->dispatch($event->getName(), $symfonyEvent);
     }
-
 }

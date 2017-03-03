@@ -1,0 +1,14 @@
+language: php
+
+php:
+  - 7.1
+
+before_script:
+  - travis_retry composer self-update
+  - travis_retry composer install --no-interaction --prefer-source --dev
+  - travis_retry phpenv rehash
+
+script:
+  - ./vendor/bin/phpcs --standard=psr2 src/
+  - ./vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
+

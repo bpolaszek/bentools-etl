@@ -37,5 +37,4 @@ class IncrementorExtractor extends KeyValueExtractor implements ExtractorInterfa
         $element->setId(++$this->index);
         return $element;
     }
-
 }

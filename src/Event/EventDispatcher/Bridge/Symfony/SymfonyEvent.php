@@ -24,5 +24,4 @@ class SymfonyEvent extends Event
     {
         $this->wrappedEvent->stopPropagation();
     }
-
 }

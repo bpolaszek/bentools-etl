@@ -27,12 +27,11 @@ class ETLEventDispatcher implements EventDispatcherInterface
     public function trigger(EventInterface $event): void
     {
         if (!empty($this->listeners[$event->getName()])) {
-            foreach ($this->listeners[$event->getName()] AS $listen) {
+            foreach ($this->listeners[$event->getName()] as $listen) {
                 if (!$event->isPropagationStopped()) {
                     $listen($event);
                 }
             }
         }
     }
-
 }
