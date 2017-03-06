@@ -14,6 +14,7 @@ Overview
 ```php
 require_once __DIR__ . '/vendor/autoload.php';
 
+use BenTools\ETL\Event\ContextElementEvent;
 use BenTools\ETL\Extractor\IncrementorExtractor;
 use BenTools\ETL\Loader\DebugLoader;
 use BenTools\ETL\Runner\ETLRunner;
@@ -21,12 +22,19 @@ use BenTools\ETL\Transformer\CallbackTransformer;
 
 $items     = [
     'France',
-    'Germany'
+    'Germany',
+    'Poland',
 ];
 $extract   = new IncrementorExtractor();
 $transform = new CallbackTransformer('strtolower');
 $load      = new DebugLoader();
 $run       = new ETLRunner();
+$run->onExtract(function (ContextElementEvent $event) {
+    $element = $event->getElement();
+    if ('Germany' === $element->getData()) {
+        $element->skip();
+    }
+});
 $run($items, $extract, $transform, $load);
 ```
 
@@ -35,8 +43,8 @@ Output:
 array(2) {
   [0]=>
   string(6) "france"
-  [1]=>
-  string(7) "germany"
+  [2]=>
+  string(7) "poland"
 }
 
 ```

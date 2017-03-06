@@ -4,6 +4,7 @@ namespace BenTools\ETL\Runner;
 
 use BenTools\ETL\Context\ContextElementInterface;
 use BenTools\ETL\Event\ContextElementEvent;
+use BenTools\ETL\Event\EventDispatcher\ETLEventDispatcher;
 use BenTools\ETL\Event\EventDispatcher\EventDispatcherInterface;
 use BenTools\ETL\Event\EventDispatcher\NullEventDispatcher;
 use BenTools\ETL\Event\ETLEvents;
@@ -45,7 +46,7 @@ class ETLRunner implements ETLRunnerInterface
         EventDispatcherInterface $eventDispatcher = null
     ) {
         $this->logger = $logger ?? new NullLogger();
-        $this->eventDispatcher = $eventDispatcher ?? new NullEventDispatcher();
+        $this->eventDispatcher = $eventDispatcher ?? new ETLEventDispatcher();
     }
 
     /**
@@ -88,6 +89,42 @@ class ETLRunner implements ETLRunnerInterface
         // Flush remaining data
         $this->flush($loader, true);
         $this->end();
+    }
+
+    /**
+     * Shortcut to ETLEvents::AFTER_EXTRACT listener creation.
+     * @param callable $callback
+     */
+    public function onExtract(callable $callback): void
+    {
+        $this->eventDispatcher->addListener(ETLEvents::AFTER_EXTRACT, $callback);
+    }
+
+    /**
+     * Shortcut to ETLEvents::AFTER_TRANSFORM listener creation.
+     * @param callable $callback
+     */
+    public function onTransform(callable $callback): void
+    {
+        $this->eventDispatcher->addListener(ETLEvents::AFTER_TRANSFORM, $callback);
+    }
+
+    /**
+     * Shortcut to ETLEvents::AFTER_LOAD listener creation.
+     * @param callable $callback
+     */
+    public function onLoad(callable $callback): void
+    {
+        $this->eventDispatcher->addListener(ETLEvents::AFTER_LOAD, $callback);
+    }
+
+    /**
+     * Shortcut to ETLEvents::AFTER_FLUSH listener creation.
+     * @param callable $callback
+     */
+    public function onFlush(callable $callback): void
+    {
+        $this->eventDispatcher->addListener(ETLEvents::AFTER_FLUSH, $callback);
     }
 
     private function reset()

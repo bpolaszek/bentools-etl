@@ -5,6 +5,7 @@ namespace BenTools\ETL\Tests\Runner;
 use BenTools\ETL\Context\ContextElementInterface;
 use BenTools\ETL\Extractor\IncrementorExtractor;
 use BenTools\ETL\Loader\ArrayLoader;
+use BenTools\ETL\Loader\DebugLoader;
 use BenTools\ETL\Loader\FlushableLoaderInterface;
 use BenTools\ETL\Tests\TestSuite;
 use PHPUnit\Framework\TestCase;
@@ -335,5 +336,43 @@ class ETLRunnerTest extends TestCase
                 ]
             ]
         ], $result[0]);
+    }
+
+    public function testBuiltInEventDispatcher()
+    {
+        $items     = [
+            'foo',
+            'bar',
+            'baz',
+        ];
+        $extract   = new IncrementorExtractor();
+        $doNothing = $transform = function () {};
+        $load      = new DebugLoader([], $doNothing);
+        $run       = new ETLRunner();
+
+        $extractEventReceived = $transformEventReceived = $loadEventReceived = $flushEventReceived = false;
+
+        $run->onExtract(function () use (&$extractEventReceived) {
+            $extractEventReceived = true;
+        });
+
+        $run->onTransform(function () use (&$transformEventReceived) {
+            $transformEventReceived = true;
+        });
+
+        $run->onLoad(function () use (&$loadEventReceived) {
+            $loadEventReceived = true;
+        });
+
+        $run->onFlush(function () use (&$flushEventReceived) {
+            $flushEventReceived = true;
+        });
+
+        $run($items, $extract, $transform, $load);
+
+        $this->assertTrue($extractEventReceived);
+        $this->assertTrue($transformEventReceived);
+        $this->assertTrue($loadEventReceived);
+        $this->assertTrue($flushEventReceived);
     }
 }

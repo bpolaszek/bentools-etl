@@ -24,6 +24,14 @@ class SymfonyEventDispatcherBridge implements EventDispatcherInterface
     }
 
     /**
+     * @inheritDoc
+     */
+    public function addListener(string $eventName, callable $callback): void
+    {
+        $this->wrappedDispatcher->addListener($eventName, $callback);
+    }
+
+    /**
      * @inheritdoc
      */
     public function trigger(EventInterface $event): void
