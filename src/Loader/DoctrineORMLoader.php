@@ -110,6 +110,10 @@ class DoctrineORMLoader implements FlushableLoaderInterface
             $this->objectManagers[] = $objectManager;
         }
 
+        if (1 === $this->flushEvery) {
+            $this->flush();
+        }
+
         $this->counter++;
     }
 }
