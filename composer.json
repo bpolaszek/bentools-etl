@@ -27,7 +27,8 @@
     "squizlabs/php_codesniffer": "~2.0",
     "symfony/event-dispatcher": "^3.2",
     "doctrine/orm": "^2.5",
-    "guzzlehttp/promises": "^1.3"
+    "guzzlehttp/promises": "^1.3",
+    "satooshi/php-coveralls": "^1.0"
   },
   "suggest": {
     "symfony/event-dispatcher": "An event dispatcher to hook into the ETL process.",
