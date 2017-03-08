@@ -46,13 +46,8 @@ class CsvFileIterator extends FilterIterator implements \Countable
     public function count()
     {
         if (null === $this->nbLines) {
-            $flags   = $this->file->getFlags();
-            $current = $this->file->key();
-            $this->file->setFlags(null);
-            $this->file->seek(PHP_INT_MAX);
-            $this->nbLines = $this->file->key() + 1;
-            $this->file->seek($current);
-            $this->file->setFlags($flags);
+            $this->rewind();
+            $this->nbLines = count(iterator_to_array($this));
         }
 
         return $this->nbLines;
