@@ -6,7 +6,6 @@ use BenTools\ETL\Context\ContextElementInterface;
 use BenTools\ETL\Event\ContextElementEvent;
 use BenTools\ETL\Event\EventDispatcher\ETLEventDispatcher;
 use BenTools\ETL\Event\EventDispatcher\EventDispatcherInterface;
-use BenTools\ETL\Event\EventDispatcher\NullEventDispatcher;
 use BenTools\ETL\Event\ETLEvents;
 use BenTools\ETL\Event\ETLEvent;
 use BenTools\ETL\Extractor\ExtractorInterface;

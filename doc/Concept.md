@@ -70,7 +70,7 @@ Advanced Usage
 The `BenTools\ETL\Runner\ETLRunner` constructor accepts 2 optionnal arguments:
 
 * A `Psr\Log\LoggerInterface` logger like Monolog to get some info about the ETL process
-* A `BenTools\ETL\Event\EventDispatcher\EventDispatcherInterface` event manager of your own (or use the Symfony Bridge provided) to hook on the ETL process (see [Events](Events.md)).
+* A `BenTools\ETL\Event\EventDispatcher\EventDispatcherInterface` event manager of your own (or use either our built-in Event Dispatcher or the Symfony Bridge provided) to hook on the ETL process (see [Events](Events.md)).
 
 
 Next: [Getting started](GettingStarted.md)
