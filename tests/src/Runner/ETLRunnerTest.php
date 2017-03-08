@@ -247,7 +247,6 @@ class ETLRunnerTest extends TestCase
     /**
      * Abort and flush
      * @depends testSimpleETL
-     * @covers ETLRunner::stop
      */
     public function testAbortAndDoNotFlush($input)
     {

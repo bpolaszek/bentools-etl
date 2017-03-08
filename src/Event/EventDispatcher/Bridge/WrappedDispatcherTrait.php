@@ -2,7 +2,6 @@
 
 namespace BenTools\ETL\Event\EventDispatcher\Bridge;
 
-
 trait WrappedDispatcherTrait
 {
     /**
