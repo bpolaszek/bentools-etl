@@ -29,6 +29,7 @@ class IncrementorExtractorTest extends TestCase
     public function testExtractorWithAnotherStartIndex()
     {
         $extract = new IncrementorExtractor(10);
+        $this->assertEquals(9, $extract->getIndex());
 
         $element = $extract('foo', 'bar');
         $this->assertInstanceOf(ContextElementInterface::class, $element);

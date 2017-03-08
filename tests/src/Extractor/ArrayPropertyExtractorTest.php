@@ -41,4 +41,26 @@ class ArrayPropertyExtractorTest extends TestCase
             'dolor' => 'sit amet',
         ], $element->getData());
     }
+
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testExtractorWithNonExistentProperty()
+    {
+
+        $extract = new ArrayPropertyExtractor('bar');
+        $extract('foo', []);
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testExtractorWithAnInvalidContextClass()
+    {
+        $context = new class() {};
+        $class = get_class($context);
+        $extract = new ArrayPropertyExtractor('bar', true, $class);
+        $extract('foo', ['bar' => 'baz']);
+    }
 }

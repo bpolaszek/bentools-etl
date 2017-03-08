@@ -2,6 +2,7 @@
 
 namespace BenTools\ETL\Tests\Loader;
 
+use BenTools\ETL\Context\ContextElement;
 use BenTools\ETL\Extractor\KeyValueExtractor;
 use BenTools\ETL\Runner\ETLRunner;
 use PHPUnit\Framework\TestCase;
@@ -31,4 +32,13 @@ class DebugLoaderTest extends TestCase
         ], $debug);
     }
 
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testInvalidCallable()
+    {
+        $load = new DebugLoader([], 'not_callable');
+        $load(new ContextElement('foo', 'bar'));
+        $load->flush();
+    }
 }

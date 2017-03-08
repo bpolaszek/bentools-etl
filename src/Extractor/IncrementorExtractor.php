@@ -14,9 +14,9 @@ class IncrementorExtractor extends KeyValueExtractor implements ExtractorInterfa
     /**
      * IncrementorExtractor constructor.
      */
-    public function __construct(int $startIndex = 0, string $class = self::DEFAULT_CLASS)
+    public function __construct(int $startAt = 0, string $class = self::DEFAULT_CLASS)
     {
-        $this->index = $startIndex - 1;
+        $this->index = $startAt - 1;
         parent::__construct($class);
     }
 

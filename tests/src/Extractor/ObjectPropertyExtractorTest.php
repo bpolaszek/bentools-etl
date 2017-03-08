@@ -25,4 +25,25 @@ class ObjectPropertyExtractorTest extends TestCase
             'dolor' => 'sit amet',
         ], $element->getData());
     }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testExtractorWithNonExistentProperty()
+    {
+
+        $extract = new ObjectPropertyExtractor('bar');
+        $extract('foo', new \stdClass());
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testExtractorWithAnInvalidContextClass()
+    {
+        $context = new class() {};
+        $class = get_class($context);
+        $extract = new ObjectPropertyExtractor('bar', $class);
+        $extract('foo', (object) ['bar' => 'baz']);
+    }
 }

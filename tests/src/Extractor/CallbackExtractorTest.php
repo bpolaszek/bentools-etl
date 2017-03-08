@@ -30,4 +30,20 @@ class CallbackExtractorTest extends TestCase
             'dolor' => 'sit amet',
         ], $element->getData());
     }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testExtractorWithAnInvalidContextClass()
+    {
+        $callback = function (ContextElementInterface $element) {
+            $data = $element->getData();
+            $this->assertEquals('foo', $element->getId());
+            $element->setId($data->bar);
+        };
+        $context = new class() {};
+        $class = get_class($context);
+        $extract = new CallbackExtractor($callback, $class);
+        $element = $extract('foo', 'bar');
+    }
 }

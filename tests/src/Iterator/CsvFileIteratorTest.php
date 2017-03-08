@@ -13,6 +13,7 @@ class CsvFileIteratorTest extends TestCase
     {
         $file     = new \SplFileObject(TestSuite::getDataFile('dictators.csv'));
         $iterator = new CsvFileIterator($file);
+        $this->assertCount(3, $iterator);
         $this->assertEquals([
             [
                 'country',
@@ -27,5 +28,6 @@ class CsvFileIteratorTest extends TestCase
                 'Vladimir Poutine',
             ],
         ], array_values(iterator_to_array($iterator)));
+
     }
 }

@@ -35,16 +35,7 @@ class CallbackExtractor extends KeyValueExtractor implements ExtractorInterface
     {
         $element = parent::__invoke($key, $value);
         $callback = $this->callback;
-        $result = $callback($element);
-        if (null !== $result) {
-            if (!$result instanceof ContextElementInterface) {
-                throw new \RuntimeException(
-                    sprintf("The callback should either return nothing or a %s class.", ContextElementInterface::class)
-                );
-            } else {
-                $element = $result;
-            }
-        }
+        $callback($element);
         return $element;
     }
 }
