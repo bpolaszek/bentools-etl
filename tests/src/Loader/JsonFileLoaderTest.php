@@ -2,6 +2,7 @@
 
 namespace BenTools\ETL\Tests\Loader;
 
+use BenTools\ETL\Context\ContextElement;
 use BenTools\ETL\Context\ContextElementInterface;
 use BenTools\ETL\Event\ContextElementEvent;
 use BenTools\ETL\Event\ETLEvents;
@@ -47,5 +48,15 @@ class JsonFileLoaderTest extends TestCase
         $output->rewind();
         $generated = implode(null, iterator_to_array($output));
         $this->assertSame($compared, $generated);
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testFileNotWritableShouldThrowException()
+    {
+        $output = new SplFileObject('foo.txt', 'r');
+        $load = new JsonFileLoader($output);
+        $load(new ContextElement('foo', ['bar' => 'baz']));
     }
 }

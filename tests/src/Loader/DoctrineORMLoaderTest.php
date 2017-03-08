@@ -14,7 +14,6 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
 use PHPUnit\Framework\TestCase;
 
-
 class DoctrineORMLoaderTest extends TestCase
 {
     /**
@@ -24,7 +23,8 @@ class DoctrineORMLoaderTest extends TestCase
      */
     private function fakeEntity($id, $name)
     {
-        return new class($id, $name) {
+        return new class($id, $name)
+        {
             private $id, $name;
 
             public function __construct($id, $name)
@@ -53,9 +53,10 @@ class DoctrineORMLoaderTest extends TestCase
      */
     private function fakeRepository($className): ObjectRepository
     {
-        $fakeRepository = new class($className) implements ObjectRepository {
+        $fakeRepository = new class($className) implements ObjectRepository
+        {
 
-            private $storage = [];
+            private $storage   = [];
             private $className = '';
 
             public function __construct($className)
@@ -115,7 +116,7 @@ class DoctrineORMLoaderTest extends TestCase
         {
 
             private $repositories = [];
-            private $tmpStorage = [];
+            private $tmpStorage   = [];
 
             public function __construct(array $repositories)
             {
@@ -206,7 +207,8 @@ class DoctrineORMLoaderTest extends TestCase
      */
     private function fakeManagerRegistry($objectManagers): ManagerRegistry
     {
-        $fakeRegistry = new class($objectManagers) implements ManagerRegistry {
+        $fakeRegistry = new class($objectManagers) implements ManagerRegistry
+        {
 
             private $objectManagers = [];
 
@@ -292,7 +294,7 @@ class DoctrineORMLoaderTest extends TestCase
 
     public function testFakeEntity()
     {
-        $entity = $this->fakeEntity('foo', 'bar');
+        $entity        = $this->fakeEntity('foo', 'bar');
         $anotherEntity = $this->fakeEntity('bar', 'baz');
         $this->assertEquals(get_class($entity), get_class($anotherEntity));
         $this->assertEquals('foo', $entity->getId());
@@ -304,7 +306,7 @@ class DoctrineORMLoaderTest extends TestCase
     public function testFakeRepository()
     {
 
-        $entity = $this->fakeEntity('foo', 'bar');
+        $entity    = $this->fakeEntity('foo', 'bar');
         $className = get_class($entity);
 
         $repository = $this->fakeRepository($className);
@@ -320,10 +322,10 @@ class DoctrineORMLoaderTest extends TestCase
 
     public function testFakeObjectManager()
     {
-        $entity = $this->fakeEntity('foo', 'bar');
-        $className = get_class($entity);
+        $entity     = $this->fakeEntity('foo', 'bar');
+        $className  = get_class($entity);
         $repository = $this->fakeRepository($className);
-        $em = $this->fakeObjectManager([$className => $repository]);
+        $em         = $this->fakeObjectManager([$className => $repository]);
 
         $this->assertNull($em->find($className, $entity->getId()));
         $this->assertFalse($em->contains($entity));
@@ -341,19 +343,19 @@ class DoctrineORMLoaderTest extends TestCase
 
     public function testFakeRegistry()
     {
-        $entity = $this->fakeEntity('foo', 'bar');
-        $className = get_class($entity);
+        $entity     = $this->fakeEntity('foo', 'bar');
+        $className  = get_class($entity);
         $repository = $this->fakeRepository($className);
-        $em = $this->fakeObjectManager([$className => $repository]);
-        $registry = $this->fakeManagerRegistry(['default' => $em]);
+        $em         = $this->fakeObjectManager([$className => $repository]);
+        $registry   = $this->fakeManagerRegistry(['default' => $em]);
         $this->assertSame($registry->getManagerForClass($className), $em);
     }
 
     public function testLoaderWithDefaultSettings()
     {
-        $entity = $this->fakeEntity('foo', 'bar');
+        $entity        = $this->fakeEntity('foo', 'bar');
         $anotherEntity = $this->fakeEntity('bar', 'baz');
-        $className = get_class($entity);
+        $className     = get_class($entity);
 
         $registry = $this->fakeManagerRegistry(
             [
@@ -383,9 +385,9 @@ class DoctrineORMLoaderTest extends TestCase
 
     public function testLoaderWithBufferedFlush()
     {
-        $entity = $this->fakeEntity('foo', 'bar');
+        $entity        = $this->fakeEntity('foo', 'bar');
         $anotherEntity = $this->fakeEntity('bar', 'baz');
-        $className = get_class($entity);
+        $className     = get_class($entity);
 
         $registry = $this->fakeManagerRegistry(
             [
@@ -409,11 +411,13 @@ class DoctrineORMLoaderTest extends TestCase
         });
 
         // Init ETL
-        $entities   = [
+        $entities = [
             $entity,
             $anotherEntity,
         ];
-        $extract    = new KeyValueExtractor();
+        $extract  = new KeyValueExtractor();
+
+        // Test with constructor
         $flushEvery = 2;
         $load       = new DoctrineORMLoader($registry, $flushEvery);
         $run        = new ETLRunner(null, $eventDispatcher);
@@ -425,4 +429,75 @@ class DoctrineORMLoaderTest extends TestCase
         $this->assertNotNull($repository->find($anotherEntity->getId()));
 
     }
+
+    public function testLoaderWithBufferedFlushSetter()
+    {
+        $entity        = $this->fakeEntity('foo', 'bar');
+        $anotherEntity = $this->fakeEntity('bar', 'baz');
+        $className     = get_class($entity);
+
+        $registry = $this->fakeManagerRegistry(
+            [
+                'default' => $em = $this->fakeObjectManager([
+                    $className => $repository = $this->fakeRepository($className)
+                ])
+            ]
+        );
+
+        // The storage should be empty
+        $this->assertFalse($em->contains($entity));
+        $this->assertFalse($em->contains($anotherEntity));
+        $this->assertNull($repository->find($entity->getId()));
+        $this->assertNull($repository->find($anotherEntity->getId()));
+
+        $eventDispatcher = new ETLEventDispatcher();
+        $eventDispatcher->addListener(ETLEvents::AFTER_LOAD, function (ContextElementEvent $event) use ($em, $repository) {
+            $loadedEntity = $event->getElement()->getData();
+            $this->assertTrue($em->contains($loadedEntity)); // After load, the entity should be present in the unit of work
+            $this->assertNull($repository->find($loadedEntity->getId())); // But it should not be flushed yet
+        });
+
+        // Init ETL
+        $entities = [
+            $entity,
+            $anotherEntity,
+        ];
+        $extract  = new KeyValueExtractor();
+
+        // Test with constructor
+        $flushEvery = 2;
+        $load       = new DoctrineORMLoader($registry);
+        $run        = new ETLRunner(null, $eventDispatcher);
+
+        $load->setFlushEvery($flushEvery);
+        $run($entities, $extract, null, $load);
+        $this->assertTrue($em->contains($entity));
+        $this->assertNotNull($repository->find($entity->getId()));
+        $this->assertTrue($em->contains($anotherEntity));
+        $this->assertNotNull($repository->find($anotherEntity->getId()));
+
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessageRegExp #The transformed data should return an entity object.#
+     */
+    public function testInvalidData()
+    {
+        $registry = $this->fakeManagerRegistry([]);
+        $load     = new DoctrineORMLoader($registry);
+        $load(new ContextElement('foo', ['bar']));
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessageRegExp #Unable to locate Doctrine manager#
+     */
+    public function testInvalidEntityManager()
+    {
+        $registry = $this->fakeManagerRegistry([]);
+        $load     = new DoctrineORMLoader($registry);
+        $load(new ContextElement('foo', new \stdClass()));
+    }
+
 }
