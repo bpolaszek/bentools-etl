@@ -223,8 +223,8 @@ class ETLRunner implements ETLRunnerInterface
                 && (true === $forceFlush || $loader->shouldFlushAfterLoad()))) {
             $this->logger->info('Flushing elements...');
             $loader->flush();
+            $this->eventDispatcher->trigger(new ETLEvent(ETLEvents::AFTER_FLUSH));
         }
-        $this->eventDispatcher->trigger(new ETLEvent(ETLEvents::AFTER_FLUSH));
     }
 
     /**
