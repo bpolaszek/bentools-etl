@@ -2,12 +2,11 @@
 
 namespace BenTools\ETL\Event\EventDispatcher\Bridge;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface as SymfonyEventDispatcherInterface;
 
 trait WrappedDispatcherTrait
 {
     /**
-     * @var SymfonyEventDispatcherInterface
+     * @var mixed
      */
     protected $wrappedDispatcher;
 
@@ -21,7 +20,7 @@ trait WrappedDispatcherTrait
     }
 
     /**
-     * @return SymfonyEventDispatcherInterface
+     * @return mixed
      */
     public function getWrappedDispatcher()
     {
