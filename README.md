@@ -29,12 +29,15 @@ $extract   = new IncrementorExtractor();
 $transform = new CallbackTransformer('strtolower');
 $load      = new DebugLoader();
 $run       = new ETLRunner();
+
+// Optionnal: hook on the AFTER_EXTRACT event to skip some elements
 $run->onExtract(function (ContextElementEvent $event) {
     $element = $event->getElement();
     if ('Germany' === $element->getData()) {
         $element->skip();
     }
 });
+
 $run($items, $extract, $transform, $load);
 ```
 

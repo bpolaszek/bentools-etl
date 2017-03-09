@@ -1,9 +1,17 @@
 Extractors
 ==========
 
-The role of an extractor is to return a `BenTools\ETL\Context\ContextElementInterface` object and hydrate its id and its data.
+Extractors are kind of factories: when you iterate over a PHP loop, like `foreach ($items AS $key => $value)`, you get a `$key` and a `$value`. 
 
-Here's the list of the provided extractors:
+However, the real way to identify of your resource may not be the `$key` itself, but something within your `$value` (`$value->getId()` for instance).
+
+Here comes the **ContextElement**. A **ContextElement** carries _your_ id (which may, or may not, differ from `$key`), and the data associated (`$value`). 
+
+As a **ContextElement** factory, the role of an extractor is to return a `BenTools\ETL\Context\ContextElementInterface` object and hydrate its id and its data.
+
+To respect the ETL pattern, if you define your own extractors, it's also their responsibility to validate the source data (and they might throw exceptions or call `$contextElement->skip()` or `$contextElement->stop()` if this element is blocking the whole loop).
+
+To make things simpler we provide a default `BenTools\ETL\Context\ContextElement` class and default extractors:
 
 KeyValueExtractor
 -----------------
