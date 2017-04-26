@@ -478,6 +478,45 @@ class DoctrineORMLoaderTest extends TestCase
 
     }
 
+
+
+    public function testLoaderWillWaitForFlush()
+    {
+        $entity        = $this->fakeEntity('foo', 'bar');
+        $anotherEntity = $this->fakeEntity('bar', 'baz');
+        $className     = get_class($entity);
+
+        $registry = $this->fakeManagerRegistry(
+            [
+                'default' => $em = $this->fakeObjectManager([
+                    $className => $repository = $this->fakeRepository($className)
+                ])
+            ]
+        );
+
+        // The storage should be empty
+        $this->assertFalse($em->contains($entity));
+        $this->assertFalse($em->contains($anotherEntity));
+        $this->assertNull($repository->find($entity->getId()));
+        $this->assertNull($repository->find($anotherEntity->getId()));
+
+        // Try to load 1st entity - it should not be flushed
+        $load = new DoctrineORMLoader($registry, 0);
+        $load(new ContextElement($entity->getId(), $entity));
+        $this->assertTrue($em->contains($entity));
+        $this->assertNull($repository->find($entity->getId()));
+
+        // Try to load 2nd entity - it should not be flushed
+        $load(new ContextElement($anotherEntity->getId(), $anotherEntity));
+        $this->assertTrue($em->contains($anotherEntity));
+        $this->assertNull($repository->find($anotherEntity->getId()));
+
+        // Now, flush manually
+        $load->flush();
+        $this->assertNotNull($repository->find($entity->getId()));
+        $this->assertNotNull($repository->find($anotherEntity->getId()));
+    }
+
     /**
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessageRegExp #The transformed data should return an entity object.#
@@ -499,5 +538,7 @@ class DoctrineORMLoaderTest extends TestCase
         $load     = new DoctrineORMLoader($registry);
         $load(new ContextElement('foo', new \stdClass()));
     }
+
+
 
 }

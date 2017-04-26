@@ -63,7 +63,8 @@ class DoctrineORMLoader implements FlushableLoaderInterface
      */
     public function shouldFlushAfterLoad(): bool
     {
-        return 0 === ($this->counter % $this->flushEvery);
+        return 0 !== $this->flushEvery // Otherwise we'll wait on an explicit flush() call
+            && 0 === ($this->counter % $this->flushEvery);
     }
 
     /**
@@ -100,9 +101,9 @@ class DoctrineORMLoader implements FlushableLoaderInterface
         $this->logger->debug(
             'Loading entity',
             [
-            'class' => $className,
-            'id' => $element->getId(),
-            'data', $element->getData()
+                'class' => $className,
+                'id' => $element->getId(),
+                'data', $element->getData()
             ]
         );
 
