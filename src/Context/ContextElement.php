@@ -13,6 +13,7 @@ class ContextElement implements ContextElementInterface
 
     /**
      * ContextElement constructor.
+     *
      * @param $id
      * @param $data
      */

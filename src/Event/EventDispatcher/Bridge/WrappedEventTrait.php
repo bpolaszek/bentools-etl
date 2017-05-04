@@ -13,6 +13,7 @@ trait WrappedEventTrait
 
     /**
      * WrappedEventTrait constructor.
+     *
      * @param EventInterface $wrappedEvent
      */
     public function __construct(EventInterface $wrappedEvent)

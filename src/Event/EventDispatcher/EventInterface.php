@@ -2,6 +2,8 @@
 
 namespace BenTools\ETL\Event\EventDispatcher;
 
+use Throwable;
+
 interface EventInterface
 {
 
@@ -23,4 +25,14 @@ interface EventInterface
      * Stops the event propagation.
      */
     public function stopPropagation(): void;
+
+    /**
+     * @return bool
+     */
+    public function hasException(): bool;
+
+    /**
+     * @return null|Throwable
+     */
+    public function getException(): ?Throwable;
 }

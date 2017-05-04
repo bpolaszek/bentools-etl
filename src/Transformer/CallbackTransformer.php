@@ -13,6 +13,7 @@ class CallbackTransformer implements TransformerInterface
 
     /**
      * CallbackTransformer constructor.
+     *
      * @param callable $callback
      */
     public function __construct(callable $callback)

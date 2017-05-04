@@ -3,6 +3,7 @@
 namespace BenTools\ETL\Event;
 
 use BenTools\ETL\Event\EventDispatcher\EventInterface;
+use Throwable;
 
 class ETLEvent implements EventInterface
 {
@@ -16,6 +17,11 @@ class ETLEvent implements EventInterface
      * @var bool
      */
     private $running = true;
+
+    /**
+     * @var \Throwable
+     */
+    private $exception;
 
     /**
      * ContextElementEvent constructor.
@@ -47,5 +53,42 @@ class ETLEvent implements EventInterface
     public function stopPropagation(): void
     {
         $this->running = false;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function hasException(): bool
+    {
+        return null !== $this->exception;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getException(): ?Throwable
+    {
+        return $this->exception;
+    }
+
+    /**
+     * @param Throwable $exception
+     * @return $this - Provides Fluent Interface
+     */
+    public function setException(Throwable $exception = null)
+    {
+        $this->exception = $exception;
+        return $this;
+    }
+
+    /**
+     * Removes the exception, if any.
+     *
+     * @return $this
+     */
+    public function removeException()
+    {
+        $this->exception = null;
+        return $this;
     }
 }

@@ -10,7 +10,7 @@ class ETLEventDispatcher implements EventDispatcherInterface
     private $listeners = [];
 
     /**
-     * @param string $eventName
+     * @param string   $eventName
      * @param callable $listener
      */
     public function addListener(string $eventName, callable $listener): void

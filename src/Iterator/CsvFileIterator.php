@@ -15,8 +15,8 @@ class CsvFileIterator extends FilterIterator implements \Countable
      * CsvFileIterator constructor.
      *
      * @param $filename
-     * @param string $delimiter
-     * @param string $enclosure
+     * @param string   $delimiter
+     * @param string   $enclosure
      */
     public function __construct(SplFileObject $file, $delimiter = ',', $enclosure = '"', $escapeString = '\\')
     {
@@ -32,12 +32,14 @@ class CsvFileIterator extends FilterIterator implements \Countable
     public function accept()
     {
         $current = $this->getInnerIterator()->current();
-        return !empty(array_filter(
-            $current,
-            function ($cell) {
-                return null !== $cell;
-            }
-        ));
+        return !empty(
+            array_filter(
+                $current,
+                function ($cell) {
+                    return null !== $cell;
+                }
+            )
+        );
     }
 
     /**

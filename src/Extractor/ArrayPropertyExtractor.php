@@ -21,7 +21,7 @@ class ArrayPropertyExtractor extends KeyValueExtractor implements ExtractorInter
      * ObjectPropertyExtractor constructor.
      *
      * @param string $property
-     * @param bool $shift
+     * @param bool   $shift
      * @param string $class
      */
     public function __construct(string $property, bool $shift = true, string $class = self::DEFAULT_CLASS)
