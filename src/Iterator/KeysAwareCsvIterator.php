@@ -4,12 +4,12 @@ namespace BenTools\ETL\Iterator;
 
 use IteratorAggregate;
 
-class KeysAwareCsvFileIterator implements IteratorAggregate
+class KeysAwareCsvIterator implements IteratorAggregate, CsvIteratorInterface
 {
     /**
-     * @var CsvFileIterator
+     * @var CsvIteratorInterface
      */
-    private $csvFileIterator;
+    private $csvIterator;
 
     /**
      * @var array
@@ -28,14 +28,14 @@ class KeysAwareCsvFileIterator implements IteratorAggregate
 
     /**
      * KeysAwareCsvFileIterator constructor.
-     * @param CsvFileIterator $csvFileIterator
+     * @param CsvIteratorInterface $csvIterator
      * @param array $keys
      * @param bool $skipFirstRow
      */
-    public function __construct(CsvFileIterator $csvFileIterator, array $keys = [], bool $skipFirstRow = true)
+    public function __construct(CsvIteratorInterface $csvIterator, array $keys = [], bool $skipFirstRow = true)
     {
-        $this->csvFileIterator = $csvFileIterator;
-        $this->keys = $keys;
+        $this->csvIterator  = $csvIterator;
+        $this->keys         = $keys;
         $this->skipFirstRow = $skipFirstRow;
     }
 
@@ -44,7 +44,7 @@ class KeysAwareCsvFileIterator implements IteratorAggregate
      */
     public function getIterator()
     {
-        foreach ($this->csvFileIterator as $value) {
+        foreach ($this->csvIterator as $value) {
             if (false === $this->started) {
                 $this->started = true;
                 if (empty($this->keys)) {
