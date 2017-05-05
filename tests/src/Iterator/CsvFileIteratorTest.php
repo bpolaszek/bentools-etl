@@ -11,8 +11,7 @@ class CsvFileIteratorTest extends TestCase
 
     public function testIterator()
     {
-        $file     = new \SplFileObject(TestSuite::getDataFile('dictators.csv'));
-        $iterator = new CsvFileIterator($file);
+        $iterator = CsvFileIterator::createFromFilename(TestSuite::getDataFile('dictators.csv'));
         $this->assertCount(3, $iterator);
         $this->assertEquals([
             [

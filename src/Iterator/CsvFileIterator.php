@@ -27,6 +27,18 @@ class CsvFileIterator extends FilterIterator implements CsvIteratorInterface, \C
     }
 
     /**
+     * @param string $filename
+     * @param string $delimiter
+     * @param string $enclosure
+     * @param string $escape
+     * @return static
+     */
+    public static function createFromFilename(string $filename, $delimiter = ',', $enclosure = '"', $escape = '\\')
+    {
+        return new static(new SplFileObject($filename, 'r'), $delimiter, $enclosure, $escape);
+    }
+
+    /**
      * @inheritDoc
      */
     public function accept()
