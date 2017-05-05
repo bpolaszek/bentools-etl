@@ -1,7 +1,6 @@
 {
   "name": "bentools/etl",
   "description": "Some classes to implement the ETL pattern, with the ability to hook on each event.",
-  "minimum-stability": "stable",
   "license": "MIT",
   "authors": [
     {
