@@ -32,11 +32,36 @@ class TextLinesIterator implements IteratorAggregate, StringIteratorInterface
      */
     public function getIterator()
     {
+        if (true === $this->skipEmptyLines) {
+            return $this->traverseWithStrTok();
+        }
+        else {
+            return $this->traverseWithPregSplit();
+        }
+    }
+
+    /**
+     * Uses a regex to split lines.
+     * @return \Generator|string[]
+     */
+    private function traverseWithPregSplit()
+    {
         $lines = preg_split("/((\r?\n)|(\r\n?))/", $this->content);
         foreach ($lines as $line) {
-            if (true === $this->skipEmptyLines && 0 === mb_strlen($line)) {
-                continue;
-            }
+            yield $line;
+        }
+    }
+
+    /**
+     * Uses strtok to split lines. Provides better performance, but skips empty lines.
+     * @return \Generator|string[]
+     */
+    private function traverseWithStrTok()
+    {
+        $tok = strtok($this->content, "\r\n");
+        while (false !== $tok) {
+            $line = $tok;
+            $tok = strtok("\n\r");
             yield $line;
         }
     }
