@@ -34,8 +34,7 @@ class TextLinesIterator implements IteratorAggregate, StringIteratorInterface
     {
         if (true === $this->skipEmptyLines) {
             return $this->traverseWithStrTok();
-        }
-        else {
+        } else {
             return $this->traverseWithPregSplit();
         }
     }
