@@ -69,51 +69,27 @@ class TransformerStackTest extends TestCase
         $this->assertEquals('bar', $context->getData());
     }
 
-    public function testSkip()
-    {
-        $stack = new TransformerStack();
-        $foo = function (ContextElementInterface $element) {
-            $element->setData('foo');
-            $element->skip();
-        };
-        $bar = function (ContextElementInterface $element) {
-            $element->setData('bar');
-            $element->skip();
-        };
-        $baz = function (ContextElementInterface $element) {
-            $element->setData('baz');
-            $element->skip();
-        };
-        $stack->registerTransformer($foo, 50);
-        $stack->registerTransformer($bar, 0);
-        $stack->registerTransformer($baz, 100);
-
-        $context = new ContextElement();
-        $stack($context);
-        $this->assertEquals('baz', $context->getData());
-    }
-
     public function testStop()
     {
         $stack = new TransformerStack();
-        $foo = function (ContextElementInterface $element) {
+        $foo = function (ContextElementInterface $element) use ($stack) {
             $element->setData('foo');
-            $element->stop();
+            $stack->stop();
         };
-        $bar = function (ContextElementInterface $element) {
+        $bar = function (ContextElementInterface $element) use ($stack) {
             $element->setData('bar');
-            $element->stop();
+            $stack->stop();
         };
-        $baz = function (ContextElementInterface $element) {
+        $baz = function (ContextElementInterface $element) use ($stack) {
             $element->setData('baz');
-            $element->stop();
+            $stack->stop();
         };
         $stack->registerTransformer($foo, 50);
-        $stack->registerTransformer($bar, 0);
-        $stack->registerTransformer($baz, 100);
+        $stack->registerTransformer($bar, 100);
+        $stack->registerTransformer($baz, 0);
 
         $context = new ContextElement();
         $stack($context);
-        $this->assertEquals('baz', $context->getData());
+        $this->assertEquals('bar', $context->getData());
     }
 }

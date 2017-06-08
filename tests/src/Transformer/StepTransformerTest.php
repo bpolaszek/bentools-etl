@@ -16,7 +16,7 @@ class StepTransformerTest extends TestCase
 
     public function setUp()
     {
-        $this->stack = new StepTransformer(['first', 'second']);
+        $this->stack = new StepTransformer(['first', 'second', 'third']);
     }
 
     /**
@@ -75,12 +75,13 @@ class StepTransformerTest extends TestCase
         $bar = function (ContextElementInterface $element) {
             $element->setData('bar');
         };
-        $stack->registerTransformer('first', $bar, $foo);
+        $stack->registerTransformer('first', $bar);
+        $stack->registerTransformer('first', $foo);
         $stack($context);
         $this->assertEquals('foo', $context->getData());
     }
 
-    public function testAddTransformersWhenOneConfigured()
+    public function testMultipleTransformersWithPriority()
     {
 
         $context = new ContextElement();
@@ -92,26 +93,76 @@ class StepTransformerTest extends TestCase
             $element->setData('bar');
         };
         $stack->registerTransformer('first', $bar);
-        $stack->registerTransformer('first', $bar, $foo);
-        $stack($context);
-        $this->assertEquals('foo', $context->getData());
-    }
-
-    public function testAddTransformersWhenMultipleConfigured()
-    {
-
-        $context = new ContextElement();
-        $stack = $this->stack;
-        $foo = function (ContextElementInterface $element) {
-            $element->setData('foo');
-        };
-        $bar = function (ContextElementInterface $element) {
-            $element->setData('bar');
-        };
-        $stack->registerTransformer('first', $bar, $foo);
-        $stack->registerTransformer('first', $foo, $bar);
+        $stack->registerTransformer('first', $foo, 100);
         $stack($context);
         $this->assertEquals('bar', $context->getData());
+    }
+
+    public function testStop()
+    {
+        $context = new ContextElement();
+        $stack = $this->stack;
+        $foo = function (ContextElementInterface $element) use ($stack) {
+            $element->setData('foo');
+            $stack->stop();
+        };
+        $bar = function (ContextElementInterface $element) use ($stack) {
+            $element->setData('bar');
+            $stack->stop();
+        };
+        $baz = function (ContextElementInterface $element) use ($stack) {
+            $element->setData('baz');
+            $stack->stop();
+        };
+        $stack->registerTransformer('first', $foo);
+        $stack->registerTransformer('second', $bar);
+        $stack->registerTransformer('third', $baz);
+        $stack($context);
+        $this->assertEquals('foo', $context->getData());
+
+    }
+
+    public function testStopStep()
+    {
+        $context = new ContextElement();
+        $stack = $this->stack;
+        $barHasNotBeenCalled = true;
+        $foo = function (ContextElementInterface $element) use ($stack) {
+            $element->setData('foo');
+            $stack->stop('first');
+        };
+        $bar = function (ContextElementInterface $element) use ($stack, &$barHasNotBeenCalled) {
+            $barHasNotBeenCalled = false;
+            $element->setData('bar');
+        };
+        $baz = function (ContextElementInterface $element) use ($stack) {
+            $element->setData('baz');
+        };
+        $stack->registerTransformer('first', $foo);
+        $stack->registerTransformer('first', $bar);
+        $stack->registerTransformer('second', $baz);
+        $stack($context);
+        $this->assertEquals('baz', $context->getData());
+        $this->assertTrue($barHasNotBeenCalled);
+    }
+
+    public function testStopStepBeforeItBegins()
+    {
+        $context = new ContextElement();
+        $stack = $this->stack;
+        $foo = function (ContextElementInterface $element) use ($stack) {
+            $element->setData('foo');
+            $stack->stop('first');
+        };
+        $bar = function (ContextElementInterface $element) use ($stack) {
+            $element->setData('bar');
+            $stack->stop();
+        };
+        $stack->registerTransformer('first', $foo);
+        $stack->registerTransformer('second', $bar);
+        $stack->stop('second');
+        $stack($context);
+        $this->assertEquals('foo', $context->getData());
     }
 
 }

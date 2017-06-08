@@ -8,6 +8,8 @@ class StepTransformer implements TransformerInterface
 {
     protected $steps = [];
     protected $transformers = [];
+    protected $stoppedSteps = [];
+    protected $stop = false;
 
     /**
      * StepTransformer constructor.
@@ -37,46 +39,46 @@ class StepTransformer implements TransformerInterface
     /**
      * Register one or several transformers for a particular step.
      *
-     * @param       $step
-     * @param array ...$transformer
+     * @param                               $step
+     * @param callable|TransformerInterface $transformer
+     * @param int                           $priority
      * @throws \InvalidArgumentException
      */
-    public function registerTransformer($step, callable ...$transformer): void
+    public function registerTransformer($step, callable $transformer, int $priority = 0): void
     {
         if (!in_array($step, $this->steps)) {
-            throw new \InvalidArgumentException("Step {$step} is not registered.");
+            throw new \InvalidArgumentException(sprintf('Step "%s" is not registered.', $step));
         }
 
-        if (0 === count($transformer)) {
-            throw new \InvalidArgumentException(sprintf("At least 1 transformer should be registered for step %s", $step));
-        }
+        $stack = $this->transformers[$step] ?? new TransformerStack();
+        $stack->registerTransformer($transformer, $priority);
+        $this->transformers[$step] = $stack;
+    }
 
-        if (1 !== count($transformer)) {
-            foreach ($transformer as $callable) {
-                $this->registerTransformer($step, $callable);
+    /**
+     * @param null $step
+     * @throws \InvalidArgumentException
+     */
+    public function stop($step = null)
+    {
+        if (null !== $step) {
+            if (!in_array($step, $this->steps)) {
+                throw new \InvalidArgumentException(sprintf('Step "%s" is not registered.', $step));
             }
-            return;
-        }
-
-        $transformer = $transformer[0];
-
-        if (isset($this->transformers[$step])) { // Step already has transformers
-            if ($this->transformers[$step] instanceof TransformerStack) { // There are already multiple transformers for this step
-                $this->transformers[$step]->registerTransformer($transformer);
-            } else { // Otherwise, we should create a stack of transformers
-                $this->transformers[$step] = new TransformerStack([$this->transformers[$step]]);
-                $this->transformers[$step]->registerTransformer($transformer);
+            if (null !== ($transformer = $this->getTransformerFor($step))) {
+                $transformer->stop();
+                $this->stoppedSteps[] = $step;
             }
         } else {
-            $this->transformers[$step] = $transformer;
+            $this->stop = true;
         }
     }
 
     /**
      * @param $step
-     * @return callable|TransformerInterface|null
+     * @return TransformerStack|null
      */
-    private function getTransformerFor($step)
+    public function getTransformerFor($step)
     {
         return $this->transformers[$step] ?? null;
     }
@@ -87,10 +89,10 @@ class StepTransformer implements TransformerInterface
     public function __invoke(ContextElementInterface $element): void
     {
         foreach ($this->steps as $step) {
-            if (null !== ($transform = $this->getTransformerFor($step))) {
-                if (!$element->shouldSkip() && !$element->shouldStop()) {
+            if (false === $this->stop
+                && false === in_array($step, $this->stoppedSteps, true)
+                && null !== ($transform = $this->getTransformerFor($step))) {
                     $transform($element);
-                }
             }
         }
     }

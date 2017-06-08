@@ -9,6 +9,7 @@ use Traversable;
 class TransformerStack implements TransformerInterface, IteratorAggregate
 {
     private $transformers = [];
+    private $stop = false;
 
     /**
      * TransformerStack constructor.
@@ -48,12 +49,20 @@ class TransformerStack implements TransformerInterface, IteratorAggregate
     }
 
     /**
+     * Stops the transformer chain.
+     */
+    public function stop()
+    {
+        $this->stop = true;
+    }
+
+    /**
      * @inheritDoc
      */
     public function __invoke(ContextElementInterface $element): void
     {
         foreach ($this as $transform) {
-            if (!$element->shouldSkip() && !$element->shouldFlush()) {
+            if (false === $this->stop) {
                 $transform($element);
             }
         }

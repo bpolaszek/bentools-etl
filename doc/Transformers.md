@@ -107,11 +107,15 @@ $stack = new StepTransformer([
 
 $stack->registerTransformer('step_1', function (ContextElementInterface $element) {
     $element->setData('foo');
-}); // You can add more transformers if necessary, or a TransformerStack
+});
 
 $stack->registerTransformer('step_2', function (ContextElementInterface $element) {
     $element->setData('bar');
 });
+
+$stack->registerTransformer('step_2', function (ContextElementInterface $element) {
+    $element->setData('baz');
+}, 100); // Will be executed on top of step_2
 
 $element = new ContextElement();
 $stack($element);
