@@ -21,6 +21,15 @@ class StepTransformer implements TransformerInterface
     }
 
     /**
+     * Reset stop state
+     */
+    public function reset(): void
+    {
+        $this->stop = false;
+        $this->stoppedSteps = [];
+    }
+
+    /**
      * Register steps, in the order they should be executed.
      *
      * @param array $steps
@@ -88,6 +97,7 @@ class StepTransformer implements TransformerInterface
      */
     public function __invoke(ContextElementInterface $element): void
     {
+        $this->reset();
         foreach ($this->steps as $step) {
             if (false === $this->stop
                 && false === in_array($step, $this->stoppedSteps, true)
