@@ -16,12 +16,12 @@ Installation
 composer require bentools/etl:^3.0@alpha
 ```
 
-_Warning: version 3.0 is a complete rewrite and a involves major BC breaks. Don't upgrade from `^2.0` unless you know what you're doing!_
+_Warning: version 3.0 is a complete rewrite and a involves important BC breaks. Don't upgrade from `^2.0` unless you know what you're doing!_
 
 Usage
 -----
 
-To sum up, you will apply _transformations_ onto an `iterable` of "anythings" in order to _load_ them in some place. 
+To sum up, you will apply _transformations_ onto an `iterable` of any _things_ in order to _load_ them in some place. 
 Sometimes your `iterable` is ready to go, sometimes you just don't need to perform transformations, but anyway you need to load that data somewhere.
 
 Let's start with a really simple example:
@@ -106,7 +106,7 @@ As you guessed, the following content was just written into `data.json`:
 ]
 ```
 
-We provide helpful extractors and loaders to manipulate JSON, CSV, text, and you'll also find a `DoctrineORMLoader` for when your transformer yields Doctrine entities.
+We provide helpful extractors and loaders to manipulate JSON, CSV, text, and you'll also find a `DoctrineORMLoader` for when your transformer _yields_ Doctrine entities.
 
 Because yes, a transformer must return a `\Generator`. Why? Because a single extracted item can lead to several output items. Let's take a more sophisticated example:
 
@@ -115,6 +115,7 @@ use BenTools\ETL\EtlBuilder;
 use BenTools\ETL\Extractor\JsonExtractor;
 
 $pdo = new \PDO('mysql:host=localhost;dbname=test');
+$input = __DIR__.'/data.json'; // The JsonExtractor will convert that file to a PHP array
 
 $etl = EtlBuilder::init()
     ->extractFrom(new JsonExtractor())
@@ -145,20 +146,20 @@ $etl = EtlBuilder::init()
     )
     ->createEtl();
 
-$etl->process(__DIR__.'/data.json'); // The JsonExtractor will convert that file to a PHP array
+$etl->process($input);
 ```
 
 As you can see, from a single item, we loaded up to 2 queries.
 
-And as you can notice, your _extractors_, _transformers_ and _loaders_ can implement `ExtractorInterface`, `TransformerInterface` or `LoaderInterface` as well as being simple `callables`.
+Your _extractors_, _transformers_ and _loaders_ can implement `[ExtractorInterface](src/Extractor/ExtractorInterface.php)`, `[TransformerInterface](src/Transformer/TransformerInterface.php)` or `[LoaderInterface](src/Loader/LoaderInterface.php)` as well as being simple `callables`.
 
 
 Skipping items
 --------------
 
-Each _extractor_ / _transformer_ / _loader_ callback gets the current `Etl` object passed in their arguments. 
+Each _extractor_ / _transformer_ / _loader_ callback gets the current `Etl` object injected in their arguments. 
 
-This allows you to ask the ETL to skip an item, or even stop the process:
+This allows you to ask the ETL to skip an item, or even to stop the whole process:
 
 ```php
 use BenTools\ETL\Etl;
@@ -260,13 +261,13 @@ var_dump($storage); // ['apple', 'banana']
 
 Here, we intentionnally threw an exception during the _transform_ operation. But thanks to the event dispatcher, we could tell the ETL this exception can be safely ignored and it can pursue the rest of the process.
 
-You can attach as many event listeners as you wish and sort them by priority.
+You can attach as many event listeners as you wish, and sort them by priority.
 
 
 Recipes
 -------
 
-A recipe is an ETL pattern that can be reused through different tasks. It's a kind of `ETLBuilder` factory, but you must know that a recipe can **replace** the builder's _extractor_, _transformer_ and _loader_ but will **add** event listeners.
+A recipe is an ETL pattern that can be reused through different tasks.
 If you want to log everything that goes through an ETL for example, use our built-in Logger recipe:
 
 ```php
@@ -315,6 +316,7 @@ $etl = EtlBuilder::init()
 $etl->process('input.csv');
 ```
 
+To sum up, a _recipe_ is a kind of an `ETLBuilder` factory, but keep in mind that a recipe will only **add** event listeners to the existing builder but can also **replace** the builder's _extractor_, _transformer_ and/or _loader_.
 
 Tests
 -----
