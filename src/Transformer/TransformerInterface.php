@@ -2,15 +2,18 @@
 
 namespace BenTools\ETL\Transformer;
 
-use BenTools\ETL\Context\ContextElementInterface;
+use BenTools\ETL\Etl;
 
 interface TransformerInterface
 {
 
     /**
-     * Transforms data and hydrates element (should call $element->setData())
+     * Transform $value.
      *
-     * @param ContextElementInterface $element
+     * @param     $value
+     * @param     $key
+     * @param Etl $etl
+     * @return \Generator - yield values to load
      */
-    public function __invoke(ContextElementInterface $element): void;
+    public function transform($value, $key, Etl $etl): \Generator;
 }

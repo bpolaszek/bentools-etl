@@ -5,7 +5,7 @@ namespace BenTools\ETL\Iterator;
 use FilterIterator;
 use SplFileObject;
 
-class CsvFileIterator extends FilterIterator implements CsvIteratorInterface, \Countable
+final class CsvFileIterator extends FilterIterator implements CsvIteratorInterface, \Countable
 {
 
     private $nbLines;
@@ -45,7 +45,7 @@ class CsvFileIterator extends FilterIterator implements CsvIteratorInterface, \C
     {
         $current = $this->getInnerIterator()->current();
         return !empty(
-            array_filter(
+            \array_filter(
                 $current,
                 function ($cell) {
                     return null !== $cell;
@@ -61,7 +61,7 @@ class CsvFileIterator extends FilterIterator implements CsvIteratorInterface, \C
     {
         if (null === $this->nbLines) {
             $this->rewind();
-            $this->nbLines = count(iterator_to_array($this));
+            $this->nbLines = \count(\iterator_to_array($this));
         }
 
         return $this->nbLines;

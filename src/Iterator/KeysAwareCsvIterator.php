@@ -4,7 +4,7 @@ namespace BenTools\ETL\Iterator;
 
 use IteratorAggregate;
 
-class KeysAwareCsvIterator implements IteratorAggregate, CsvIteratorInterface
+final class KeysAwareCsvIterator implements IteratorAggregate, CsvIteratorInterface
 {
     /**
      * @var CsvIteratorInterface

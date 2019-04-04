@@ -2,13 +2,16 @@
 
 namespace BenTools\ETL\Loader;
 
-class JsonFileLoader extends ArrayLoader implements FlushableLoaderInterface
+use BenTools\ETL\Etl;
+use SplFileObject;
+
+final class JsonFileLoader implements LoaderInterface
 {
 
     /**
-     * @var \SplFileObject
+     * @var SplFileObject
      */
-    protected $file;
+    private $file;
 
     /**
      * @var int
@@ -21,16 +24,19 @@ class JsonFileLoader extends ArrayLoader implements FlushableLoaderInterface
     private $jsonDepth = 512;
 
     /**
+     * @var array
+     */
+    private $data = [];
+
+    /**
      * JsonFileLoader constructor.
      *
-     * @param \SplFileObject $file
+     * @param SplFileObject $file
      * @param int            $jsonOptions
      * @param int            $jsonDepth
      */
-    public function __construct(\SplFileObject $file, int $jsonOptions = 0, int $jsonDepth = 512)
+    public function __construct(SplFileObject $file, int $jsonOptions = 0, int $jsonDepth = 512)
     {
-        $output = [];
-        parent::__construct($output);
         $this->file = $file;
         $this->jsonOptions = $jsonOptions;
         $this->jsonDepth = $jsonDepth;
@@ -39,18 +45,52 @@ class JsonFileLoader extends ArrayLoader implements FlushableLoaderInterface
     /**
      * @inheritDoc
      */
-    public function shouldFlushAfterLoad(): bool
+    public function load(\Generator $items, $identifier, Etl $etl): void
     {
-        return false;
+        foreach ($items as $key => $value) {
+            $this->data[$key] = $value;
+        }
     }
 
     /**
      * @inheritDoc
      */
-    public function flush(): void
+    public function init(): void
     {
-        if (0 === $this->file->fwrite(json_encode($this->getArray(), $this->jsonOptions, $this->jsonDepth))) {
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function rollback(): void
+    {
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function commit(bool $partial): void
+    {
+        if (true === $partial) {
+            return;
+        }
+
+        if (0 === $this->file->fwrite(json_encode($this->data, $this->jsonOptions, $this->jsonDepth))) {
             throw new \RuntimeException(sprintf('Unable to write to %s', $this->file->getPathname()));
         }
+    }
+
+    /**
+     * @param string $filename
+     * @param int    $jsonOptions
+     * @param int    $jsonDepth
+     * @return JsonFileLoader
+     * @throws \LogicException
+     * @throws \RuntimeException
+     */
+    public static function toFile(string $filename, int $jsonOptions = 0, int $jsonDepth = 512): self
+    {
+        return new self(new SplFileObject($filename, 'w'), $jsonOptions, $jsonDepth);
     }
 }

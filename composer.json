@@ -1,6 +1,6 @@
 {
   "name": "bentools/etl",
-  "description": "Some classes to implement the ETL pattern, with the ability to hook on each event.",
+  "description": "Extract / Transform / Load in PHP - Multiple formats - No dependency.",
   "license": "MIT",
   "authors": [
     {
@@ -8,15 +8,25 @@
     }
   ],
   "require": {
-    "php": ">=7.1",
-    "psr/log": "^1.0"
+    "php": ">=7.2",
+    "thecodingmachine/safe": "^0.1.14",
+    "psr/event-dispatcher": "^1.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^6.0",
+    "squizlabs/php_codesniffer": "~2.0",
+    "doctrine/orm": "^2.5",
+    "symfony/var-dumper": "^4.0",
+    "php-coveralls/php-coveralls": "^2.1",
+    "psr/log": "^1.1"
   },
   "autoload-dev": {
     "psr-4": {
       "BenTools\\ETL\\Tests\\": "tests/src"
     },
     "files": [
-      "vendor/symfony/var-dumper/Resources/functions/dump.php"
+      "vendor/symfony/var-dumper/Resources/functions/dump.php",
+      "tests/functions.php"
     ]
   },
   "autoload": {
@@ -24,18 +34,9 @@
       "BenTools\\ETL\\": "src"
     }
   },
-  "require-dev": {
-    "phpunit/phpunit": "^6.0",
-    "squizlabs/php_codesniffer": "~2.0",
-    "symfony/event-dispatcher": "^3.2",
-    "doctrine/orm": "^2.5",
-    "guzzlehttp/promises": "^1.3",
-    "satooshi/php-coveralls": "^1.0",
-    "symfony/var-dumper": "^3.2"
-  },
-  "suggest": {
-    "symfony/event-dispatcher": "An event dispatcher to hook into the ETL process.",
-    "guzzlehttp/promises": "Process Asynchronous ETL",
-    "cocur/slugify": "Generates slugs from strings - useful to create array keys."
+  "extra": {
+    "branch-alias": {
+      "dev-3.0": "3.0.x-dev"
+    }
   }
 }

@@ -2,9 +2,9 @@
 
 namespace BenTools\ETL\Loader;
 
-use BenTools\ETL\Context\ContextElementInterface;
+use BenTools\ETL\Etl;
 
-class ArrayLoader implements LoaderInterface
+final class ArrayLoader implements LoaderInterface
 {
 
     /**
@@ -13,28 +13,61 @@ class ArrayLoader implements LoaderInterface
     protected $array;
 
     /**
+     * @var bool
+     */
+    private $preserveKeys;
+
+    /**
      * ArrayLoader constructor.
      *
      * @param array $array
      */
-    public function __construct(array &$array = [])
+    public function __construct(bool $preserveKeys = true, array &$array = [])
     {
         $this->array = &$array;
-    }
-
-    /**
-     * @return array
-     */
-    public function getArray()
-    {
-        return $this->array;
+        $this->preserveKeys = $preserveKeys;
     }
 
     /**
      * @inheritDoc
      */
-    public function __invoke(ContextElementInterface $element): void
+    public function init(): void
     {
-        $this->array[$element->getId()] = $element->getData();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function load(\Generator $items, $key, Etl $etl): void
+    {
+        foreach ($items as $v) {
+            if ($this->preserveKeys) {
+                $this->array[$key] = $v;
+            } else {
+                $this->array[] = $v;
+            }
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function rollback(): void
+    {
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function commit(bool $partial): void
+    {
+    }
+
+    /**
+     * @return array
+     */
+    public function getArray(): array
+    {
+        return $this->array;
     }
 }

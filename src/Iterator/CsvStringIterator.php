@@ -4,7 +4,7 @@ namespace BenTools\ETL\Iterator;
 
 use IteratorAggregate;
 
-class CsvStringIterator implements IteratorAggregate, CsvIteratorInterface
+final class CsvStringIterator implements IteratorAggregate, CsvIteratorInterface
 {
 
     /**
@@ -49,7 +49,6 @@ class CsvStringIterator implements IteratorAggregate, CsvIteratorInterface
 
     /**
      * @param string $text
-     * @param bool $skipEmptyLines
      * @param string $delimiter
      * @param string $enclosure
      * @param string $escapeString
@@ -57,13 +56,12 @@ class CsvStringIterator implements IteratorAggregate, CsvIteratorInterface
      */
     public static function createFromText(
         string $text,
-        bool $skipEmptyLines = true,
         $delimiter = ',',
         $enclosure = '"',
         $escapeString = '\\'
     ) {
 
-        return new static(new TextLinesIterator($text, $skipEmptyLines), $delimiter, $enclosure, $escapeString);
+        return new static(new TextLinesIterator($text, true), $delimiter, $enclosure, $escapeString);
     }
 
     /**
@@ -72,7 +70,7 @@ class CsvStringIterator implements IteratorAggregate, CsvIteratorInterface
     public function getIterator()
     {
         foreach ($this->stringIterator as $line) {
-            yield str_getcsv($line, $this->delimiter, $this->enclosure, $this->escapeString);
+            yield \str_getcsv($line, $this->delimiter, $this->enclosure, $this->escapeString);
         }
     }
 }

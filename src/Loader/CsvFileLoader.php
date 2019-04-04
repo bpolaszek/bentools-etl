@@ -2,11 +2,12 @@
 
 namespace BenTools\ETL\Loader;
 
-use BenTools\ETL\Context\ContextElementInterface;
-use Psr\Log\LoggerInterface;
+use BenTools\ETL\Etl;
+use SplFileObject;
 
-class CsvFileLoader extends FileLoader
+final class CsvFileLoader implements LoaderInterface
 {
+    private $file;
 
     /**
      * @var string
@@ -17,6 +18,7 @@ class CsvFileLoader extends FileLoader
      * @var string
      */
     private $enclosure;
+
     /**
      * @var string
      */
@@ -28,75 +30,53 @@ class CsvFileLoader extends FileLoader
     private $keys;
 
     /**
-     * @var bool
-     */
-    private $startedWriting = false;
-
-    /**
      * @inheritDoc
      */
     public function __construct(
-        \SplFileObject $file,
-        LoggerInterface $logger = null,
+        SplFileObject $file,
         $delimiter = ',',
         $enclosure = '"',
         $escape = '\\',
         array $keys = []
     ) {
-        parent::__construct($file, $logger);
+        $this->file = $file;
         $this->delimiter = $delimiter;
         $this->enclosure = $enclosure;
-        $this->escape    = $escape;
+        $this->escape = $escape;
         $this->keys = $keys;
-    }
-
-    /**
-     * @return array
-     */
-    public function getKeys()
-    {
-        return $this->keys;
-    }
-
-    /**
-     * @param array $keys
-     * @return $this - Provides Fluent Interface
-     */
-    public function setKeys(array $keys)
-    {
-        if (true === $this->startedWriting) {
-            throw new \RuntimeException("It is too late to set the keys, the loader has already started writing.");
-        }
-
-        $this->keys = $keys;
-        return $this;
     }
 
     /**
      * @inheritDoc
      */
-    public function __invoke(ContextElementInterface $element): void
+    public function load(\Generator $generator, $key, Etl $etl): void
     {
-        if (!empty($this->keys) && false === $this->startedWriting) {
-            if (false !== (bool) $this->file->fputcsv($this->keys, $this->delimiter, $this->enclosure, $this->escape)) {
-                $this->startedWriting = true;
-            }
+        foreach ($generator as $row) {
+            $this->file->fputcsv($row, $this->delimiter, $this->enclosure, $this->escape);
         }
+    }
 
-        $bytes = $this->file->fputcsv($element->getData(), $this->delimiter, $this->enclosure, $this->escape);
-
-        if (0 !== $bytes && false === $this->startedWriting) {
-            $this->startedWriting = true;
+    /**
+     * @inheritDoc
+     */
+    public function init(): void
+    {
+        if (!empty($this->keys)) {
+            $this->file->fputcsv($this->keys, $this->delimiter, $this->enclosure, $this->escape);
         }
+    }
 
-        $this->logger->debug(
-            'Write a field array as a CSV line',
-            [
-            'id' => $element->getId(),
-            'data' => $element->getData(),
-            'filename' => $this->file->getBasename(),
-            'bytes' => $bytes
-            ]
-        );
+    /**
+     * @inheritDoc
+     */
+    public function commit(bool $partial): void
+    {
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function rollback(): void
+    {
     }
 }

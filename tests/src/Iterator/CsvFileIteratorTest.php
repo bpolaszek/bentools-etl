@@ -8,8 +8,10 @@ use PHPUnit\Framework\TestCase;
 
 class CsvFileIteratorTest extends TestCase
 {
-
-    public function testIterator()
+    /**
+     * @test
+     */
+    public function it_iterates()
     {
         $iterator = CsvFileIterator::createFromFilename(TestSuite::getDataFile('dictators.csv'));
         $this->assertCount(3, $iterator);

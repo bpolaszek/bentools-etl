@@ -8,7 +8,10 @@ use PHPUnit\Framework\TestCase;
 
 class CsvStringIteratorTest extends TestCase
 {
-    public function testIterator()
+    /**
+     * @test
+     */
+    public function it_iterates()
     {
         $text     = file_get_contents(TestSuite::getDataFile('dictators.csv'));
         $iterator = CsvStringIterator::createFromText($text);

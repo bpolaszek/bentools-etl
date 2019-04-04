@@ -3,8 +3,9 @@
 namespace BenTools\ETL\Iterator;
 
 use IteratorAggregate;
+use function Safe\preg_split;
 
-class TextLinesIterator implements IteratorAggregate, StringIteratorInterface
+final class TextLinesIterator implements IteratorAggregate, StringIteratorInterface
 {
     /**
      * @var string
@@ -57,10 +58,10 @@ class TextLinesIterator implements IteratorAggregate, StringIteratorInterface
      */
     private function traverseWithStrTok()
     {
-        $tok = strtok($this->content, "\r\n");
+        $tok = \strtok($this->content, "\r\n");
         while (false !== $tok) {
             $line = $tok;
-            $tok = strtok("\n\r");
+            $tok = \strtok("\n\r");
             yield $line;
         }
     }
