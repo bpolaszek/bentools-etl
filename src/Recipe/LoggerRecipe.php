@@ -15,27 +15,29 @@ use Psr\Log\LogLevel;
 final class LoggerRecipe extends Recipe
 {
     private const DEFAULT_LOG_LEVELS = [
-        EtlEvents::START     => LogLevel::INFO,
-        EtlEvents::EXTRACT   => LogLevel::INFO,
-        EtlEvents::TRANSFORM => LogLevel::INFO,
-        EtlEvents::LOAD      => LogLevel::INFO,
-        EtlEvents::FLUSH     => LogLevel::INFO,
-        EtlEvents::SKIP      => LogLevel::INFO,
-        EtlEvents::STOP      => LogLevel::INFO,
-        EtlEvents::ROLLBACK  => LogLevel::INFO,
-        EtlEvents::END       => LogLevel::INFO,
+        EtlEvents::START       => LogLevel::INFO,
+        EtlEvents::EXTRACT     => LogLevel::INFO,
+        EtlEvents::TRANSFORM   => LogLevel::INFO,
+        EtlEvents::LOADER_INIT => LogLevel::INFO,
+        EtlEvents::LOAD        => LogLevel::INFO,
+        EtlEvents::FLUSH       => LogLevel::INFO,
+        EtlEvents::SKIP        => LogLevel::INFO,
+        EtlEvents::STOP        => LogLevel::INFO,
+        EtlEvents::ROLLBACK    => LogLevel::INFO,
+        EtlEvents::END         => LogLevel::INFO,
     ];
 
     private const DEFAULT_EVENT_PRIORITIES = [
-        EtlEvents::START     => 128,
-        EtlEvents::EXTRACT   => 128,
-        EtlEvents::TRANSFORM => 128,
-        EtlEvents::LOAD      => 128,
-        EtlEvents::FLUSH     => 128,
-        EtlEvents::SKIP      => 128,
-        EtlEvents::STOP      => 128,
-        EtlEvents::ROLLBACK  => 128,
-        EtlEvents::END       => 128,
+        EtlEvents::START       => 128,
+        EtlEvents::EXTRACT     => 128,
+        EtlEvents::TRANSFORM   => 128,
+        EtlEvents::LOADER_INIT => 128,
+        EtlEvents::LOAD        => 128,
+        EtlEvents::FLUSH       => 128,
+        EtlEvents::SKIP        => 128,
+        EtlEvents::STOP        => 128,
+        EtlEvents::ROLLBACK    => 128,
+        EtlEvents::END         => 128,
     ];
 
     /**
@@ -47,6 +49,7 @@ final class LoggerRecipe extends Recipe
      * @var array
      */
     private $logLevels;
+
     /**
      * @var array
      */
@@ -85,6 +88,12 @@ final class LoggerRecipe extends Recipe
                     $this->logger->log($this->getLogLevel($event), sprintf('Transformed %s.', $event->getKey()));
                 },
                 $this->getPriority(EtlEvents::TRANSFORM)
+            )
+            ->onLoaderInit(
+                function (ItemEvent $event) {
+                    $this->logger->log($this->getLogLevel($event), 'Initializing loader...');
+                },
+                $this->getPriority(EtlEvents::LOAD)
             )
             ->onLoad(
                 function (ItemEvent $event) {
