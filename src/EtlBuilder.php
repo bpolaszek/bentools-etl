@@ -226,6 +226,18 @@ final class EtlBuilder
      * @param int      $priority
      * @return EtlBuilder
      */
+    public function onLoaderInit(callable $callable, int $priority = 0): self
+    {
+        $this->listeners[] = new EventListener(EtlEvents::LOADER_INIT, $callable, $priority);
+
+        return $this;
+    }
+
+    /**
+     * @param callable $callable
+     * @param int      $priority
+     * @return EtlBuilder
+     */
     public function onLoad(callable $callable, int $priority = 0): self
     {
         $this->listeners[] = new EventListener(EtlEvents::LOAD, $callable, $priority);

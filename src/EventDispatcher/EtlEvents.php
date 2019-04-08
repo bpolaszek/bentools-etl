@@ -35,6 +35,12 @@ final class EtlEvents
     public const TRANSFORM_EXCEPTION = 'transform.exception';
 
     /**
+     * This event is fired when initializing the loader (just before the 1st item gets loaded).
+     * This event will yield a \BenTools\ETL\EventDispatcher\Event\ItemEvent object.
+     */
+    public const LOADER_INIT = 'loader.init';
+
+    /**
      * Fired after an item has been loaded.
      * This event will yield a \BenTools\ETL\EventDispatcher\Event\ItemEvent object.
      */

@@ -56,9 +56,9 @@ $data = [
 
 $etl = EtlBuilder::init()
     ->transformWith(new CallableTransformer('strtoupper'))
-    ->loadInto(JsonFileLoader::toFile(__DIR__.'/data.json'))
+    ->loadInto(JsonFileLoader::factory())
     ->createEtl();
-$etl->process($data);
+$etl->process($data, __DIR__.'/data.json'); // You can also set the output file when processing :-)
 ```
 
 Didn't you just write the string `["FOO","BAR"]` into `data.json` ? Yes, you did!
@@ -77,19 +77,13 @@ RU,Russia,"Vladimir Putin"
 CSV;
 
 $etl = EtlBuilder::init()
-    ->extractFrom(new CsvExtractor(
-            $delimiter = ',', 
-            $enclosure = '"', 
-            $escapeString = '\\', 
-            $createKeys = true,  // 1st row will be used for keys
-            CsvExtractor::INPUT_STRING
-        ))
-    ->loadInto(JsonFileLoader::toFile(__DIR__.'/data.json', \JSON_PRETTY_PRINT))
+    ->extractFrom(new CsvExtractor())
+    ->loadInto(JsonFileLoader::factory(['json_options' => \JSON_PRETTY_PRINT]))
     ->createEtl();
-$etl->process($data);
+$etl->process($data, __DIR__.'/data.json');
 ```
 
-As you guessed, the following content was just written into `data.json`:
+As you guessed, the following content was just written into `presidents.json`:
 
 ```json
 [
@@ -115,7 +109,7 @@ use BenTools\ETL\EtlBuilder;
 use BenTools\ETL\Extractor\JsonExtractor;
 
 $pdo = new \PDO('mysql:host=localhost;dbname=test');
-$input = __DIR__.'/data.json'; // The JsonExtractor will convert that file to a PHP array
+$input = __DIR__.'/presidents.json';
 
 $etl = EtlBuilder::init()
     ->extractFrom(new JsonExtractor())
@@ -146,12 +140,12 @@ $etl = EtlBuilder::init()
     )
     ->createEtl();
 
-$etl->process($input);
+$etl->process(__DIR__.'/presidents.json'); // The JsonExtractor will convert that file to a PHP array
 ```
 
 As you can see, from a single item, we loaded up to 2 queries.
 
-Your _extractors_, _transformers_ and _loaders_ can implement `[ExtractorInterface](src/Extractor/ExtractorInterface.php)`, `[TransformerInterface](src/Transformer/TransformerInterface.php)` or `[LoaderInterface](src/Loader/LoaderInterface.php)` as well as being simple `callables`.
+Your _extractors_, _transformers_ and _loaders_ can implement [`ExtractorInterface`](https://github.com/bpolaszek/bentools-etl/tree/master/src/Extractor/ExtractorInterface.php), [`TransformerInterface`](https://github.com/bpolaszek/bentools-etl/tree/master/src/Transformer/TransformerInterface.php) or [`LoaderInterface`](https://github.com/bpolaszek/bentools-etl/tree/master/src/Loader/LoaderInterface.php) as well as being simple `callables`.
 
 
 Skipping items
@@ -210,6 +204,7 @@ Now you're wondering how you can hook on the ETL lifecycle, to log things, handl
 * The extraction failed
 * An item has been transformed
 * Transformation failed
+* Loader is initialized (1st item is about to be loaded)
 * An item has been loaded
 * Loading failed
 * An item has been skipped
@@ -218,7 +213,7 @@ Now you're wondering how you can hook on the ETL lifecycle, to log things, handl
 * A rollback operation was completed
 * The ETL completed the whole process.
 
-The _item_ events will allow you to mark the current item to be skipped, or even handle runtime exceptions. Let's take another example:
+The _ItemEvents_ (on extract, transform, load) will allow you to mark the current item to be skipped, or even handle runtime exceptions. Let's take another example:
 
 ```php
 use BenTools\ETL\EtlBuilder;
@@ -283,37 +278,41 @@ You can also create your own recipes:
 
 ```php
 use BenTools\ETL\EtlBuilder;
-use BenTools\ETL\Extractor\CsvExtractor;
-use BenTools\ETL\Loader\JsonFileLoader;
-use BenTools\ETL\Recipe\LoggerRecipe;
+use BenTools\ETL\EventDispatcher\Event\ItemEvent;
+use BenTools\ETL\Extractor\JsonExtractor;
+use BenTools\ETL\Loader\CsvFileLoader;
 use BenTools\ETL\Recipe\Recipe;
 
-class CSVtoJSONRecipe extends Recipe
+
+class JSONToCSVRecipe extends Recipe
 {
-    private $outputFile;
-
-    public function __construct(string $outputFile)
-    {
-        $this->outputFile = $outputFile;
-    }
-
     /**
      * @inheritDoc
      */
     public function updateBuilder(EtlBuilder $builder): EtlBuilder
     {
         return $builder
-            ->extractFrom(new CsvExtractor())
-            ->loadInto(JsonFileLoader::toFile($this->outputFile))
+            ->extractFrom(new JsonExtractor())
+            ->loadInto($loader = CsvFileLoader::factory(['delimiter' => ';']))
+            ->onLoaderInit(
+                function (ItemEvent $event) use ($loader) {
+                    $loader::factory(['keys' => array_keys($event->getItem())], $loader);
+                })
             ;
     }
+
 }
 
-$etl = EtlBuilder::init()
-    ->useRecipe(new CSVtoJSONRecipe('output.json'))
-    ->useRecipe(new LoggerRecipe($logger))
-    ->createEtl();
-$etl->process('input.csv');
+$builder = EtlBuilder::init()->useRecipe(new JSONToCSVRecipe());
+$etl = $builder->createEtl();
+$etl->process(__DIR__.'/presidents.json', __DIR__.'/presidents.csv');
+```
+
+The above example will result in `presidents.csv` containing:
+```csv
+country_code;country_name;president
+US;USA;"Donald Trump"
+RU;Russia;"Vladimir Putin"
 ```
 
 To sum up, a _recipe_ is a kind of an `ETLBuilder` factory, but keep in mind that a recipe will only **add** event listeners to the existing builder but can also **replace** the builder's _extractor_, _transformer_ and/or _loader_.

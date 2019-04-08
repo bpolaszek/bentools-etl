@@ -4,6 +4,9 @@ namespace BenTools\ETL\Transformer;
 
 use BenTools\ETL\Etl;
 
+/**
+ * A transformer is responsible to generate transformations / normalizations on extracted data.
+ */
 interface TransformerInterface
 {
 

@@ -307,4 +307,59 @@ class EtlBuilderTest extends TestCase
             EtlEvents::END,
         ], $calledEvents);
     }
+
+    /**
+     * @test
+     */
+    public function loader_init_event_is_called_once()
+    {
+        $data = ['foo', 'bar', 'baz'];
+        $called_item = null;
+        $count = 0;
+
+        $builder = EtlBuilder::init()->loadInto(new NullLoader())
+            ->onLoaderInit(
+                function (ItemEvent $event) use (&$called_item, &$count) {
+                    $count++;
+                    $called_item = $event->getItem();
+                }
+            );
+
+        $etl = $builder->createEtl();
+        $etl->process($data);
+
+        $this->assertEquals('foo', $called_item);
+        $this->assertSame(1, $count);
+    }
+
+    /**
+     * @test
+     */
+    public function loader_init_event_is_called_once_even_when_1st_item_is_skipped()
+    {
+        $data = ['foo', 'bar', 'baz'];
+        $called_item = null;
+        $count = 0;
+
+        $builder = EtlBuilder::init()->loadInto(new NullLoader())
+            ->onExtract(
+                function (ItemEvent $event) {
+                    if ('foo' === $event->getItem()) {
+                        $event->getEtl()->skipCurrentItem();
+                    }
+                })
+            ->onLoaderInit(
+                function (ItemEvent $event) use (&$called_item, &$count) {
+                    $count++;
+                    $called_item = $event->getItem();
+                }
+            );
+
+        $etl = $builder->createEtl();
+        $etl->process($data);
+
+        $this->assertEquals('bar', $called_item);
+        $this->assertSame(1, $count);
+    }
+
 }

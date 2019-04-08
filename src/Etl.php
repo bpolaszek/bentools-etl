@@ -98,9 +98,10 @@ final class Etl
      * Run the ETL on the given input.
      *
      * @param $data
+     * @param ...$initLoaderArgs - Optional arguments for loader init
      * @throws EtlException
      */
-    public function process($data): void
+    public function process($data, ...$initLoaderArgs): void
     {
         $flushCounter = $totalCounter = 0;
         $this->start();
@@ -132,7 +133,7 @@ final class Etl
             $totalCounter++;
 
             if (1 === $totalCounter) {
-                $this->initLoader();
+                $this->initLoader($item, $key, ...$initLoaderArgs);
             }
 
             $flush = (null === $this->flushEvery ? false : (0 === ($totalCounter % $this->flushEvery)));
@@ -272,13 +273,15 @@ final class Etl
     /**
      * Init the loader on the 1st item.
      */
-    private function initLoader(): void
+    private function initLoader($item, $key, ...$initLoaderArgs): void
     {
+        $this->eventDispatcher->dispatch(new ItemEvent(EtlEvents::LOADER_INIT, $item, $key, $this));
+
         if (null === $this->init) {
             return;
         }
 
-        ($this->init)();
+        ($this->init)(...$initLoaderArgs);
     }
 
     /**

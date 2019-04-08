@@ -12,7 +12,10 @@ use SplTempFileObject;
 
 class FileLoaderTest extends TestCase
 {
-    public function testLoader()
+    /**
+     * @test
+     */
+    public function it_writes_new_lines_by_default()
     {
         $items     = [
             'foo' => 'bar',
@@ -20,6 +23,30 @@ class FileLoaderTest extends TestCase
         ];
         $file      = new SplTempFileObject();
         $loader    = new FileLoader($file);
+
+        foreach ($items as $key => $value) {
+            $loader->load(create_generator([$key => $value]), $key, dummy_etl());
+        }
+
+        $file->rewind();
+        $this->assertEquals(implode(\PHP_EOL, [
+            'bar',
+            'baz',
+            ''
+        ]), implode('', iterator_to_array($file)));
+    }
+
+    /**
+     * @test
+     */
+    public function it_concats_all_strings()
+    {
+        $items     = [
+            'foo' => 'bar',
+            'bar' => 'baz'
+        ];
+        $file      = new SplTempFileObject();
+        $loader    = new FileLoader($file, ['eol' => FileLoader::NO_EOL]);
 
         foreach ($items as $key => $value) {
             $loader->load(create_generator([$key => $value]), $key, dummy_etl());

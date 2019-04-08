@@ -14,7 +14,7 @@ class CsvFileLoaderTest extends TestCase
     public function testLoaderWithoutKeys()
     {
         $file = new SplTempFileObject();
-        $loader = new CsvFileLoader($file, '|');
+        $loader = CsvFileLoader::toFile($file, ['delimiter' => '|']);
         $data = [
             ['Bill', 'Clinton'],
             ['Richard', 'Nixon'],

@@ -4,6 +4,10 @@ namespace BenTools\ETL\Extractor;
 
 use BenTools\ETL\Etl;
 
+/**
+ * An extractor is responsible to convert any source of data (file, resource, ...)
+ * into an iterable of items.
+ */
 interface ExtractorInterface
 {
 

@@ -4,11 +4,15 @@ namespace BenTools\ETL\Loader;
 
 use BenTools\ETL\Etl;
 
+/**
+ * A loader is responsible to load normalized data into the appropriate target.
+ */
 interface LoaderInterface
 {
 
     /**
-     * Init loader (start a transaction, if supported).
+     * Init loader (start a transaction, if supported) and reset loader state.
+     * Optionnal arguments can be passed.
      */
     public function init(): void;
 
