@@ -1,6 +1,15 @@
 {
   "name": "bentools/etl",
-  "description": "Extract / Transform / Load in PHP - Multiple formats - No dependency.",
+  "description": "PHP ETL (Extract / Transform / Load) implementation. Almost no dependency.",
+  "keywords": [
+    "extract",
+    "transform",
+    "load",
+    "extractor",
+    "transformer",
+    "loader",
+    "etl"
+  ],
   "license": "MIT",
   "authors": [
     {
@@ -37,7 +46,7 @@
   },
   "extra": {
     "branch-alias": {
-      "dev-3.0": "3.0.x-dev"
+      "dev-master": "3.0.x-dev"
     }
   }
 }
