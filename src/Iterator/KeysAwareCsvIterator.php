@@ -54,7 +54,30 @@ final class KeysAwareCsvIterator implements IteratorAggregate, CsvIteratorInterf
                     continue;
                 }
             }
-            yield array_combine($this->keys, $value);
+            yield self::combine($this->keys, $value);
         }
+    }
+
+    /**
+     * Combine keys & values
+     *
+     * @param array $keys
+     * @param array $values
+     * @return array
+     */
+    private static function combine(array $keys, array $values): array
+    {
+        $nbKeys = \count($keys);
+        $nbValues = \count($values);
+
+        if ($nbKeys < $nbValues) {
+            return \array_combine($keys, \array_slice(\array_values($values), 0, $nbKeys));
+        }
+
+        if ($nbKeys > $nbValues) {
+            return \array_combine($keys, \array_merge($values, \array_fill(0, $nbKeys - $nbValues, null)));
+        }
+
+        return \array_combine($keys, $values);
     }
 }

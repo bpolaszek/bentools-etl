@@ -81,4 +81,32 @@ class KeysAwareCsvIteratorTest extends TestCase
             ],
         ], $result);
     }
+
+    public function testMoreValuesThanKeys()
+    {
+        $csv = <<<CSV
+name,description
+foo,bar,baz
+CSV;
+
+        $iterator = new KeysAwareCsvIterator(CsvStringIterator::createFromText($csv));
+        $result   = iterator_to_array($iterator);
+
+        $this->assertEquals([['name' => 'foo', 'description' => 'bar']], $result);
+
+    }
+
+    public function testLessValuesThanKeys()
+    {
+        $csv = <<<CSV
+name,description
+foo
+CSV;
+
+        $iterator = new KeysAwareCsvIterator(CsvStringIterator::createFromText($csv));
+        $result   = iterator_to_array($iterator);
+
+        $this->assertEquals([['name' => 'foo', 'description' => null]], $result);
+
+    }
 }
