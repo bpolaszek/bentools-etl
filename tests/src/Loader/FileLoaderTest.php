@@ -22,7 +22,7 @@ class FileLoaderTest extends TestCase
             'bar' => 'baz'
         ];
         $file      = new SplTempFileObject();
-        $loader    = new FileLoader($file);
+        $loader    = FileLoader::toFile($file);
 
         foreach ($items as $key => $value) {
             $loader->load(create_generator([$key => $value]), $key, dummy_etl());
@@ -46,7 +46,7 @@ class FileLoaderTest extends TestCase
             'bar' => 'baz'
         ];
         $file      = new SplTempFileObject();
-        $loader    = new FileLoader($file, ['eol' => FileLoader::NO_EOL]);
+        $loader    = FileLoader::toFile($file, ['eol' => FileLoader::NO_EOL]);
 
         foreach ($items as $key => $value) {
             $loader->load(create_generator([$key => $value]), $key, dummy_etl());

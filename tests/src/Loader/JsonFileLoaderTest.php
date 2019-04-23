@@ -24,7 +24,7 @@ class JsonFileLoaderTest extends TestCase
     public function testLoader()
     {
         $file = new SplTempFileObject();
-        $loader = new JsonFileLoader($file);
+        $loader = JsonFileLoader::toFile($file);
         $data = ['foo', 'bar'];
         foreach ($data as $key => $value) {
             $loader->load(create_generator([$key => $value]), $key, dummy_etl());

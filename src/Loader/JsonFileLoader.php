@@ -37,9 +37,9 @@ final class JsonFileLoader implements LoaderInterface
      * @throws \LogicException
      * @throws \RuntimeException
      */
-    public function __construct($file = null, array $options = [])
+    public function __construct(array $options = [])
     {
-        self::factory(\array_replace($options, ['file' => $file]), $this);
+        self::factory($options, $this);
     }
 
 

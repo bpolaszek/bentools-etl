@@ -23,14 +23,13 @@ final class FileLoader implements LoaderInterface
     /**
      * FileLoader constructor.
      *
-     * @param string|SplFileObject $file
      * @param string               $eol
      * @throws \LogicException
      * @throws \RuntimeException
      */
-    public function __construct($file = null, array $options = [])
+    public function __construct(array $options = [])
     {
-        self::factory(\array_replace($options, ['file' => $file]), $this);
+        self::factory($options, $this);
     }
 
     /**
@@ -45,8 +44,6 @@ final class FileLoader implements LoaderInterface
                 self::factory($options, $this);
             }
         }
-        unset($this->file);
-        self::factory($options, $this);
     }
 
     /**
@@ -81,7 +78,7 @@ final class FileLoader implements LoaderInterface
      * @throws \LogicException
      * @throws \RuntimeException
      */
-    public static function toFile($file, array $options): self
+    public static function toFile($file, array $options = []): self
     {
         return self::factory(\array_replace($options, ['file' => $file]));
     }

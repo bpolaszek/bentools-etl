@@ -36,12 +36,11 @@ final class CsvFileLoader implements LoaderInterface
     /**
      * CsvFileLoader constructor.
      *
-     * @param string|SplFileObject  $file
      * @param array $options
      */
-    public function __construct($file = null, array $options = [])
+    public function __construct(array $options = [])
     {
-        self::factory(\array_replace($options, ['file' => $file]), $this);
+        self::factory($options, $this);
     }
 
     /**
@@ -94,11 +93,19 @@ final class CsvFileLoader implements LoaderInterface
      * @throws \LogicException
      * @throws \RuntimeException
      */
-    public static function toFile($file, array $options): self
+    public static function toFile($file, array $options = []): self
     {
         return self::factory(\array_replace($options, ['file' => $file]));
     }
 
+    /**
+     * @param array     $options
+     * @param self|null $that
+     * @return CsvFileLoader
+     * @throws UnexpectedTypeException
+     * @throws \LogicException
+     * @throws \RuntimeException
+     */
     public static function factory(array $options = [], self $that = null): self
     {
         $that = $that ?? new self;
