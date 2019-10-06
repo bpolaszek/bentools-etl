@@ -54,6 +54,11 @@ final class Etl
     /**
      * @var bool
      */
+    private $shouldFlush;
+
+    /**
+     * @var bool
+     */
     private $shouldSkip;
 
     /**
@@ -158,6 +163,14 @@ final class Etl
     }
 
     /**
+     * Ask the loader to trigger flush ASAP.
+     */
+    public function triggerFlush(): void
+    {
+        $this->shouldFlush = true;
+    }
+
+    /**
      * Process item skip.
      *
      * @param $item
@@ -195,6 +208,7 @@ final class Etl
     private function reset(): void
     {
         $this->shouldSkip = false;
+        $this->shouldFlush = false;
         $this->shouldStop = false;
         $this->shouldRollback = false;
     }
@@ -304,6 +318,8 @@ final class Etl
             $totalCounter--;
         }
 
+        $flush = $this->shouldFlush || $flush;
+
         if (true === $flush) {
             $this->flush($flushCounter, true);
         }
@@ -321,6 +337,7 @@ final class Etl
         ($this->flush)($partial);
         $this->eventDispatcher->dispatch(new FlushEvent($this, $flushCounter, $partial));
         $flushCounter = 0;
+        $this->shouldFlush = false;
     }
 
     /**
