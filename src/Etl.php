@@ -102,11 +102,11 @@ final class Etl
     /**
      * Run the ETL on the given input.
      *
-     * @param $data
+     * @param mixed|null $data
      * @param ...$initLoaderArgs - Optional arguments for loader init
      * @throws EtlException
      */
-    public function process($data, ...$initLoaderArgs): void
+    public function process($data = null, ...$initLoaderArgs): void
     {
         $flushCounter = $totalCounter = 0;
         $this->start();
