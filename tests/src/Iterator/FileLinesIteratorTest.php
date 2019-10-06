@@ -25,5 +25,4 @@ class FileLinesIteratorTest extends TestCase
         $iterator = new FileLinesIterator($file);
         $this->assertSame($data, \iterator_to_array($iterator));
     }
-
 }

@@ -28,7 +28,6 @@ EOF;
             'foo',
             'bar'
         ], iterator_to_array($iterator));
-
     }
 
     public function testIteratorWithoutSkippingEmptyLines()
@@ -41,7 +40,5 @@ EOF;
             '',
             'bar'
         ], iterator_to_array($iterator));
-
     }
-
 }

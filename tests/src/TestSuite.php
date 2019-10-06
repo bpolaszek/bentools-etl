@@ -15,5 +15,4 @@ class TestSuite
     {
         return sprintf('%s/%s', self::DATA_DIR, $fileName);
     }
-
 }

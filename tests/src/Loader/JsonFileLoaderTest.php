@@ -37,5 +37,4 @@ class JsonFileLoaderTest extends TestCase
         }
         $this->assertEquals(json_encode($data), trim($content));
     }
-
 }

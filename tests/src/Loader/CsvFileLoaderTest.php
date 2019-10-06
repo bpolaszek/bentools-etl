@@ -29,6 +29,5 @@ class CsvFileLoaderTest extends TestCase
             'Richard|Nixon' . PHP_EOL,
         ];
         $this->assertEquals($expected, iterator_to_array($file));
-
     }
 }

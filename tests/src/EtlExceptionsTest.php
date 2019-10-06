@@ -35,7 +35,8 @@ class EtlExceptionsTest extends TestCase
                         throw $item;
                     }
                     yield $item;
-                })
+                }
+            )
             ->createEtl()
         ;
 
@@ -104,15 +105,18 @@ class EtlExceptionsTest extends TestCase
                         throw new \RuntimeException('I don\'t like bar.');
                     }
                     yield $item;
-                })
+                }
+            )
             ->onTransformException(
                 function (ItemExceptionEvent $event) {
                     $event->ignoreException();
-                })
+                }
+            )
             ->onEnd(
                 function (EndProcessEvent $event) use (&$counter) {
                     $counter = $event->getCounter();
-                })
+                }
+            )
             ->createEtl()
         ;
 
@@ -144,15 +148,18 @@ class EtlExceptionsTest extends TestCase
                         }
                     }
                     $array[] = $item;
-                })
+                }
+            )
             ->onLoadException(
                 function (ItemExceptionEvent $event) {
                     $event->ignoreException();
-                })
+                }
+            )
             ->onEnd(
                 function (EndProcessEvent $event) use (&$counter) {
                     $counter = $event->getCounter();
-                })
+                }
+            )
             ->createEtl()
         ;
 
@@ -161,5 +168,4 @@ class EtlExceptionsTest extends TestCase
         $this->assertEquals(['foo', 'baz'], $array);
         $this->assertEquals(2, $counter);
     }
-
 }

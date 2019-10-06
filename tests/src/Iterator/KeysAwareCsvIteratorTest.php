@@ -93,7 +93,6 @@ CSV;
         $result   = iterator_to_array($iterator);
 
         $this->assertEquals([['name' => 'foo', 'description' => 'bar']], $result);
-
     }
 
     public function testLessValuesThanKeys()
@@ -107,6 +106,5 @@ CSV;
         $result   = iterator_to_array($iterator);
 
         $this->assertEquals([['name' => 'foo', 'description' => null]], $result);
-
     }
 }

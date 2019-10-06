@@ -159,7 +159,7 @@ class DoctrineORMLoaderTest extends TestCase
 
             public function flush()
             {
-                foreach ($this->tmpStorage AS $o => $object) {
+                foreach ($this->tmpStorage as $o => $object) {
                     $this->getRepository(get_class($object))->store($object);
                     unset($this->tmpStorage[$o]);
                 }
@@ -265,7 +265,7 @@ class DoctrineORMLoaderTest extends TestCase
 
             public function getRepository($persistentObject, $persistentManagerName = null)
             {
-                foreach ($this->objectManagers AS $manager) {
+                foreach ($this->objectManagers as $manager) {
                     if (null !== $manager->getRepository(get_class($persistentObject))) {
                         return $manager;
                     }
@@ -275,7 +275,7 @@ class DoctrineORMLoaderTest extends TestCase
 
             public function getManagerForClass($class)
             {
-                foreach ($this->objectManagers AS $manager) {
+                foreach ($this->objectManagers as $manager) {
                     if (null !== $manager->getRepository($class)) {
                         return $manager;
                     }
@@ -418,7 +418,6 @@ class DoctrineORMLoaderTest extends TestCase
         // Both entities should be flushed now
         $this->assertNotNull($repository->find($entity->getId()));
         $this->assertNotNull($repository->find($anotherEntity->getId()));
-
     }
 
 
@@ -443,6 +442,4 @@ class DoctrineORMLoaderTest extends TestCase
         $loader = new DoctrineORMLoader($registry);
         $loader->load(create_generator([new \stdClass()]), null, dummy_etl());
     }
-
-
 }

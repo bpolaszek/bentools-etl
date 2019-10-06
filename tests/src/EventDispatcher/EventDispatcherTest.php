@@ -125,5 +125,4 @@ class EventDispatcherTest extends TestCase
 
         $this->assertEquals(['bar', 'baz'], $stack);
     }
-
 }

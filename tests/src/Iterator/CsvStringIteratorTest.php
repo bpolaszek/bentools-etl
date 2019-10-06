@@ -29,6 +29,5 @@ class CsvStringIteratorTest extends TestCase
                 'Vladimir Poutine',
             ],
         ], array_values(iterator_to_array($iterator)));
-
     }
 }

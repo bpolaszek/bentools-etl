@@ -15,6 +15,5 @@ class CallableTransformerTest extends TestCase
         $transform = new CallableTransformer('strtolower');
         $transformed = $transform->transform($item, 0, dummy_etl());
         $this->assertSame('caps are hell', \iterator_to_array($transformed)[0]);
-
     }
 }

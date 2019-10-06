@@ -156,5 +156,4 @@ final class FlushableLoaderTest extends TestCase
 
         };
     }
-
 }

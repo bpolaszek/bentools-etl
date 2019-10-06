@@ -35,8 +35,8 @@ class EtlBuilderTest extends TestCase
     {
         $builder = EtlBuilder::init()->loadInto(
             function () {
-
-            })->flushEvery(0);
+            }
+        )->flushEvery(0);
         $builder->createEtl();
     }
 
@@ -49,7 +49,6 @@ class EtlBuilderTest extends TestCase
             null,
             null,
             function () {
-
             }
         );
         $etl = $builder->createEtl();
@@ -142,12 +141,10 @@ class EtlBuilderTest extends TestCase
             $etl->stopProcessing(true);
             yield;
         },
-            $loader
-        )->createEtl();
+            $loader)->createEtl();
         $etl->process($data);
 
         $this->assertTrue($loader->rollback);
-
     }
 
     /**
@@ -202,7 +199,8 @@ class EtlBuilderTest extends TestCase
                     if ('foo' === $event->getItem()) {
                         $event->getEtl()->skipCurrentItem();
                     }
-                })
+                }
+            )
             ->onExtract($logEvent)
             ->onTransform($logEvent)
             ->onLoad($logEvent)
@@ -245,7 +243,8 @@ class EtlBuilderTest extends TestCase
                     if ('foo' === $event->getItem()) {
                         $event->getEtl()->stopProcessing();
                     }
-                })
+                }
+            )
             ->onExtract($logEvent)
             ->onTransform($logEvent)
             ->onLoad($logEvent)
@@ -285,7 +284,8 @@ class EtlBuilderTest extends TestCase
                     if ('foo' === $event->getItem()) {
                         $event->getEtl()->stopProcessing(true);
                     }
-                })
+                }
+            )
             ->onExtract($logEvent)
             ->onTransform($logEvent)
             ->onLoad($logEvent)
@@ -347,7 +347,8 @@ class EtlBuilderTest extends TestCase
                     if ('foo' === $event->getItem()) {
                         $event->getEtl()->skipCurrentItem();
                     }
-                })
+                }
+            )
             ->onLoaderInit(
                 function (ItemEvent $event) use (&$called_item, &$count) {
                     $count++;
@@ -361,5 +362,4 @@ class EtlBuilderTest extends TestCase
         $this->assertEquals('bar', $called_item);
         $this->assertSame(1, $count);
     }
-
 }
