@@ -3,8 +3,8 @@
 namespace BenTools\ETL\Loader;
 
 use BenTools\ETL\Etl;
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use Doctrine\Common\Util\ClassUtils;
 use Psr\Log\LoggerAwareTrait;
 
@@ -24,12 +24,15 @@ final class DoctrineORMLoader implements LoaderInterface
     private $objectManagers = [];
 
     /**
-     * DoctrineORMLoader constructor.
-     *
-     * @param ManagerRegistry      $managerRegistry
+     * @param ManagerRegistry $managerRegistry
      */
-    public function __construct(ManagerRegistry $managerRegistry)
+    public function __construct($managerRegistry)
     {
+        if (!\is_a($managerRegistry, 'Doctrine\\Common\\Persistence\\ManagerRegistry')
+            && !\is_a($managerRegistry, 'Doctrine\\Persistence\\ManagerRegistry')) {
+            throw new \TypeError(\sprintf('Invalid ManagerRegistry class, got %s', \get_class($managerRegistry)));
+        }
+
         $this->managerRegistry = $managerRegistry;
     }
 
