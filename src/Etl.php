@@ -267,9 +267,13 @@ final class Etl
             throw new EtlException('The transformer must return a generator.');
         }
 
+        $output = [];
+
         // Traverse generator to trigger events
         try {
-            $transformed = \iterator_to_array($transformed);
+            foreach ($transformed as $key => $value) {
+                $output[] = [$key, $value];
+            }
             $this->eventDispatcher->dispatch(new ItemEvent(EtlEvents::TRANSFORM, $item, $key, $this));
         } catch (\Exception $e) {
             /** @var ItemExceptionEvent $event */
@@ -279,8 +283,10 @@ final class Etl
             }
         }
 
-        return function () use ($transformed) {
-            yield from $transformed;
+        return static function () use ($output) {
+            foreach ($output as [$key, $value]) {
+                yield $key => $value;
+            }
         };
     }
 
