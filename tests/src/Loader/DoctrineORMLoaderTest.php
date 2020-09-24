@@ -5,9 +5,9 @@ namespace BenTools\ETL\Tests\Loader;
 use BenTools\ETL\Loader\DoctrineORMLoader;
 use function BenTools\ETL\Tests\create_generator;
 use function BenTools\ETL\Tests\dummy_etl;
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectRepository;
 use PHPUnit\Framework\TestCase;
 
 class DoctrineORMLoaderTest extends TestCase
