@@ -18,7 +18,7 @@
   ],
   "require": {
     "php": ">=7.2",
-    "thecodingmachine/safe": "^0.1.14",
+    "thecodingmachine/safe": "^1.0",
     "psr/event-dispatcher": "^1.0"
   },
   "require-dev": {
