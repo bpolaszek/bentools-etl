@@ -1,20 +1,15 @@
 <?php
 
-namespace BenTools\ETL\Extractor;
+declare(strict_types=1);
 
-use BenTools\ETL\Etl;
+namespace Bentools\ETL\Extractor;
 
-/**
- * An extractor is responsible to convert any source of data (file, resource, ...)
- * into an iterable of items.
- */
+use Bentools\ETL\EtlState;
+
 interface ExtractorInterface
 {
-
     /**
-     * @param mixed $input
-     * @param Etl   $etl
-     * @return iterable
+     * @return iterable<mixed>
      */
-    public function extract($input, Etl $etl): iterable;
+    public function extract(EtlState $state): iterable;
 }

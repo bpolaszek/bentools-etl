@@ -1,153 +1,175 @@
 <?php
 
-namespace BenTools\ETL\Recipe;
+declare(strict_types=1);
 
-use BenTools\ETL\EtlBuilder;
-use BenTools\ETL\EventDispatcher\EtlEvents;
-use BenTools\ETL\EventDispatcher\Event\EndProcessEvent;
-use BenTools\ETL\EventDispatcher\Event\EtlEvent;
-use BenTools\ETL\EventDispatcher\Event\FlushEvent;
-use BenTools\ETL\EventDispatcher\Event\ItemEvent;
-use BenTools\ETL\EventDispatcher\Event\RollbackEvent;
+namespace Bentools\ETL\Recipe;
+
+use Bentools\ETL\EtlExecutor;
+use Bentools\ETL\EventDispatcher\Event\EndEvent;
+use Bentools\ETL\EventDispatcher\Event\Event;
+use Bentools\ETL\EventDispatcher\Event\ExtractEvent;
+use Bentools\ETL\EventDispatcher\Event\ExtractExceptionEvent;
+use Bentools\ETL\EventDispatcher\Event\FlushEvent;
+use Bentools\ETL\EventDispatcher\Event\FlushExceptionEvent;
+use Bentools\ETL\EventDispatcher\Event\InitEvent;
+use Bentools\ETL\EventDispatcher\Event\LoadEvent;
+use Bentools\ETL\EventDispatcher\Event\LoadExceptionEvent;
+use Bentools\ETL\EventDispatcher\Event\StartEvent;
+use Bentools\ETL\EventDispatcher\Event\TransformEvent;
+use Bentools\ETL\EventDispatcher\Event\TransformExceptionEvent;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
+use Psr\Log\NullLogger;
+use Stringable;
 
+/**
+ * @codeCoverageIgnore
+ */
 final class LoggerRecipe extends Recipe
 {
-    private const DEFAULT_LOG_LEVELS = [
-        EtlEvents::START       => LogLevel::INFO,
-        EtlEvents::EXTRACT     => LogLevel::INFO,
-        EtlEvents::TRANSFORM   => LogLevel::INFO,
-        EtlEvents::LOADER_INIT => LogLevel::INFO,
-        EtlEvents::LOAD        => LogLevel::INFO,
-        EtlEvents::FLUSH       => LogLevel::INFO,
-        EtlEvents::SKIP        => LogLevel::INFO,
-        EtlEvents::STOP        => LogLevel::INFO,
-        EtlEvents::ROLLBACK    => LogLevel::INFO,
-        EtlEvents::END         => LogLevel::INFO,
-    ];
-
-    private const DEFAULT_EVENT_PRIORITIES = [
-        EtlEvents::START       => 128,
-        EtlEvents::EXTRACT     => 128,
-        EtlEvents::TRANSFORM   => 128,
-        EtlEvents::LOADER_INIT => 128,
-        EtlEvents::LOAD        => 128,
-        EtlEvents::FLUSH       => 128,
-        EtlEvents::SKIP        => 128,
-        EtlEvents::STOP        => 128,
-        EtlEvents::ROLLBACK    => 128,
-        EtlEvents::END         => 128,
-    ];
-
     /**
-     * @var LoggerInterface
+     * @param array<class-string, string> $logLevels
+     * @param array<class-string, int>    $priorities
      */
-    private $logger;
-
-    /**
-     * @var array
-     */
-    private $logLevels;
-
-    /**
-     * @var array
-     */
-    private $eventPriorities;
-
-    /**
-     * LoggerRecipe constructor.
-     */
-    public function __construct(LoggerInterface $logger, array $logLevels = [], array $eventPriorities = [])
-    {
-        $this->logger = $logger;
-        $this->logLevels = \array_replace(self::DEFAULT_LOG_LEVELS, $logLevels);
-        $this->eventPriorities = \array_replace(self::DEFAULT_EVENT_PRIORITIES, $eventPriorities);
+    public function __construct(
+        private readonly LoggerInterface $logger = new NullLogger(),
+        private readonly array $logLevels = [
+            StartEvent::class => LogLevel::INFO,
+            FlushEvent::class => LogLevel::INFO,
+            EndEvent::class => LogLevel::INFO,
+            ExtractExceptionEvent::class => LogLevel::ERROR,
+            TransformExceptionEvent::class => LogLevel::ERROR,
+            LoadExceptionEvent::class => LogLevel::ERROR,
+            FlushExceptionEvent::class => LogLevel::ERROR,
+        ],
+        private readonly string $defaultLogLevel = LogLevel::DEBUG,
+        private readonly array $priorities = [],
+        private readonly int $defaultPriority = -1,
+    ) {
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function updateBuilder(EtlBuilder $builder): EtlBuilder
+    public function fork(EtlExecutor $executor): EtlExecutor
     {
-        return $builder
-            ->onStart(
-                function (EtlEvent $event) {
-                    $this->logger->log($this->getLogLevel($event), 'Starting ETL...');
-                },
-                $this->getPriority(EtlEvents::START)
-            )
+        return $executor
+            ->onInit(fn (InitEvent $event) => $this->log($event, 'Initializing ETL...', ['state' => $event->state]),
+                $this->priorities[InitEvent::class] ?? $this->defaultPriority)
+            ->onStart(fn (StartEvent $event) => $this->log($event, 'Starting ETL...', ['state' => $event->state]),
+                $this->priorities[StartEvent::class] ?? $this->defaultPriority)
             ->onExtract(
-                function (ItemEvent $event) {
-                    $this->logger->log($this->getLogLevel($event), sprintf('Extracted %s.', $event->getKey()));
-                },
-                $this->getPriority(EtlEvents::EXTRACT)
+                fn (ExtractEvent $event) => $this->log(
+                    $event,
+                    'Extracting item #{key}',
+                    [
+                        'key' => $event->state->currentItemKey,
+                        'state' => $event->state,
+                        'item' => $event->item,
+                    ],
+                ),
+                $this->priorities[ExtractEvent::class] ?? $this->defaultPriority,
+            )
+            ->onExtractException(
+                fn (ExtractExceptionEvent $event) => $this->log(
+                    $event,
+                    'Extract exception on key #{key}: {msg}',
+                    [
+                        'msg' => $event->exception->getMessage(),
+                        'key' => $event->state->currentItemKey,
+                        'state' => $event->state,
+                    ],
+                ),
+                $this->priorities[ExtractExceptionEvent::class] ?? $this->defaultPriority,
             )
             ->onTransform(
-                function (ItemEvent $event) {
-                    $this->logger->log($this->getLogLevel($event), sprintf('Transformed %s.', $event->getKey()));
-                },
-                $this->getPriority(EtlEvents::TRANSFORM)
+                fn (TransformEvent $event) => $this->log(
+                    $event,
+                    'Transformed item #{key}',
+                    [
+                        'key' => $event->state->currentItemKey,
+                        'state' => $event->state,
+                        'items' => $event->items,
+                    ],
+                ),
+                $this->priorities[TransformEvent::class] ?? $this->defaultPriority,
             )
-            ->onLoaderInit(
-                function (ItemEvent $event) {
-                    $this->logger->log($this->getLogLevel($event), 'Initializing loader...');
-                },
-                $this->getPriority(EtlEvents::LOAD)
+            ->onTransformException(
+                fn (TransformExceptionEvent $event) => $this->log(
+                    $event,
+                    'Transform exception on key #{key}: {msg}',
+                    [
+                        'msg' => $event->exception->getMessage(),
+                        'key' => $event->state->currentItemKey,
+                        'state' => $event->state,
+                    ],
+                ),
+                $this->priorities[TransformExceptionEvent::class] ?? $this->defaultPriority,
             )
             ->onLoad(
-                function (ItemEvent $event) {
-                    $this->logger->log($this->getLogLevel($event), sprintf('Loaded %s.', $event->getKey()));
-                },
-                $this->getPriority(EtlEvents::LOAD)
+                fn (LoadEvent $event) => $this->log(
+                    $event,
+                    'Loaded item #{key}',
+                    [
+                        'key' => $event->state->currentItemKey,
+                        'state' => $event->state,
+                        'item' => $event->item,
+                    ],
+                ),
+                $this->priorities[LoadEvent::class] ?? $this->defaultPriority,
             )
-            ->onSkip(
-                function (ItemEvent $event) {
-                    $this->logger->log($this->getLogLevel($event), sprintf('Skipping item %s.', $event->getKey()));
-                },
-                $this->getPriority(EtlEvents::SKIP)
-            )
-            ->onStop(
-                function (ItemEvent $event) {
-                    $this->logger->log($this->getLogLevel($event), sprintf('Stopping on item %s.', $event->getKey()));
-                },
-                $this->getPriority(EtlEvents::STOP)
+            ->onLoadException(
+                fn (LoadExceptionEvent $event) => $this->log(
+                    $event,
+                    'Load exception on key #{key}: {msg}',
+                    [
+                        'msg' => $event->exception->getMessage(),
+                        'key' => $event->state->currentItemKey,
+                        'state' => $event->state,
+                    ],
+                ),
+                $this->priorities[LoadExceptionEvent::class] ?? $this->defaultPriority,
             )
             ->onFlush(
-                function (FlushEvent $event) {
-                    $this->logger->log($this->getLogLevel($event), sprintf('Flushed %d items.', $event->getCounter()));
-                },
-                $this->getPriority(EtlEvents::FLUSH)
+                fn (FlushEvent $event) => $this->log(
+                    $event,
+                    $event->partial ? 'Flushing items (partial)...' : 'Flushing items...',
+                    [
+                        'key' => $event->state->currentItemKey,
+                        'state' => $event->state,
+                    ],
+                ),
+                $this->priorities[FlushEvent::class] ?? $this->defaultPriority,
             )
-            ->onRollback(
-                function (RollbackEvent $event) {
-                    $this->logger->log($this->getLogLevel($event), sprintf('Rollback %d items.', $event->getCounter()));
-                },
-                $this->getPriority(EtlEvents::ROLLBACK)
+            ->onFlushException(
+                fn (FlushExceptionEvent $event) => $this->log(
+                    $event,
+                    'Flush exception: {msg}',
+                    [
+                        'msg' => $event->exception->getMessage(),
+                        'state' => $event->state,
+                    ],
+                ),
+                $this->priorities[FlushExceptionEvent::class] ?? $this->defaultPriority,
             )
             ->onEnd(
-                function (EndProcessEvent $event) {
-                    $this->logger->log($this->getLogLevel($event), sprintf('ETL completed on %d items.', $event->getCounter()));
-                },
-                $this->getPriority(EtlEvents::END)
+                fn (EndEvent $event) => $this->log(
+                    $event,
+                    'ETL complete. {nb} items were loaded in {duration}s.',
+                    [
+                        'nb' => $event->state->nbLoadedItems,
+                        'duration' => $event->state->getDuration(),
+                        'state' => $event->state,
+                    ],
+                ),
+                $this->priorities[EndEvent::class] ?? $this->defaultPriority,
             );
     }
 
     /**
-     * @param EtlEvent $event
-     * @return string
+     * @param array<string, mixed> $context
      */
-    private function getLogLevel(EtlEvent $event): string
+    private function log(Event $event, string|Stringable $message, array $context = []): void
     {
-        return $this->logLevels[$event->getName()] ?? LogLevel::INFO;
-    }
+        $level = $this->logLevels[$event::class] ?? $this->defaultLogLevel;
 
-    /**
-     * @param EtlEvent $event
-     * @return int
-     */
-    private function getPriority(string $eventName): int
-    {
-        return $this->eventPriorities[$eventName] ?? 128;
+        $this->logger->log($level, $message, $context);
     }
 }

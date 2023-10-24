@@ -1,52 +1,43 @@
 {
   "name": "bentools/etl",
-  "description": "PHP ETL (Extract / Transform / Load) implementation. Almost no dependency.",
-  "keywords": [
-    "extract",
-    "transform",
-    "load",
-    "extractor",
-    "transformer",
-    "loader",
-    "etl"
-  ],
-  "license": "MIT",
-  "authors": [
-    {
-      "name": "Beno!t POLASZEK"
-    }
-  ],
+  "description": "PHP ETL (Extract / Transform / Load) implementation, with very few dependencies.",
+  "type": "library",
   "require": {
-    "php": ">=7.2",
-    "thecodingmachine/safe": "^1.0",
-    "psr/event-dispatcher": "^1.0"
+    "php": ">=8.2",
+    "psr/event-dispatcher": "^1.0",
+    "psr/log": "^3.0",
+    "symfony/options-resolver": "@stable",
+    "thecodingmachine/safe": "^2.5"
   },
   "require-dev": {
-    "phpunit/phpunit": "^6.0",
-    "squizlabs/php_codesniffer": "~2.0",
-    "doctrine/orm": "^2.7",
-    "symfony/var-dumper": "^4.0",
-    "php-coveralls/php-coveralls": "^2.1",
-    "psr/log": "^1.1",
-    "phpstan/phpstan": "^0.11.5"
+    "friendsofphp/php-cs-fixer": "^3.35",
+    "pestphp/pest": "^2.24",
+    "phpstan/phpstan": "^1.10",
+    "symfony/var-dumper": "*"
+  },
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "Bentools\\ETL\\": "src/"
+    }
   },
   "autoload-dev": {
     "psr-4": {
-      "BenTools\\ETL\\Tests\\": "tests/src"
-    },
-    "files": [
-      "vendor/symfony/var-dumper/Resources/functions/dump.php",
-      "tests/functions.php"
-    ]
-  },
-  "autoload": {
-    "psr-4": {
-      "BenTools\\ETL\\": "src"
+      "BenTools\\ETL\\Tests\\": "tests/"
     }
   },
-  "extra": {
-    "branch-alias": {
-      "dev-master": "3.0.x-dev"
+  "scripts": {
+    "ci:check": [
+      "vendor/bin/php-cs-fixer fix",
+      "vendor/bin/phpstan analyse",
+      "vendor/bin/pest --coverage"
+    ]
+  },
+  "minimum-stability": "stable",
+  "config": {
+    "sort-packages": true,
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
     }
   }
 }

@@ -1,31 +1,40 @@
 <?php
 
-namespace BenTools\ETL\Extractor;
+declare(strict_types=1);
 
-use BenTools\ETL\Etl;
-use function Safe\file_get_contents;
+namespace Bentools\ETL\Extractor;
 
-final class FileExtractor implements ExtractorInterface
+use Bentools\ETL\EtlState;
+use Bentools\ETL\Exception\ExtractException;
+use Bentools\ETL\Iterator\FileIterator;
+use SplFileObject;
+
+use function is_string;
+
+final readonly class FileExtractor implements ExtractorInterface
 {
     /**
-     * @var ExtractorInterface
+     * @param array{skipEmptyLines?: bool} $options
      */
-    private $contentExtractor;
-
-    /**
-     * FileExtractor constructor.
-     * @param ExtractorInterface $contentExtractor
-     */
-    public function __construct(ExtractorInterface $contentExtractor)
-    {
-        $this->contentExtractor = $contentExtractor;
+    public function __construct(
+        private string|SplFileObject|null $file,
+        private array $options,
+    ) {
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function extract(/*string */$filename, Etl $etl): iterable
+    public function extract(EtlState $state): iterable
     {
-        return $this->contentExtractor->extract(file_get_contents($filename), $etl);
+        $file = $state->source ?? $this->file;
+
+        return new FileIterator($this->resolveFile($file), $this->options);
+    }
+
+    private function resolveFile(mixed $file): SplFileObject
+    {
+        return match (true) {
+            $file instanceof SplFileObject => $file,
+            is_string($file) => new SplFileObject($file),
+            default => throw new ExtractException('Invalid file.'),
+        };
     }
 }
