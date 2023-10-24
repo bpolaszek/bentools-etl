@@ -1,39 +1,22 @@
 <?php
 
-namespace BenTools\ETL\Loader;
+declare(strict_types=1);
 
-use BenTools\ETL\Etl;
+namespace Bentools\ETL\Loader;
 
-/**
- * A loader is responsible to load normalized data into the appropriate target.
- */
+use Bentools\ETL\EtlState;
+
 interface LoaderInterface
 {
+    /**
+     * Load a transformed item to its destination.
+     */
+    public function load(mixed $item, EtlState $state): void;
 
     /**
-     * Init loader (start a transaction, if supported) and reset loader state.
-     * Optionnal arguments can be passed.
+     * Flush pending items to destination.
+     * The implementation MAY return a value when $isPartial is false (e.g. when the final flush() is called).
+     * The returned value will be provided to the state at the end of the ETL execution.
      */
-    public function init(): void;
-
-    /**
-     * Load elements.
-     *
-     * @param \Generator $items
-     * @param            $key
-     * @param Etl        $etl
-     */
-    public function load(\Generator $items, $key, Etl $etl): void;
-
-    /**
-     * Flush elements (if supported).
-     *
-     * @param bool $partial - whether or not there remains elements to process.
-     */
-    public function commit(bool $partial): void;
-
-    /**
-     * Rollback (if supported).
-     */
-    public function rollback(): void;
+    public function flush(bool $isPartial, EtlState $state): mixed;
 }
