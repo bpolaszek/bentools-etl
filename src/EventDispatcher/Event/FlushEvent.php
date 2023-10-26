@@ -1,54 +1,21 @@
 <?php
 
-namespace BenTools\ETL\EventDispatcher\Event;
+declare(strict_types=1);
 
-use BenTools\ETL\Etl;
-use BenTools\ETL\EventDispatcher\EtlEvents;
+namespace Bentools\ETL\EventDispatcher\Event;
 
-final class FlushEvent extends EtlEvent
+use Bentools\ETL\EtlState;
+use Bentools\ETL\EventDispatcher\StoppableEventTrait;
+use Psr\EventDispatcher\StoppableEventInterface;
+
+final class FlushEvent extends Event implements StoppableEventInterface
 {
-    /**
-     * @var int
-     */
-    private $counter;
-    /**
-     * @var bool
-     */
-    private $partial;
+    use StoppableEventTrait;
 
-    /**
-     * EndProcessEvent constructor.
-     *
-     * @param Etl $etl
-     */
-    public function __construct(Etl $etl, int $counter, bool $partial)
-    {
-        parent::__construct($etl);
-        $this->counter = $counter;
-        $this->partial = $partial;
-    }
-
-    /**
-     * @return int
-     */
-    public function getCounter(): int
-    {
-        return $this->counter;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isPartial(): bool
-    {
-        return $this->partial;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getName(): string
-    {
-        return EtlEvents::FLUSH;
+    public function __construct(
+        public readonly EtlState $state,
+        public readonly bool $partial,
+        public mixed $output,
+    ) {
     }
 }

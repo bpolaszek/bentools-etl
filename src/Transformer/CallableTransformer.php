@@ -1,29 +1,25 @@
 <?php
 
-namespace BenTools\ETL\Transformer;
+declare(strict_types=1);
 
-use BenTools\ETL\Etl;
+namespace Bentools\ETL\Transformer;
 
-final class CallableTransformer implements TransformerInterface
+use Bentools\ETL\EtlState;
+use Closure;
+use Generator;
+
+final readonly class CallableTransformer implements TransformerInterface
 {
-    /**
-     * @var callable
-     */
-    private $callable;
-
-    /**
-     * CallableTransformer constructor.
-     */
-    public function __construct(callable $callable)
-    {
-        $this->callable = $callable;
+    public function __construct(
+        public Closure $closure,
+    ) {
     }
 
     /**
-     * @inheritDoc
+     * @return Generator<mixed>
      */
-    public function transform($value, $key, Etl $etl): \Generator
+    public function transform(mixed $item, EtlState $state): Generator
     {
-        yield $key => ($this->callable)($value);
+        return ($this->closure)($item, $state);
     }
 }

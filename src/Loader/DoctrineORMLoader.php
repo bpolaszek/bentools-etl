@@ -1,92 +1,47 @@
 <?php
 
-namespace BenTools\ETL\Loader;
+declare(strict_types=1);
 
-use BenTools\ETL\Etl;
+namespace Bentools\ETL\Loader;
+
+use Bentools\ETL\EtlState;
+use Bentools\ETL\Exception\LoadException;
 use Doctrine\Persistence\ManagerRegistry;
-use Doctrine\Persistence\ObjectManager;
-use Doctrine\Common\Util\ClassUtils;
-use Psr\Log\LoggerAwareTrait;
+use SplObjectStorage;
 
-final class DoctrineORMLoader implements LoaderInterface
+use function gettype;
+use function is_object;
+use function sprintf;
+
+final readonly class DoctrineORMLoader implements LoaderInterface
 {
-
-    use LoggerAwareTrait;
-
-    /**
-     * @var ManagerRegistry
-     */
-    private $managerRegistry;
-
-    /**
-     * @var ObjectManager[]
-     */
-    private $objectManagers = [];
-
-    /**
-     * @param ManagerRegistry $managerRegistry
-     */
-    public function __construct($managerRegistry)
-    {
-        if (!\is_a($managerRegistry, 'Doctrine\\Common\\Persistence\\ManagerRegistry')
-            && !\is_a($managerRegistry, 'Doctrine\\Persistence\\ManagerRegistry')) {
-            throw new \TypeError(\sprintf('Invalid ManagerRegistry class, got %s', \get_class($managerRegistry)));
-        }
-
-        $this->managerRegistry = $managerRegistry;
+    public function __construct(
+        private ManagerRegistry $managerRegistry,
+    ) {
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function init(): void
+    public function load(mixed $item, EtlState $state): void
     {
+        if (!is_object($item)) {
+            throw new LoadException(sprintf('Expecting object, got %s.', gettype($item)));
+        }
+
+        $manager = $this->managerRegistry->getManagerForClass($item::class)
+            ?? throw new LoadException(sprintf('Could not find manager for class %s.', $item::class));
+
+        $managers = $state->context[__CLASS__]['managers'] ??= new SplObjectStorage();
+        $managers->attach($manager);
+        $manager->persist($item);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function load(\Generator $entities, $key, Etl $etl): void
+    public function flush(bool $isPartial, EtlState $state): null
     {
-        foreach ($entities as $entity) {
-            if (!is_object($entity)) {
-                throw new \InvalidArgumentException("The transformed data should return a generator of entities.");
-            }
-
-            $className = ClassUtils::getClass($entity);
-            $objectManager = $this->managerRegistry->getManagerForClass($className);
-            if (null === $objectManager) {
-                throw new \RuntimeException(sprintf("Unable to locate Doctrine manager for class %s.", $className));
-            }
-
-            $objectManager->persist($entity);
-
-            if (!in_array($objectManager, $this->objectManagers)) {
-                $this->objectManagers[] = $objectManager;
-            }
+        $managers = $state->context[__CLASS__]['managers'] ??= new SplObjectStorage();
+        foreach ($managers as $manager) {
+            $manager->flush();
+            $managers->detach($manager);
         }
-    }
 
-
-    /**
-     * @inheritDoc
-     */
-    public function rollback(): void
-    {
-        foreach ($this->objectManagers as $objectManager) {
-            $objectManager->clear();
-        }
-        $this->objectManagers = [];
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function commit(bool $partial): void
-    {
-        foreach ($this->objectManagers as $objectManager) {
-            $objectManager->flush();
-        }
-        $this->objectManagers = [];
+        return null;
     }
 }

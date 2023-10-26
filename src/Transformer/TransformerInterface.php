@@ -1,22 +1,16 @@
 <?php
 
-namespace BenTools\ETL\Transformer;
+declare(strict_types=1);
 
-use BenTools\ETL\Etl;
+namespace Bentools\ETL\Transformer;
 
-/**
- * A transformer is responsible to generate transformations / normalizations on extracted data.
- */
+use Bentools\ETL\EtlState;
+use Generator;
+
 interface TransformerInterface
 {
-
     /**
-     * Transform $value.
-     *
-     * @param     $value
-     * @param     $key
-     * @param Etl $etl
-     * @return \Generator - yield values to load
+     * @return Generator<mixed>
      */
-    public function transform($value, $key, Etl $etl): \Generator;
+    public function transform(mixed $item, EtlState $state): Generator;
 }

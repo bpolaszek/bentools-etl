@@ -1,8 +1,11 @@
 <?php
 
-namespace BenTools\ETL\Exception;
+declare(strict_types=1);
 
-final class EtlException extends \RuntimeException
+namespace Bentools\ETL\Exception;
+
+use RuntimeException;
+
+abstract class EtlException extends RuntimeException
 {
-
 }

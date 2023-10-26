@@ -1,0 +1,36 @@
+name: CI Workflow
+on:
+  push:
+    branches: [ master, '4.0' ]
+  pull_request:
+    branches: [ master, '4.0' ]
+
+jobs:
+  tests:
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        php:
+          - 8.2
+          - 8.3
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Check types
+        run: vendor/bin/phpstan analyse
+
+      - name: Run test suite
+        run: vendor/bin/pest --coverage --coverage-clover=coverage.xml
+
+      -   name: Upload coverage to Codecov
+          uses: codecov/codecov-action@v1
+          with:
+            token: ${{ secrets.CODECOV_TOKEN }}

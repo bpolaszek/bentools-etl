@@ -1,330 +1,222 @@
 [![Latest Stable Version](https://poser.pugx.org/bentools/etl/v/stable)](https://packagist.org/packages/bentools/etl)
 [![License](https://poser.pugx.org/bentools/etl/license)](https://packagist.org/packages/bentools/etl)
-[![Build Status](https://img.shields.io/travis/bpolaszek/bentools-etl/master.svg?style=flat-square)](https://travis-ci.org/bpolaszek/bentools-etl)
-[![Coverage Status](https://coveralls.io/repos/github/bpolaszek/bentools-etl/badge.svg?branch=master)](https://coveralls.io/github/bpolaszek/bentools-etl?branch=master)
-[![Quality Score](https://img.shields.io/scrutinizer/g/bpolaszek/bentools-etl.svg?style=flat-square)](https://scrutinizer-ci.com/g/bpolaszek/bentools-etl)
+[![CI Workflow](https://github.com/bpolaszek/bentools-etl/actions/workflows/ci.yml/badge.svg)](https://github.com/bpolaszek/bentools-etl/actions/workflows/ci.yml)
+[![Coverage](https://codecov.io/gh/bpolaszek/bentools-etl/branch/main/graph/badge.svg?token=L5ulTaymbt)](https://codecov.io/gh/bpolaszek/bentools-etl)
 [![Total Downloads](https://poser.pugx.org/bentools/etl/downloads)](https://packagist.org/packages/bentools/etl)
 
-Okay, so you heard about the [Extract / Transform / Load](https://en.wikipedia.org/wiki/Extract,_transform,_load) pattern and you're looking for a PHP library to do the stuff.
+Okay, so you heard about the [Extract / Transform / Load](https://en.wikipedia.org/wiki/Extract,_transform,_load) pattern,
+and you're looking for a PHP library to do the stuff.
 
-Alright, let's go! 
+Alright, let's go!
 
 Installation
 ------------
 
 ```bash
-composer require bentools/etl:^3.0@alpha
+composer require bentools/etl
 ```
 
-_Warning: version 3.0 is a complete rewrite and a involves important BC breaks. Don't upgrade from `^2.0` unless you know what you're doing!_
+_Warning: version 3.1 is a complete rewrite and a involves important BC breaks._
+
+_Don't upgrade from `^2.0` unless you know what you're doing!_
 
 Usage
 -----
 
-To sum up, you will apply _transformations_ onto an `iterable` of any _things_ in order to _load_ them in some place. 
-Sometimes your `iterable` is ready to go, sometimes you just don't need to perform transformations, but anyway you need to load that data somewhere.
+Let's cover the basic concepts:
+- **Extract**: you have a source of data (a database, a CSV file, whatever) - an **extractor** is able to read that data and provide an iterator of items
+- **Transform**: apply transformation to each item. A **transformer** may generate 0, 1 or several items to **load** (for example, 1 item may generate multiple SQL queries)
+- **Load**: load transformed item to the destination. For example, **extracted items** have been **transformed** to SQL queries, and your **loader** will run those queries against your database.
 
-Let's start with a really simple example:
-
-```php
-use BenTools\ETL\EtlBuilder;
-use BenTools\ETL\Loader\JsonFileLoader;
-
-$data = [
-    'foo',
-    'bar',
-];
-
-$etl = EtlBuilder::init()
-    ->loadInto(JsonFileLoader::toFile(__DIR__.'/data.json'))
-    ->createEtl();
-$etl->process($data);
-```
-
-Basically you just loaded the string `["foo","bar"]` into `data.json`. Yay!
-
-Now let's apply a basic uppercase transformation:
+Now let's have a look on how simple it is:
 
 ```php
-use BenTools\ETL\EtlBuilder;
-use BenTools\ETL\Loader\JsonFileLoader;
+use Bentools\ETL\EtlExecutor;
 
-$data = [
-    'foo',
-    'bar',
-];
+$etl = (new EtlExecutor())
+    ->transformWith(function (string $name) {
+        yield strtoupper($name);
+    });
 
-$etl = EtlBuilder::init()
-    ->transformWith(new CallableTransformer('strtoupper'))
-    ->loadInto(JsonFileLoader::factory())
-    ->createEtl();
-$etl->process($data, __DIR__.'/data.json'); // You can also set the output file when processing :-)
+$singers = ['Bob Marley', 'Amy Winehouse'];
+$report = $etl->process($singers);
+dump($report->output); // ["BOB MARLEY", "AMY WINEHOUSE"]
 ```
 
-Didn't you just write the string `["FOO","BAR"]` into `data.json` ? Yes, you did!
+OK, that wasn't really hard, here we basically don't have to extract anything (we can already iterate on `$singers`),
+and we're not loading anywhere, except into PHP's memory.
 
-Okay, but what if your source data is not an iterable (yet)? It can be a CSV file or a CSV string, for instance. Here's another example:
+Now let's take this to the next level:
+
+```csv
+city_english_name,city_local_name,country_iso_code,continent,population
+"New York","New York",US,"North America",8537673
+"Los Angeles","Los Angeles",US,"North America",39776830
+Tokyo,東京,JP,Asia,13929286
+```
 
 ```php
-use BenTools\ETL\EtlBuilder;
-use BenTools\ETL\Extractor\CsvExtractor;
-use BenTools\ETL\Loader\JsonFileLoader;
+use Bentools\ETL\EtlExecutor;
 
-$data = <<<CSV
-country_code,country_name,president
-US,USA,"Donald Trump"
-RU,Russia,"Vladimir Putin"
-CSV;
+$etl = (new EtlExecutor())
+    ->extractFrom(new CSVExtractor(options: ['columns' => 'auto']))
+    ->loadInto(new JSONLoader());
 
-$etl = EtlBuilder::init()
-    ->extractFrom(new CsvExtractor())
-    ->loadInto(JsonFileLoader::factory(['json_options' => \JSON_PRETTY_PRINT]))
-    ->createEtl();
-$etl->process($data, __DIR__.'/data.json');
+$report = $etl->process('file:///tmp/cities.csv', 'file:///tmp/cities.json');
+dump($report->output); // file:///tmp/cities.json
 ```
 
-As you guessed, the following content was just written into `presidents.json`:
-
+Then, let's have a look at `/tmp/cities.json`:
 ```json
 [
     {
-        "country_code": "US",
-        "country_name": "USA",
-        "president": "Donald Trump"
+        "city_english_name": "New York",
+        "city_local_name": "New York",
+        "country_iso_code": "US",
+        "continent": "North America",
+        "population": 8537673
     },
     {
-        "country_code": "RU",
-        "country_name": "Russia",
-        "president": "Vladimir Putin"
+        "city_english_name": "Los Angeles",
+        "city_local_name": "Los Angeles",
+        "country_iso_code": "US",
+        "continent": "North America",
+        "population": 39776830
+    },
+    {
+        "city_english_name": "Tokyo",
+        "city_local_name": "東京",
+        "country_iso_code": "JP",
+        "continent": "Asia",
+        "population": 13929286
     }
 ]
 ```
 
-We provide helpful extractors and loaders to manipulate JSON, CSV, text, and you'll also find a `DoctrineORMLoader` for when your transformer _yields_ Doctrine entities.
+Notice that we didn't _transform_ anything here, we just denormalized the CSV file to an array, then serialized that array to a JSON file.
 
-Because yes, a transformer must return a `\Generator`. Why? Because a single extracted item can lead to several output items. Let's take a more sophisticated example:
+The `CSVExtractor` has some options to _read_ the data, such as considering that the 1st row is the column keys.
 
+Creating your own Extractor / Transformers / Loaders
+--------------------------------------------------
+
+You can implement `ExtractorInterface`, `TransformerInterface` and `LoaderInterface`, or basically use simple `callable` with the same signatures.
+
+Here's another example:
 ```php
-use BenTools\ETL\EtlBuilder;
-use BenTools\ETL\Extractor\JsonExtractor;
-
-$pdo = new \PDO('mysql:host=localhost;dbname=test');
-$input = __DIR__.'/presidents.json';
-
-$etl = EtlBuilder::init()
-    ->extractFrom(new JsonExtractor())
-    ->transformWith(
-        function ($item) use ($pdo) {
-            $stmt = $pdo->prepare('SELECT country_code FROM countries WHERE country_code = ?');
-            $stmt->bindValue(1, $item['country_code'], \PDO::PARAM_STR);
-            $stmt->execute();
-            if (0 === $stmt->rowCount()) {
-                yield ['INSERT INTO countries (country_code, country_name) VALUES (?, ?)', [$item['country_code'], $item['country_name']]];
-            }
-
-            yield ['REPLACE INTO presidents (country_code, president_name) VALUES (?, ?)', [$item['country_code'], $item['president']]];
-
-        }
-    )
-    ->loadInto(
-        $loader = function (\Generator $queries) use ($pdo) {
-            foreach ($queries as $query) {
-                list($sql, $params) = $query;
-                $stmt = $pdo->prepare($sql);
-                foreach ($params as $i => $value) {
-                    $stmt->bindValue($i + 1, $value);
-                }
-                $stmt->execute();
-            }
-        }
-    )
-    ->createEtl();
-
-$etl->process(__DIR__.'/presidents.json'); // The JsonExtractor will convert that file to a PHP array
+$pdo = new \PDO('mysql:host=localhost;dbname=cities');
+$etl = (new EtlExecutor())
+    ->extractFrom(new CSVExtractor(options: ['columns' => 'auto']))
+    ->transformWith(function (mixed $city) {
+        yield [
+            'INSERT INTO countries (country_code, continent) VALUES (?, ?)',
+            [$city['country_iso_code'], $city['continent']],
+        ];
+        yield [
+            'INSERT INTO cities (english_name, local_name, country_code, population)',
+            [$city['city_english_name'], $city['city_local_name'], $city['country_code'], $city['population']],
+        ];
+    })
+    ->loadInto(function (array $query, EtlState $state) {
+        /** @var \PDO $pdo */
+        $pdo = $state->destination;
+        [$sql, $params] = $query;
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+    });
+$etl->process('file:///tmp/cities.csv', $pdo);
 ```
 
-As you can see, from a single item, we loaded up to 2 queries.
+As you can see, you can use `EtlState.destination` to retrieve the second argument you passed yo `$etl->process()`.
 
-Your _extractors_, _transformers_ and _loaders_ can implement [`ExtractorInterface`](https://github.com/bpolaszek/bentools-etl/tree/master/src/Extractor/ExtractorInterface.php), [`TransformerInterface`](https://github.com/bpolaszek/bentools-etl/tree/master/src/Transformer/TransformerInterface.php) or [`LoaderInterface`](https://github.com/bpolaszek/bentools-etl/tree/master/src/Loader/LoaderInterface.php) as well as being simple `callables`.
+The `EtlState` object contains all elements relative to the state of your ETL workflow being running.
 
+Using events
+------------
+
+The `EtlExecutor` emits various events during the workflow:
+- `InitEvent` when `process()` was just called
+- `StartEvent` when extraction just started (we might know the total number of items to extract at this time, if the extractor provides this)
+- `ExtractEvent` upon each extracted item
+- `ExtractExceptionEvent` when something wrong occured during extraction (this is generally not recoverable)
+- `TransformEvent` upon each transformed item
+- `TransformExceptionEvent` when something wrong occured during transformation (the exception can be dismissed)
+- `LoadEvent` upon each loaded item
+- `LoadExceptionEvent` when something wrong occured during loading (the exception can be dismissed)
+- `FlushEvent` at each flush
+- `FlushExceptionEvent` when something wrong occured during flush (the exception can be dismissed)
+- `EndEvent` whenever the workflow is complete.
+
+You can hook to those events during `EtlExecutor` instantiation, i.e.:
+
+```php
+$etl = (new EtlExecutor())
+    ->onExtract(
+        fn (ExtractEvent $event) => $logger->info('Extracting item #{key}', ['key' => $event->state->currentItemKey]),
+    );
+```
 
 Skipping items
 --------------
 
-Each _extractor_ / _transformer_ / _loader_ callback gets the current `Etl` object injected in their arguments. 
+You can skip items at any time.
 
-This allows you to ask the ETL to skip an item, or even to stop the whole process:
+Use the `$state->skip()` method from the `EtlState` object as soon as your business logic requires it.
 
-```php
-use BenTools\ETL\Etl;
-use BenTools\ETL\EtlBuilder;
-use BenTools\ETL\Transformer\CallableTransformer;
+Stopping the workflow
+---------------------
 
-$fruits = [
-    'apple',
-    'banana',
-    'strawberry',
-    'pineapple',
-    'pear',
-];
+You can stop the workflow at any time.
 
+Use the `$state->stop()` method from the `EtlState` object as soon as your business logic requires it.
 
-$storage = [];
-$etl = EtlBuilder::init()
-    ->transformWith(new CallableTransformer('strtoupper'))
-    ->loadInto(
-        function ($generated, $key, Etl $etl) use (&$storage) {
-            foreach ($generated as $fruit) {
-                if ('BANANA' === $fruit) {
-                    $etl->skipCurrentItem();
-                    break;
-                }
-                if ('PINEAPPLE' === $fruit) {
-                    $etl->stopProcessing();
-                    break;
-                }
-                $storage[] = $fruit;
-            }
-        })
-    ->createEtl();
+Early flush
+-----------
 
-$etl->process($fruits);
-
-var_dump($storage); // ['APPLE', 'STRAWBERRY']
-```
-
-
-Events
-------
-
-Now you're wondering how you can hook on the ETL lifecycle, to log things, handle exceptions, ... This library ships with a built-in Event Dispatcher that you can leverage when:
-
-* The ETL starts
-* An item has been extracted
-* The extraction failed
-* An item has been transformed
-* Transformation failed
-* Loader is initialized (1st item is about to be loaded)
-* An item has been loaded
-* Loading failed
-* An item has been skipped
-* The ETL was stopped
-* A flush operation was completed
-* A rollback operation was completed
-* The ETL completed the whole process.
-
-The _ItemEvents_ (on extract, transform, load) will allow you to mark the current item to be skipped, or even handle runtime exceptions. Let's take another example:
+You can define the flush frequency (defaults to 1) and optionally flush earlier than expected at any time:
 
 ```php
-use BenTools\ETL\EtlBuilder;
-use BenTools\ETL\EventDispatcher\Event\ItemExceptionEvent;
-
-$fruits = [
-    'apple',
-    new \RuntimeException('Is tomato a fruit?'),
-    'banana',
-];
-
-
-$storage = [];
-$etl = EtlBuilder::init()
-    ->transformWith(
-        function ($item, $key) {
-            if ($item instanceof \Exception) {
-                throw $item;
+$etl = (new EtlExecutor(options: new EtlConfiguration(flushEvery: 10)))
+    ->onLoad(
+        function (LoadEvent $event) {
+            if (/* whatever reason */) {
+                $event->state->flush();
             }
-
-            yield $key => $item;
-        })
-    ->loadInto(
-        function (iterable $transformed) use (&$storage) {
-            foreach ($transformed as $fruit) {
-                $storage[] = $fruit;
-            }
-        })
-    ->onTransformException(
-        function (ItemExceptionEvent $event) {
-            echo $event->getException()->getMessage(); // Is tomato a fruit?
-            $event->ignoreException();
-        })
-    ->createEtl();
-
-$etl->process($fruits);
-
-var_dump($storage); // ['apple', 'banana']
+        },
+    );
 ```
-
-Here, we intentionnally threw an exception during the _transform_ operation. But thanks to the event dispatcher, we could tell the ETL this exception can be safely ignored and it can pursue the rest of the process.
-
-You can attach as many event listeners as you wish, and sort them by priority.
-
 
 Recipes
 -------
 
-A recipe is an ETL pattern that can be reused through different tasks.
-If you want to log everything that goes through an ETL for example, use our built-in Logger recipe:
+Recipes are reusable configurations of an `EtlExecutor`.
+For example, to enable logging, use the `LoggerRecipe`:
 
 ```php
-use BenTools\ETL\EtlBuilder;
-use BenTools\ETL\Recipe\LoggerRecipe;
+use Bentools\ETL\EtlExecutor;
+use Bentools\ETL\Recipe\LoggerRecipe;
+use Monolog\Logger;
 
-$etl = EtlBuilder::init()
-    ->useRecipe(new LoggerRecipe($logger))
-    ->createEtl();
+$logger = new Logger();
+$etl = (new EtlExecutor())
+    ->withRecipe(new LoggerRecipe($logger));
 ```
 
-You can also create your own recipes:
+This will basically listen to all events and fire log entries.
 
-```php
-use BenTools\ETL\EtlBuilder;
-use BenTools\ETL\EventDispatcher\Event\ItemEvent;
-use BenTools\ETL\Extractor\JsonExtractor;
-use BenTools\ETL\Loader\CsvFileLoader;
-use BenTools\ETL\Recipe\Recipe;
+You can create your own recipes by implementing `Bentools\ETL\Recipe\Recipe` or using a callable with the same signature.
 
+Contribute
+----------
 
-class JSONToCSVRecipe extends Recipe
-{
-    /**
-     * @inheritDoc
-     */
-    public function updateBuilder(EtlBuilder $builder): EtlBuilder
-    {
-        return $builder
-            ->extractFrom(new JsonExtractor())
-            ->loadInto($loader = CsvFileLoader::factory(['delimiter' => ';']))
-            ->onLoaderInit(
-                function (ItemEvent $event) use ($loader) {
-                    $loader::factory(['keys' => array_keys($event->getItem())], $loader);
-                })
-            ;
-    }
-
-}
-
-$builder = EtlBuilder::init()->useRecipe(new JSONToCSVRecipe());
-$etl = $builder->createEtl();
-$etl->process(__DIR__.'/presidents.json', __DIR__.'/presidents.csv');
-```
-
-The above example will result in `presidents.csv` containing:
-```csv
-country_code;country_name;president
-US;USA;"Donald Trump"
-RU;Russia;"Vladimir Putin"
-```
-
-To sum up, a _recipe_ is a kind of an `ETLBuilder` factory, but keep in mind that a recipe will only **add** event listeners to the existing builder but can also **replace** the builder's _extractor_, _transformer_ and/or _loader_.
-
-Tests
------
+Contributions are welcome! 
+Before sending your PRs, run this command to ensure test pass and 100% of the code is covered.
 
 ```bash
-./vendor/bin/phpunit
+composer ci:check
 ```
 
 License
 -------
 
-MIT
+MIT.
