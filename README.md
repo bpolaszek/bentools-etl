@@ -171,13 +171,17 @@ You can stop the workflow at any time.
 
 Use the `$state->stop()` method from the `EtlState` object as soon as your business logic requires it.
 
-Early flush
------------
+Flush frequency and early flushes
+---------------------------------
 
-You can define the flush frequency (defaults to 1) and optionally flush earlier than expected at any time:
+By default, the `flush()` method of your loader will be invoked at the end of the ETL, 
+meaning it will likely keep all loaded items in memory before dumping them to their final destination.
+
+Feel free to adjust a `flushFrequency` that fits your needs 
+and optionally trigger an early flush at any time during the ETL process:
 
 ```php
-$etl = (new EtlExecutor(options: new EtlConfiguration(flushEvery: 10)))
+$etl = (new EtlExecutor(options: new EtlConfiguration(flushFrequency: 10)))
     ->onLoad(
         function (LoadEvent $event) {
             if (/* whatever reason */) {
