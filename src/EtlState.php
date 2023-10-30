@@ -29,7 +29,7 @@ final class EtlState
         public readonly ?DateTimeImmutable $endedAt = null,
         public readonly mixed $output = null,
         private readonly int $nbLoadedItemsSinceLastFlush = 0,
-        private bool $flush = false,
+        private bool $earlyFlush = false,
         public array $context = [],
     ) {
     }
@@ -39,7 +39,7 @@ final class EtlState
      */
     public function flush(): void
     {
-        $this->flush = true;
+        $this->earlyFlush = true;
     }
 
     /**
@@ -60,8 +60,12 @@ final class EtlState
 
     public function shouldFlush(): bool
     {
-        return $this->flush
-            || (0 === ($this->nbLoadedItemsSinceLastFlush % $this->options->flushEvery));
+        if (INF === $this->options->flushFrequency) {
+            return false;
+        }
+
+        return $this->earlyFlush
+                || (0 === ($this->nbLoadedItemsSinceLastFlush % $this->options->flushFrequency));
     }
 
     public function getDuration(): float
@@ -116,7 +120,7 @@ final class EtlState
     public function withClearedFlush(): self
     {
         return $this->clone([
-            'flush' => false,
+            'earlyFlush' => false,
             'nbLoadedItemsSinceLastFlush' => 0,
         ]);
     }
