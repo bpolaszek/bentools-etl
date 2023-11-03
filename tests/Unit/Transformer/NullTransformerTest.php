@@ -8,7 +8,6 @@ use Bentools\ETL\EtlState;
 use Bentools\ETL\Transformer\NullTransformer;
 
 use function expect;
-use function iterator_to_array;
 
 it('yields the value as-is', function () {
     // Given
@@ -19,5 +18,5 @@ it('yields the value as-is', function () {
     $transformedItems = $transformer->transform('foo', $state);
 
     // Then
-    expect(iterator_to_array($transformedItems))->toBe(['foo']);
+    expect($transformedItems)->toBe('foo');
 });

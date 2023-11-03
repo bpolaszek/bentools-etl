@@ -35,9 +35,7 @@ Now let's have a look on how simple it is:
 use Bentools\ETL\EtlExecutor;
 
 $etl = (new EtlExecutor())
-    ->transformWith(function (string $name) {
-        yield strtoupper($name);
-    });
+    ->transformWith(fn (string $name) => strtoupper($name));
 
 $singers = ['Bob Marley', 'Amy Winehouse'];
 $report = $etl->process($singers);
@@ -128,7 +126,9 @@ $etl = (new EtlExecutor())
 $etl->process('file:///tmp/cities.csv', $pdo);
 ```
 
-As you can see, you can use `EtlState.destination` to retrieve the second argument you passed yo `$etl->process()`.
+As you can see:
+- Your transformer can _yield_ values, in case 1 extracted item becomes several items to load
+- You can use `EtlState.destination` to retrieve the second argument you passed yo `$etl->process()`.
 
 The `EtlState` object contains all elements relative to the state of your ETL workflow being running.
 

@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace Bentools\ETL\Transformer;
 
 use Bentools\ETL\EtlState;
-use Generator;
 
 final readonly class NullTransformer implements TransformerInterface
 {
-    public function transform(mixed $item, EtlState $state): Generator
+    public function transform(mixed $item, EtlState $state): mixed
     {
-        yield $item;
+        return $item;
     }
 }
