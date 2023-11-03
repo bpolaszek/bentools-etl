@@ -118,7 +118,8 @@ final readonly class EtlExecutor
     private function transform(mixed $item, EtlState $state): array
     {
         try {
-            $items = [...$this->transformer->transform($item, $state)];
+            $transformed = $this->transformer->transform($item, $state);
+            $items = $transformed instanceof Generator ? [...$transformed] : [$transformed];
 
             return $this->dispatch(new TransformEvent($state, $items))->items;
         } catch (SkipRequest|StopRequest $e) {

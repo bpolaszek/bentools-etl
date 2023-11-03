@@ -6,7 +6,6 @@ namespace Bentools\ETL\Transformer;
 
 use Bentools\ETL\EtlState;
 use Closure;
-use Generator;
 
 final readonly class CallableTransformer implements TransformerInterface
 {
@@ -15,10 +14,7 @@ final readonly class CallableTransformer implements TransformerInterface
     ) {
     }
 
-    /**
-     * @return Generator<mixed>
-     */
-    public function transform(mixed $item, EtlState $state): Generator
+    public function transform(mixed $item, EtlState $state): mixed
     {
         return ($this->closure)($item, $state);
     }
