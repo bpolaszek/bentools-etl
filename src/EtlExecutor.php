@@ -82,11 +82,11 @@ final class EtlExecutor
         $state = unref($stateHolder);
         if (!$state->nbTotalItems) {
             $state = $state->withNbTotalItems($state->nbLoadedItems);
-            $stateHolder->replaceWith($state);
+            $stateHolder->update($state);
         }
 
         $state = $state->withOutput($output);
-        $stateHolder->replaceWith($state);
+        $stateHolder->update($state);
         $this->dispatch(new EndEvent($state));
 
         gc_collect_cycles();
@@ -104,13 +104,13 @@ final class EtlExecutor
             $items = $this->extractor->extract($state);
             if (is_countable($items)) {
                 $state = $state->withNbTotalItems(count($items));
-                $stateHolder->replaceWith($state);
+                $stateHolder->update($state);
             }
             $this->dispatch(new StartEvent($state));
             foreach ($items as $key => $value) {
                 try {
                     $state = unref($stateHolder)->withUpdatedItemKey($key);
-                    $stateHolder->replaceWith($state);
+                    $stateHolder->update($state);
                     $event = $this->dispatch(new ExtractEvent($state, $value));
                     yield $event->item;
                 } catch (SkipRequest) {
@@ -153,7 +153,7 @@ final class EtlExecutor
             foreach ($items as $item) {
                 $this->loader->load($item, $state);
                 $state = $state->withIncrementedNbLoadedItems();
-                $stateHolder->replaceWith($state);
+                $stateHolder->update($state);
                 $this->dispatch(new LoadEvent($state, $item));
             }
         } catch (SkipRequest|StopRequest $e) {
@@ -187,7 +187,7 @@ final class EtlExecutor
             $this->throwFlushException($e, $state);
         }
         $this->dispatch(new FlushEvent($state, $isPartial, $output));
-        $stateHolder->replaceWith($state->withClearedFlush());
+        $stateHolder->update($state->withClearedFlush());
 
         return $output;
     }

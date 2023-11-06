@@ -24,7 +24,7 @@ final class Ref
      *
      * @return self<T>
      */
-    public function replaceWith(mixed $value): self
+    public function update(mixed $value): self
     {
         $this->value = $value;
 
