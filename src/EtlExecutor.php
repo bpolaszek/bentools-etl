@@ -26,7 +26,6 @@ use Bentools\ETL\Loader\LoaderInterface;
 use Bentools\ETL\Transformer\NullTransformer;
 use Bentools\ETL\Transformer\TransformerInterface;
 use Generator;
-use IteratorIterator;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Throwable;
 
@@ -68,17 +67,11 @@ final class EtlExecutor
         try {
             $this->dispatch(new InitEvent($state));
 
-            $iterator = new IteratorIterator($this->extract($stateHolder));
-            $iterator->rewind();
-            $state = unref($stateHolder);
-            while ($iterator->valid()) {
-                $extractedItem = $iterator->current();
+            foreach ($this->extract($stateHolder) as $extractedItem) {
                 try {
                     $transformedItems = $this->transform($extractedItem, $state);
                     $this->load($transformedItems, $stateHolder);
                 } catch (SkipRequest) {
-                } finally {
-                    $iterator->next();
                 }
             }
         } catch (StopRequest) {
