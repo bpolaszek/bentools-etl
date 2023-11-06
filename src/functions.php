@@ -11,6 +11,8 @@ use function array_intersect_key;
 use function array_replace;
 
 /**
+ * @internal
+ *
  * @param list<string>         $keys
  * @param array<string, mixed> $values
  * @param array<string, mixed> ...$extraValues
@@ -26,6 +28,8 @@ function array_fill_from(array $keys, array $values, array ...$extraValues): arr
 }
 
 /**
+ * @internal
+ *
  * @template T
  *
  * @param T $value
@@ -38,6 +42,8 @@ function ref(mixed $value): Ref
 }
 
 /**
+ * @internal
+ *
  * @template T
  *
  * @param Ref<T> $ref
