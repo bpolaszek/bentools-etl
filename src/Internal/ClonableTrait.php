@@ -8,6 +8,10 @@ use ReflectionClass;
 
 use function array_column;
 use function array_combine;
+use function array_fill;
+use function array_intersect_key;
+use function count;
+use function get_object_vars;
 
 /**
  * @internal
@@ -23,21 +27,11 @@ trait ClonableTrait
      */
     private function clone(array $overridenProps = []): self
     {
-        static $refl, $properties, $constructorParams;
+        static $refl, $constructorParams, $emptyProps;
         $refl ??= new ReflectionClass($this);
-        $properties ??= array_combine(array_column($refl->getProperties(), 'name'), $refl->getProperties());
-        $constructorParams ??= $refl->getConstructor()->getParameters();
+        $constructorParams ??= array_column($refl->getConstructor()->getParameters(), 'name');
+        $emptyProps ??= array_combine($constructorParams, array_fill(0, count($constructorParams), null));
 
-        $args = (function () use ($properties, $constructorParams) {
-            foreach ($constructorParams as $param) {
-                $key = $param->getName();
-                yield $key => $properties[$key]->getValue($this);
-            }
-        })();
-
-        return new self(...[
-            ...$args,
-            ...$overridenProps,
-        ]);
+        return new self(...($overridenProps + array_intersect_key(get_object_vars($this), $emptyProps)));
     }
 }
