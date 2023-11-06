@@ -24,7 +24,7 @@ use Bentools\ETL\EventDispatcher\PrioritizedListenerProvider;
  */
 trait EtlEventListenersTrait
 {
-    private readonly PrioritizedListenerProvider $listenerProvider;
+    private PrioritizedListenerProvider $listenerProvider;
 
     /**
      * @param callable(InitEvent): void $callback
@@ -116,7 +116,7 @@ trait EtlEventListenersTrait
 
     private function listenTo(string $eventClass, callable $callback, int $priority = 0): self
     {
-        $clone = $this->clone();
+        $clone = $this->cloneWith();
         $clone->listenerProvider->listenTo($eventClass, $callback, $priority);
 
         return $clone;

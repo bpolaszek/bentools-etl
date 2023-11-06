@@ -32,7 +32,7 @@ use function count;
 use function gc_collect_cycles;
 use function is_countable;
 
-final readonly class EtlExecutor
+final class EtlExecutor
 {
     use ClonableTrait;
 
@@ -49,10 +49,10 @@ final readonly class EtlExecutor
     private EventDispatcherInterface $eventDispatcher;
 
     public function __construct(
-        private ExtractorInterface $extractor = new IterableExtractor(),
-        private TransformerInterface $transformer = new NullTransformer(),
-        private LoaderInterface $loader = new InMemoryLoader(),
-        private EtlConfiguration $options = new EtlConfiguration(),
+        private readonly ExtractorInterface $extractor = new IterableExtractor(),
+        private readonly TransformerInterface $transformer = new NullTransformer(),
+        private readonly LoaderInterface $loader = new InMemoryLoader(),
+        private readonly EtlConfiguration $options = new EtlConfiguration(),
     ) {
         $this->listenerProvider = new PrioritizedListenerProvider();
         $this->eventDispatcher = new EventDispatcher($this->listenerProvider);

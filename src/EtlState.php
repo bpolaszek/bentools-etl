@@ -80,7 +80,7 @@ final class EtlState
      */
     public function withUpdatedItemKey(mixed $key): self
     {
-        return $this->clone([
+        return $this->cloneWith([
             'currentItemKey' => $key,
             'currentItemIndex' => $this->currentItemIndex + 1,
             'nbExtractedItems' => $this->nbExtractedItems + 1,
@@ -92,7 +92,7 @@ final class EtlState
      */
     public function withIncrementedNbLoadedItems(): self
     {
-        return $this->clone([
+        return $this->cloneWith([
             'nbLoadedItems' => $this->nbLoadedItems + 1,
             'nbLoadedItemsSinceLastFlush' => $this->nbLoadedItemsSinceLastFlush + 1,
         ]);
@@ -103,7 +103,7 @@ final class EtlState
      */
     public function withNbTotalItems(?int $nbTotalItems): self
     {
-        return $this->clone(['nbTotalItems' => $nbTotalItems]);
+        return $this->cloneWith(['nbTotalItems' => $nbTotalItems]);
     }
 
     /**
@@ -111,7 +111,7 @@ final class EtlState
      */
     public function withOutput(mixed $output): self
     {
-        return $this->clone(['output' => $output]);
+        return $this->cloneWith(['output' => $output]);
     }
 
     /**
@@ -119,7 +119,7 @@ final class EtlState
      */
     public function withClearedFlush(): self
     {
-        return $this->clone([
+        return $this->cloneWith([
             'earlyFlush' => false,
             'nbLoadedItemsSinceLastFlush' => 0,
         ]);
