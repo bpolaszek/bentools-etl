@@ -2,7 +2,7 @@
 [![Latest Stable Version](https://poser.pugx.org/bentools/etl/v/stable)](https://packagist.org/packages/bentools/etl)
 [![License](https://poser.pugx.org/bentools/etl/license)](https://packagist.org/packages/bentools/etl)
 [![CI Workflow](https://github.com/bpolaszek/bentools-etl/actions/workflows/ci.yml/badge.svg)](https://github.com/bpolaszek/bentools-etl/actions/workflows/ci.yml)
-[![Coverage](https://codecov.io/gh/bpolaszek/bentools-etl/branch/main/graph/badge.svg?token=L5ulTaymbt)](https://codecov.io/gh/bpolaszek/bentools-etl)
+[![Coverage](https://codecov.io/gh/bpolaszek/bentools-etl/branch/master/graph/badge.svg?token=L5ulTaymbt)](https://codecov.io/gh/bpolaszek/bentools-etl)
 [![Total Downloads](https://poser.pugx.org/bentools/etl/downloads)](https://packagist.org/packages/bentools/etl)
 
 Okay, so you heard about the [Extract / Transform / Load](https://en.wikipedia.org/wiki/Extract,_transform,_load) pattern,
