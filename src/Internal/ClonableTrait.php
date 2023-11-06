@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Bentools\ETL\Internal;
 
 use ReflectionClass;
+use ReflectionProperty;
 
 use function array_column;
-use function array_combine;
-use function array_fill;
-use function array_intersect_key;
-use function count;
+use function array_diff;
+use function array_filter;
+use function Bentools\ETL\array_fill_from;
 use function get_object_vars;
 
 /**
@@ -23,15 +23,25 @@ trait ClonableTrait
     /**
      * Create a clone.
      *
-     * @param array<string, mixed> $overridenProps
+     * @param array<string, mixed> $cloneArgs
      */
-    private function clone(array $overridenProps = []): self
+    public function cloneWith(array $cloneArgs = []): self
     {
-        static $refl, $constructorParams, $emptyProps;
+        static $refl, $writableProps, $writablePropNames, $constructorParamNames;
         $refl ??= new ReflectionClass($this);
-        $constructorParams ??= array_column($refl->getConstructor()->getParameters(), 'name');
-        $emptyProps ??= array_combine($constructorParams, array_fill(0, count($constructorParams), null));
+        $constructorParamNames ??= array_column($refl->getConstructor()->getParameters(), 'name');
+        $writableProps ??= array_filter(
+            $refl->getProperties(),
+            fn (ReflectionProperty $property) => !$property->isReadOnly(),
+        );
+        $writablePropNames ??= array_diff(array_column($writableProps, 'name'), $constructorParamNames);
 
-        return new self(...($overridenProps + array_intersect_key(get_object_vars($this), $emptyProps)));
+        $clone = new self(...array_fill_from($constructorParamNames, get_object_vars($this), $cloneArgs));
+        $notPromotedProps = array_fill_from($writablePropNames, get_object_vars($this), $cloneArgs);
+        foreach ($notPromotedProps as $prop => $value) {
+            $clone->{$prop} = $value;
+        }
+
+        return $clone;
     }
 }

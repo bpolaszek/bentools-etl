@@ -10,12 +10,17 @@ use function expect;
 
 it('uses a recipe', function () {
     // Given
-    $toggle = 'off';
+    $hasReceivedInitEvent = false;
+    $hasReceivedEndEvent = false;
     $executor = (new EtlExecutor())->withRecipe(
-        function (EtlExecutor $executor) use (&$toggle) {
-            return $executor->onInit(function () use (&$toggle) {
-                $toggle = 'on';
-            });
+        function (EtlExecutor $executor) use (&$hasReceivedInitEvent, &$hasReceivedEndEvent) {
+            return $executor
+                ->onInit(function () use (&$hasReceivedInitEvent) {
+                    $hasReceivedInitEvent = true;
+                })
+                ->onEnd(function () use (&$hasReceivedEndEvent) {
+                    $hasReceivedEndEvent = true;
+                });
         },
     );
 
@@ -23,5 +28,6 @@ it('uses a recipe', function () {
     $executor->process([]);
 
     // Then
-    expect($toggle)->toBe('on');
+    expect($hasReceivedInitEvent)->toBeTrue()
+        ->and($hasReceivedEndEvent)->toBeTrue();
 });

@@ -31,7 +31,7 @@ trait EtlBuilderTrait
             $extractor = new CallableExtractor($extractor(...));
         }
 
-        return $this->clone(['extractor' => $extractor]);
+        return $this->cloneWith(['extractor' => $extractor]);
     }
 
     public function transformWith(TransformerInterface|callable $transformer): self
@@ -40,7 +40,7 @@ trait EtlBuilderTrait
             $transformer = new CallableTransformer($transformer(...));
         }
 
-        return $this->clone(['transformer' => $transformer]);
+        return $this->cloneWith(['transformer' => $transformer]);
     }
 
     public function loadInto(LoaderInterface|callable $loader): self
@@ -49,12 +49,12 @@ trait EtlBuilderTrait
             $loader = new CallableLoader($loader(...));
         }
 
-        return $this->clone(['loader' => $loader]);
+        return $this->cloneWith(['loader' => $loader]);
     }
 
     public function withOptions(EtlConfiguration $configuration): self
     {
-        return $this->clone(['options' => $configuration]);
+        return $this->cloneWith(['options' => $configuration]);
     }
 
     public function withRecipe(Recipe|callable $recipe): self
