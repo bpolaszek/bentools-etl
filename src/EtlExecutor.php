@@ -20,6 +20,7 @@ use Bentools\ETL\Extractor\IterableExtractor;
 use Bentools\ETL\Internal\ClonableTrait;
 use Bentools\ETL\Internal\EtlBuilderTrait;
 use Bentools\ETL\Internal\EtlExceptionsTrait;
+use Bentools\ETL\Internal\Ref;
 use Bentools\ETL\Loader\InMemoryLoader;
 use Bentools\ETL\Loader\LoaderInterface;
 use Bentools\ETL\Transformer\NullTransformer;
@@ -61,27 +62,31 @@ final class EtlExecutor
     public function process(mixed $source = null, mixed $destination = null): EtlState
     {
         $state = new EtlState(options: $this->options, source: $source, destination: $destination);
+        $stateHolder = ref($state);
 
         try {
             $this->dispatch(new InitEvent($state));
 
-            foreach ($this->extract($state) as $extractedItem) {
+            foreach ($this->extract($stateHolder) as $extractedItem) {
                 try {
                     $transformedItems = $this->transform($extractedItem, $state);
-                    $this->load($transformedItems, $state);
+                    $this->load($transformedItems, $stateHolder);
                 } catch (SkipRequest) {
                 }
             }
         } catch (StopRequest) {
         }
 
-        $output = $this->flush($state, false);
+        $output = $this->flush($stateHolder, false);
 
+        $state = unref($stateHolder);
         if (!$state->nbTotalItems) {
             $state = $state->withNbTotalItems($state->nbLoadedItems);
+            $stateHolder->update($state);
         }
 
         $state = $state->withOutput($output);
+        $stateHolder->update($state);
         $this->dispatch(new EndEvent($state));
 
         gc_collect_cycles();
@@ -89,17 +94,23 @@ final class EtlExecutor
         return $state;
     }
 
-    private function extract(EtlState &$state): Generator
+    /**
+     * @param Ref<EtlState> $stateHolder
+     */
+    private function extract(Ref $stateHolder): Generator
     {
+        $state = unref($stateHolder);
         try {
             $items = $this->extractor->extract($state);
             if (is_countable($items)) {
                 $state = $state->withNbTotalItems(count($items));
+                $stateHolder->update($state);
             }
             $this->dispatch(new StartEvent($state));
             foreach ($items as $key => $value) {
                 try {
-                    $state = $state->withUpdatedItemKey($key);
+                    $state = unref($stateHolder)->withUpdatedItemKey($key);
+                    $stateHolder->update($state);
                     $event = $this->dispatch(new ExtractEvent($state, $value));
                     yield $event->item;
                 } catch (SkipRequest) {
@@ -108,7 +119,7 @@ final class EtlExecutor
         } catch (StopRequest) {
             return;
         } catch (Throwable $exception) {
-            $this->throwExtractException($exception, $state);
+            $this->throwExtractException($exception, unref($stateHolder));
         }
     }
 
@@ -132,27 +143,34 @@ final class EtlExecutor
     }
 
     /**
-     * @param list<mixed> $items
+     * @param list<mixed>   $items
+     * @param Ref<EtlState> $stateHolder
      */
-    private function load(array $items, EtlState &$state): void
+    private function load(array $items, Ref $stateHolder): void
     {
+        $state = unref($stateHolder);
         try {
             foreach ($items as $item) {
                 $this->loader->load($item, $state);
                 $state = $state->withIncrementedNbLoadedItems();
+                $stateHolder->update($state);
                 $this->dispatch(new LoadEvent($state, $item));
             }
         } catch (SkipRequest|StopRequest $e) {
             throw $e;
         } catch (Throwable $e) {
-            $this->throwLoadException($e, $state);
+            $this->throwLoadException($e, unref($stateHolder));
         }
 
-        $this->flush($state, true);
+        $this->flush($stateHolder, true);
     }
 
-    private function flush(EtlState &$state, bool $isPartial): mixed
+    /**
+     * @param Ref<EtlState> $stateHolder
+     */
+    private function flush(Ref $stateHolder, bool $isPartial): mixed
     {
+        $state = unref($stateHolder);
         if ($isPartial && !$state->shouldFlush()) {
             return null;
         }
@@ -169,7 +187,7 @@ final class EtlExecutor
             $this->throwFlushException($e, $state);
         }
         $this->dispatch(new FlushEvent($state, $isPartial, $output));
-        $state = $state->withClearedFlush();
+        $stateHolder->update($state->withClearedFlush());
 
         return $output;
     }
