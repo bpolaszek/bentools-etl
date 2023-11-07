@@ -50,10 +50,10 @@ final class EtlExecutor
     private EventDispatcherInterface $eventDispatcher;
 
     public function __construct(
-        private readonly ExtractorInterface $extractor = new IterableExtractor(),
-        private readonly TransformerInterface $transformer = new NullTransformer(),
-        private readonly LoaderInterface $loader = new InMemoryLoader(),
-        private readonly EtlConfiguration $options = new EtlConfiguration(),
+        public readonly ExtractorInterface $extractor = new IterableExtractor(),
+        public readonly TransformerInterface $transformer = new NullTransformer(),
+        public readonly LoaderInterface $loader = new InMemoryLoader(),
+        public readonly EtlConfiguration $options = new EtlConfiguration(),
     ) {
         $this->listenerProvider = new PrioritizedListenerProvider();
         $this->eventDispatcher = new EventDispatcher($this->listenerProvider);
