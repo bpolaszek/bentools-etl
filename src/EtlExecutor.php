@@ -59,9 +59,14 @@ final class EtlExecutor
         $this->eventDispatcher = new EventDispatcher($this->listenerProvider);
     }
 
-    public function process(mixed $source = null, mixed $destination = null): EtlState
+    /**
+     * @param mixed        $source      - Optional arbitrary argument which will be passed to the Extractor
+     * @param mixed        $destination - Optional arbitrary argument which will be passed to the Loader
+     * @param array<mixed> $context     - Optional arbitrary data which will be passed to the ETLState object
+     */
+    public function process(mixed $source = null, mixed $destination = null, array $context = []): EtlState
     {
-        $state = new EtlState(options: $this->options, source: $source, destination: $destination);
+        $state = new EtlState(options: $this->options, source: $source, destination: $destination, context: $context);
         $stateHolder = ref($state);
 
         try {
