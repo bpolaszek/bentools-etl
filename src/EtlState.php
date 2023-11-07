@@ -20,6 +20,7 @@ final class EtlState
         public readonly EtlConfiguration $options = new EtlConfiguration(),
         public readonly mixed $source = null,
         public readonly mixed $destination = null,
+        public array $context = [],
         public readonly mixed $currentItemKey = null,
         public readonly int $currentItemIndex = -1,
         public readonly int $nbExtractedItems = 0,
@@ -30,7 +31,6 @@ final class EtlState
         public readonly mixed $output = null,
         private readonly int $nbLoadedItemsSinceLastFlush = 0,
         private bool $earlyFlush = false,
-        public array $context = [],
     ) {
     }
 
