@@ -18,6 +18,7 @@ use Bentools\ETL\Exception\StopRequest;
 use Bentools\ETL\Extractor\ExtractorInterface;
 use Bentools\ETL\Extractor\IterableExtractor;
 use Bentools\ETL\Internal\ClonableTrait;
+use Bentools\ETL\Internal\ConditionalLoaderTrait;
 use Bentools\ETL\Internal\EtlBuilderTrait;
 use Bentools\ETL\Internal\EtlExceptionsTrait;
 use Bentools\ETL\Internal\Ref;
@@ -46,6 +47,8 @@ final class EtlExecutor
      * @use EtlExceptionsTrait<self>
      */
     use EtlExceptionsTrait;
+
+    use ConditionalLoaderTrait;
 
     private EventDispatcherInterface $eventDispatcher;
 
@@ -156,6 +159,9 @@ final class EtlExecutor
         $state = unref($stateHolder);
         try {
             foreach ($items as $item) {
+                if (!self::shouldLoad($this->loader, $item, $state)) {
+                    continue;
+                }
                 $this->loader->load($item, $state);
                 $state = $state->withIncrementedNbLoadedItems();
                 $stateHolder->update($state);
