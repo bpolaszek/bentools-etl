@@ -22,9 +22,6 @@ use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
 use Stringable;
 
-/**
- * @codeCoverageIgnore
- */
 final class LoggerRecipe extends Recipe
 {
     /**
