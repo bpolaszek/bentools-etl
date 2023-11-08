@@ -48,7 +48,7 @@ final class LoggerRecipe extends Recipe
     ) {
     }
 
-    public function fork(EtlExecutor $executor): EtlExecutor
+    public function decorate(EtlExecutor $executor): EtlExecutor
     {
         return $executor
             ->onInit(fn (InitEvent $event) => $this->log($event, 'Initializing ETL...', ['state' => $event->state]),

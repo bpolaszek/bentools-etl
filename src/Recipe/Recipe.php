@@ -9,17 +9,17 @@ use Closure;
 
 abstract class Recipe
 {
-    abstract public function fork(EtlExecutor $executor): EtlExecutor;
+    abstract public function decorate(EtlExecutor $executor): EtlExecutor;
 
-    public static function fromCallable(callable $recipe): self
+    final public static function fromCallable(callable $recipe): self
     {
-        return new class(Closure::fromCallable($recipe)) extends Recipe {
+        return new class($recipe(...)) extends Recipe {
             public function __construct(
-                private Closure $recipe,
+                private readonly Closure $recipe,
             ) {
             }
 
-            public function fork(EtlExecutor $executor): EtlExecutor
+            public function decorate(EtlExecutor $executor): EtlExecutor
             {
                 return ($this->recipe)($executor);
             }
