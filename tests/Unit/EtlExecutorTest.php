@@ -6,7 +6,9 @@ namespace BenTools\ETL\Tests\Unit;
 
 use Bentools\ETL\EtlConfiguration;
 use Bentools\ETL\EtlExecutor;
+use Bentools\ETL\EtlState;
 use Bentools\ETL\EventDispatcher\Event\FlushEvent;
+use Bentools\ETL\Loader\ConditionalLoaderInterface;
 
 use function expect;
 use function strtoupper;
@@ -53,4 +55,38 @@ it('passes the context throughout all the ETL steps', function () {
     expect($items)->toBe(['banana', 'apple'])
         ->and($report->context['foo'])->toBe('bar')
         ->and($report->context['bar'])->toBe('baz');
+});
+
+it('loads conditionally', function () {
+    // Background
+    $loader = new class() implements ConditionalLoaderInterface {
+        public function supports(mixed $item, EtlState $state): bool
+        {
+            return 'foo' !== $item;
+        }
+
+        public function load(mixed $item, EtlState $state): void
+        {
+            $state->context[__CLASS__][] = $item;
+        }
+
+        public function flush(bool $isPartial, EtlState $state): mixed
+        {
+            foreach ($state->context[__CLASS__] as $item) {
+                $state->context['storage'][] = $item;
+            }
+
+            return $state->context['storage'];
+        }
+    };
+
+    // Given
+    $input = ['foo', 'bar', 'baz'];
+    $executor = new EtlExecutor(loader: $loader);
+
+    // When
+    $report = $executor->process($input, context: ['storage' => []]);
+
+    // Then
+    expect($report->output)->toBe(['bar', 'baz']);
 });

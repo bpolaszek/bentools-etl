@@ -10,6 +10,7 @@
     "thecodingmachine/safe": "^2.5"
   },
   "require-dev": {
+    "bentools/iterable-functions": "^2.1",
     "doctrine/orm": "^2.16",
     "friendsofphp/php-cs-fixer": "^3.35",
     "mockery/mockery": "^1.6",

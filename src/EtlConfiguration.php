@@ -11,9 +11,9 @@ use function sprintf;
 
 use const INF;
 
-final readonly class EtlConfiguration
+class EtlConfiguration
 {
-    public float|int $flushFrequency;
+    public readonly float|int $flushFrequency;
 
     public function __construct(
         float|int $flushEvery = INF,
