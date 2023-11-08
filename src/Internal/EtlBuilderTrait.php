@@ -63,6 +63,6 @@ trait EtlBuilderTrait
             $recipe = Recipe::fromCallable($recipe);
         }
 
-        return $recipe->fork($this);
+        return $recipe->decorate($this);
     }
 }
