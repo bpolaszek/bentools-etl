@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BenTools\ETL\Tests\Unit\Iterator;
 
-use Bentools\ETL\Iterator\PregSplitIterator;
+use BenTools\ETL\Iterator\PregSplitIterator;
 
 use function expect;
 

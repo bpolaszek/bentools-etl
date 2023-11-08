@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace BenTools\ETL\Tests\Behavior;
 
-use Bentools\ETL\EtlConfiguration;
-use Bentools\ETL\EtlExecutor;
-use Bentools\ETL\EventDispatcher\Event\ExtractEvent;
+use BenTools\ETL\EtlConfiguration;
+use BenTools\ETL\EtlExecutor;
+use BenTools\ETL\EventDispatcher\Event\ExtractEvent;
 use BenTools\ETL\Tests\InMemoryLoader;
 
 use function expect;

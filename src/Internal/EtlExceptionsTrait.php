@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Bentools\ETL\Internal;
+namespace BenTools\ETL\Internal;
 
-use Bentools\ETL\EtlState;
-use Bentools\ETL\EventDispatcher\Event\ExtractExceptionEvent;
-use Bentools\ETL\EventDispatcher\Event\FlushExceptionEvent;
-use Bentools\ETL\EventDispatcher\Event\LoadExceptionEvent;
-use Bentools\ETL\EventDispatcher\Event\TransformExceptionEvent;
-use Bentools\ETL\Exception\ExtractException;
-use Bentools\ETL\Exception\FlushException;
-use Bentools\ETL\Exception\LoadException;
-use Bentools\ETL\Exception\TransformException;
+use BenTools\ETL\EtlState;
+use BenTools\ETL\EventDispatcher\Event\ExtractExceptionEvent;
+use BenTools\ETL\EventDispatcher\Event\FlushExceptionEvent;
+use BenTools\ETL\EventDispatcher\Event\LoadExceptionEvent;
+use BenTools\ETL\EventDispatcher\Event\TransformExceptionEvent;
+use BenTools\ETL\Exception\ExtractException;
+use BenTools\ETL\Exception\FlushException;
+use BenTools\ETL\Exception\LoadException;
+use BenTools\ETL\Exception\TransformException;
 use Throwable;
 
 /**

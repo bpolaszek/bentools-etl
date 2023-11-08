@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Bentools\ETL\Loader;
+namespace BenTools\ETL\Loader;
 
-use Bentools\ETL\EtlState;
-use Bentools\ETL\Exception\LoadException;
+use BenTools\ETL\EtlState;
+use BenTools\ETL\Exception\LoadException;
 use SplFileObject;
 use SplTempFileObject;
 

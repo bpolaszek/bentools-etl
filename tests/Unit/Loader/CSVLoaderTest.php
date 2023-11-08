@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace BenTools\ETL\Tests\Unit\Loader;
 
-use Bentools\ETL\EtlExecutor;
-use Bentools\ETL\Loader\CSVLoader;
+use BenTools\ETL\EtlExecutor;
+use BenTools\ETL\Loader\CSVLoader;
 use SplFileObject;
 
 use function array_combine;

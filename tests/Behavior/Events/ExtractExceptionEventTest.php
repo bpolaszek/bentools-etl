@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace BenTools\ETL\Tests\Behavior\Events;
 
-use Bentools\ETL\EtlExecutor;
-use Bentools\ETL\EventDispatcher\Event\ExtractExceptionEvent;
-use Bentools\ETL\Exception\ExtractException;
+use BenTools\ETL\EtlExecutor;
+use BenTools\ETL\EventDispatcher\Event\ExtractExceptionEvent;
+use BenTools\ETL\Exception\ExtractException;
 use RuntimeException;
 
 it('catches an extract exception and return another', function () {

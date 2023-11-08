@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Bentools\ETL\EventDispatcher\Event;
+namespace BenTools\ETL\EventDispatcher\Event;
 
-use Bentools\ETL\EtlState;
+use BenTools\ETL\EtlState;
 
 abstract class Event
 {

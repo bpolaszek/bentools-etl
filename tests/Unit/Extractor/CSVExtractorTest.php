@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace BenTools\ETL\Tests\Unit\Extractor;
 
-use Bentools\ETL\EtlState;
-use Bentools\ETL\Exception\ExtractException;
-use Bentools\ETL\Extractor\CSVExtractor;
+use BenTools\ETL\EtlState;
+use BenTools\ETL\Exception\ExtractException;
+use BenTools\ETL\Extractor\CSVExtractor;
 
 use function dirname;
 use function expect;

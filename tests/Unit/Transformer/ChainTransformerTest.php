@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace BenTools\ETL\Tests\Unit\Transformer;
 
-use Bentools\ETL\EtlExecutor;
-use Bentools\ETL\Transformer\ChainTransformer;
+use BenTools\ETL\EtlExecutor;
+use BenTools\ETL\Transformer\ChainTransformer;
 use Generator;
 
 use function expect;

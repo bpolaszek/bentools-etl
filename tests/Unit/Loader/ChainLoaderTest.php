@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace BenTools\ETL\Tests\Unit\Loader;
 
 use ArrayObject;
-use Bentools\ETL\EtlExecutor;
-use Bentools\ETL\EtlState;
-use Bentools\ETL\Loader\ChainLoader;
-use Bentools\ETL\Loader\ConditionalLoaderInterface;
+use BenTools\ETL\EtlExecutor;
+use BenTools\ETL\EtlState;
+use BenTools\ETL\Loader\ChainLoader;
+use BenTools\ETL\Loader\ConditionalLoaderInterface;
 
 use function expect;
 

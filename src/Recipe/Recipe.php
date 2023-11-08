@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Bentools\ETL\Recipe;
+namespace BenTools\ETL\Recipe;
 
-use Bentools\ETL\EtlExecutor;
+use BenTools\ETL\EtlExecutor;
 use Closure;
 
 abstract class Recipe

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace BenTools\ETL\Tests\Unit\Transformer;
 
-use Bentools\ETL\EtlState;
-use Bentools\ETL\Transformer\NullTransformer;
+use BenTools\ETL\EtlState;
+use BenTools\ETL\Transformer\NullTransformer;
 
 use function expect;
 

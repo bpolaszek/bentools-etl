@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BenTools\ETL\Tests\Unit;
 
-use Bentools\ETL\EtlConfiguration;
+use BenTools\ETL\EtlConfiguration;
 use InvalidArgumentException;
 
 it('denies float values', function () {

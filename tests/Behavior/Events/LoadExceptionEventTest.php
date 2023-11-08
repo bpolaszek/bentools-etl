@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace BenTools\ETL\Tests\Behavior\Events;
 
-use Bentools\ETL\EtlExecutor;
-use Bentools\ETL\EventDispatcher\Event\LoadExceptionEvent;
-use Bentools\ETL\Exception\LoadException;
+use BenTools\ETL\EtlExecutor;
+use BenTools\ETL\EventDispatcher\Event\LoadExceptionEvent;
+use BenTools\ETL\Exception\LoadException;
 
 use function expect;
 use function it;

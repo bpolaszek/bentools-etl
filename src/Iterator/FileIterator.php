@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bentools\ETL\Iterator;
+namespace BenTools\ETL\Iterator;
 
 use IteratorAggregate;
 use SplFileObject;

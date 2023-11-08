@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BenTools\ETL\Tests\Unit\Recipe;
 
-use Bentools\ETL\EtlExecutor;
+use BenTools\ETL\EtlExecutor;
 
 use function expect;
 

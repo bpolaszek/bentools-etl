@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bentools\ETL\Internal;
+namespace BenTools\ETL\Internal;
 
 /**
  * @template T

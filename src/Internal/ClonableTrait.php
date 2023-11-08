@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bentools\ETL\Internal;
+namespace BenTools\ETL\Internal;
 
 use ReflectionClass;
 use ReflectionProperty;
@@ -10,7 +10,7 @@ use ReflectionProperty;
 use function array_column;
 use function array_diff;
 use function array_filter;
-use function Bentools\ETL\array_fill_from;
+use function BenTools\ETL\array_fill_from;
 use function get_object_vars;
 
 /**

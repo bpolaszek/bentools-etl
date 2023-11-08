@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bentools\ETL\Normalizer;
+namespace BenTools\ETL\Normalizer;
 
 final readonly class EmptyStringToNullNormalizer implements ValueNormalizerInterface
 {

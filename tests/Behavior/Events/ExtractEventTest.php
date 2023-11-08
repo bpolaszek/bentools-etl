@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace BenTools\ETL\Tests\Behavior\Events;
 
-use Bentools\ETL\EtlExecutor;
-use Bentools\ETL\EventDispatcher\Event\ExtractEvent;
+use BenTools\ETL\EtlExecutor;
+use BenTools\ETL\EventDispatcher\Event\ExtractEvent;
 
 use function expect;
 

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace BenTools\ETL\Tests\Unit\Loader;
 
-use Bentools\ETL\EtlState;
-use Bentools\ETL\Exception\LoadException;
-use Bentools\ETL\Loader\CallableLoader;
+use BenTools\ETL\EtlState;
+use BenTools\ETL\Exception\LoadException;
+use BenTools\ETL\Loader\CallableLoader;
 
 it('converts a callable to a loader', function () {
     $items = [];

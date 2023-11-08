@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace BenTools\ETL\Tests\Unit\Iterator;
 
-use Bentools\ETL\Iterator\CSVIterator;
-use Bentools\ETL\Iterator\StrTokIterator;
+use BenTools\ETL\Iterator\CSVIterator;
+use BenTools\ETL\Iterator\StrTokIterator;
 
 use function dirname;
 use function expect;
