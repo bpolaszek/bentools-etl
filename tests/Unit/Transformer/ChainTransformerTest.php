@@ -36,3 +36,28 @@ it('chains transformers', function () {
         'rab-RAB',
     ]);
 });
+
+it('silently chains transformers', function () {
+    // Given
+    $input = ['foo', 'bar'];
+
+    $etl = (new EtlExecutor())
+        ->transformWith(
+            fn (string $item): string => strrev($item),
+            function (string $item): Generator {
+                yield $item;
+                yield strtoupper($item);
+            },
+            fn (Generator $items): array => [...$items],
+            fn (array $items): string => implode('-', $items)
+        );
+
+    // When
+    $report = $etl->process($input);
+
+    // Then
+    expect($report->output)->toBe([
+        'oof-OOF',
+        'rab-RAB',
+    ]);
+});

@@ -13,11 +13,14 @@ final readonly class ChainTransformer implements TransformerInterface
      */
     private array $transformers;
 
-    public function __construct(TransformerInterface|callable ...$transformers)
-    {
-        foreach ($transformers as $t => $transformer) {
-            if (!$transformer instanceof TransformerInterface) {
-                $transformers[$t] = new CallableTransformer($transformer(...));
+    public function __construct(
+        TransformerInterface|callable $transformer,
+        TransformerInterface|callable ...$transformers
+    ) {
+        $transformers = [$transformer, ...$transformers];
+        foreach ($transformers as $t => $_transformer) {
+            if (!$_transformer instanceof TransformerInterface) {
+                $transformers[$t] = new CallableTransformer($_transformer(...));
             }
         }
         $this->transformers = $transformers;
