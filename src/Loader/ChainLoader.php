@@ -17,11 +17,13 @@ final readonly class ChainLoader implements LoaderInterface
     private array $loaders;
 
     public function __construct(
-        LoaderInterface|callable ...$loaders
+        LoaderInterface|callable $loader,
+        LoaderInterface|callable ...$loaders,
     ) {
-        foreach ($loaders as $l => $loader) {
-            if (!$loader instanceof LoaderInterface) {
-                $loaders[$l] = new CallableLoader($loader(...));
+        $loaders = [$loader, ...$loaders];
+        foreach ($loaders as $l => $_loader) {
+            if (!$_loader instanceof LoaderInterface) {
+                $loaders[$l] = new CallableLoader($_loader(...));
             }
         }
         $this->loaders = $loaders;

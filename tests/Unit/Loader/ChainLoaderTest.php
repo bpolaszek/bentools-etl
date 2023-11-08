@@ -56,3 +56,23 @@ it('chains loaders', function () {
         ->and([...$b])->toBe(['foo', 'bar'])
         ->and([...$c])->toBe(['bar']);
 });
+
+it('silently chains loaders', function () {
+    // Background
+    $a = new ArrayObject();
+    $b = new ArrayObject();
+
+    // Given
+    $input = ['foo', 'bar'];
+    $executor = (new EtlExecutor())->loadInto(
+        fn (string $item) => $a[] = $item, // @phpstan-ignore-line
+        fn (string $item) => $b[] = $item, // @phpstan-ignore-line
+    );
+
+    // When
+    $executor->process($input);
+
+    // Then
+    expect([...$a])->toBe(['foo', 'bar'])
+        ->and([...$b])->toBe(['foo', 'bar']);
+});
