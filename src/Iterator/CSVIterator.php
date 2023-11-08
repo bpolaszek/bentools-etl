@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Bentools\ETL\Iterator;
+namespace BenTools\ETL\Iterator;
 
-use Bentools\ETL\Normalizer\EmptyStringToNullNormalizer;
-use Bentools\ETL\Normalizer\NumericStringToNumberNormalizer;
-use Bentools\ETL\Normalizer\ValueNormalizerInterface;
+use BenTools\ETL\Normalizer\EmptyStringToNullNormalizer;
+use BenTools\ETL\Normalizer\NumericStringToNumberNormalizer;
+use BenTools\ETL\Normalizer\ValueNormalizerInterface;
 use IteratorAggregate;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Traversable;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bentools\ETL\EventDispatcher;
+namespace BenTools\ETL\EventDispatcher;
 
 use Psr\EventDispatcher\ListenerProviderInterface;
 

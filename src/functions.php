@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Bentools\ETL;
+namespace BenTools\ETL;
 
-use Bentools\ETL\Internal\Ref;
+use BenTools\ETL\Internal\Ref;
 
 use function array_fill_keys;
 use function array_intersect_key;

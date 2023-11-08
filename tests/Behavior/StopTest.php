@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace BenTools\ETL\Tests\Behavior;
 
-use Bentools\ETL\EtlExecutor;
-use Bentools\ETL\EventDispatcher\Event\ExtractEvent;
-use Bentools\ETL\EventDispatcher\Event\LoadEvent;
-use Bentools\ETL\EventDispatcher\Event\TransformEvent;
-use Bentools\ETL\Extractor\CSVExtractor;
+use BenTools\ETL\EtlExecutor;
+use BenTools\ETL\EventDispatcher\Event\ExtractEvent;
+use BenTools\ETL\EventDispatcher\Event\LoadEvent;
+use BenTools\ETL\EventDispatcher\Event\TransformEvent;
+use BenTools\ETL\Extractor\CSVExtractor;
 
 use function dirname;
 use function expect;

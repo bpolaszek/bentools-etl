@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace BenTools\ETL\Tests\Behavior;
 
-use Bentools\ETL\EtlExecutor;
-use Bentools\ETL\Exception\ExtractException;
+use BenTools\ETL\EtlExecutor;
+use BenTools\ETL\Exception\ExtractException;
 use RuntimeException;
 
 it('throws an extract exception when it is thrown from the extractor', function () {

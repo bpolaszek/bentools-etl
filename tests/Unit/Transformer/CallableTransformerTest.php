@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace BenTools\ETL\Tests\Unit\Transformer;
 
-use Bentools\ETL\EtlState;
-use Bentools\ETL\Transformer\CallableTransformer;
+use BenTools\ETL\EtlState;
+use BenTools\ETL\Transformer\CallableTransformer;
 
 use function strtoupper;
 

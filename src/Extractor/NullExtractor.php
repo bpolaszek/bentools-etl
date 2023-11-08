@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Bentools\ETL\Extractor;
+namespace BenTools\ETL\Extractor;
 
-use Bentools\ETL\EtlState;
+use BenTools\ETL\EtlState;
 
 /**
  * @codeCoverageIgnore

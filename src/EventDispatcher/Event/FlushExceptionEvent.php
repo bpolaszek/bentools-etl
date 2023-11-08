@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Bentools\ETL\EventDispatcher\Event;
+namespace BenTools\ETL\EventDispatcher\Event;
 
-use Bentools\ETL\EtlState;
-use Bentools\ETL\EventDispatcher\StoppableEventTrait;
-use Bentools\ETL\Exception\FlushException;
+use BenTools\ETL\EtlState;
+use BenTools\ETL\EventDispatcher\StoppableEventTrait;
+use BenTools\ETL\Exception\FlushException;
 use Psr\EventDispatcher\StoppableEventInterface;
 
 final class FlushExceptionEvent extends Event implements StoppableEventInterface

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BenTools\ETL\Tests\Unit\Normalizer;
 
-use Bentools\ETL\Normalizer\NumericStringToNumberNormalizer;
+use BenTools\ETL\Normalizer\NumericStringToNumberNormalizer;
 
 use function array_walk;
 use function expect;

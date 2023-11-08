@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Bentools\ETL\Internal;
+namespace BenTools\ETL\Internal;
 
-use Bentools\ETL\EtlState;
-use Bentools\ETL\Loader\ConditionalLoaderInterface;
-use Bentools\ETL\Loader\LoaderInterface;
+use BenTools\ETL\EtlState;
+use BenTools\ETL\Loader\ConditionalLoaderInterface;
+use BenTools\ETL\Loader\LoaderInterface;
 
 trait ConditionalLoaderTrait
 {

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace BenTools\ETL\Tests;
 
-use Bentools\ETL\EtlState;
-use Bentools\ETL\Loader\LoaderInterface;
+use BenTools\ETL\EtlState;
+use BenTools\ETL\Loader\LoaderInterface;
 
 class InMemoryLoader implements LoaderInterface
 {

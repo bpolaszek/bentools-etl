@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Bentools\ETL\Loader;
+namespace BenTools\ETL\Loader;
 
-use Bentools\ETL\EtlState;
+use BenTools\ETL\EtlState;
 
 interface ConditionalLoaderInterface extends LoaderInterface
 {

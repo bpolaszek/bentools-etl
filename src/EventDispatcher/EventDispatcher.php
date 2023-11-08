@@ -1,6 +1,6 @@
 <?php
 
-namespace Bentools\ETL\EventDispatcher;
+namespace BenTools\ETL\EventDispatcher;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;

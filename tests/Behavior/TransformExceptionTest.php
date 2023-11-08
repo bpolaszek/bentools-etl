@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace BenTools\ETL\Tests\Behavior;
 
-use Bentools\ETL\EtlExecutor;
-use Bentools\ETL\Exception\TransformException;
+use BenTools\ETL\EtlExecutor;
+use BenTools\ETL\Exception\TransformException;
 use RuntimeException;
 
 use function expect;

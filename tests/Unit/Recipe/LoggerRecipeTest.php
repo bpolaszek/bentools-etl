@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace BenTools\ETL\Tests\Unit\Recipe;
 
-use Bentools\ETL\EtlConfiguration;
-use Bentools\ETL\EtlExecutor;
-use Bentools\ETL\Recipe\LoggerRecipe;
+use BenTools\ETL\EtlConfiguration;
+use BenTools\ETL\EtlExecutor;
+use BenTools\ETL\Recipe\LoggerRecipe;
 use Monolog\Handler\TestHandler;
 use Monolog\Level;
 use Monolog\Logger;

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace BenTools\ETL\Tests\Behavior\Events;
 
-use Bentools\ETL\EtlExecutor;
-use Bentools\ETL\EventDispatcher\Event\TransformExceptionEvent;
-use Bentools\ETL\Exception\TransformException;
+use BenTools\ETL\EtlExecutor;
+use BenTools\ETL\EventDispatcher\Event\TransformExceptionEvent;
+use BenTools\ETL\Exception\TransformException;
 
 use function expect;
 use function it;

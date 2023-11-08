@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BenTools\ETL\Tests\Unit\Iterator;
 
-use Bentools\ETL\Iterator\StrTokIterator;
+use BenTools\ETL\Iterator\StrTokIterator;
 
 use function expect;
 

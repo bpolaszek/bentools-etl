@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace BenTools\ETL\Tests\Unit;
 
-use Bentools\ETL\EtlConfiguration;
-use Bentools\ETL\EtlExecutor;
-use Bentools\ETL\EtlState;
-use Bentools\ETL\EventDispatcher\Event\FlushEvent;
-use Bentools\ETL\Loader\ConditionalLoaderInterface;
+use BenTools\ETL\EtlConfiguration;
+use BenTools\ETL\EtlExecutor;
+use BenTools\ETL\EtlState;
+use BenTools\ETL\EventDispatcher\Event\FlushEvent;
+use BenTools\ETL\Loader\ConditionalLoaderInterface;
 
 use function expect;
 use function strtoupper;

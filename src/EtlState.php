@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Bentools\ETL;
+namespace BenTools\ETL;
 
-use Bentools\ETL\Exception\SkipRequest;
-use Bentools\ETL\Exception\StopRequest;
-use Bentools\ETL\Internal\ClonableTrait;
+use BenTools\ETL\Exception\SkipRequest;
+use BenTools\ETL\Exception\StopRequest;
+use BenTools\ETL\Internal\ClonableTrait;
 use DateTimeImmutable;
 
 final class EtlState

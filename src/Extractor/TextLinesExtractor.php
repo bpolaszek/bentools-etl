@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Bentools\ETL\Extractor;
+namespace BenTools\ETL\Extractor;
 
-use Bentools\ETL\EtlState;
-use Bentools\ETL\Iterator\PregSplitIterator;
-use Bentools\ETL\Iterator\StrTokIterator;
+use BenTools\ETL\EtlState;
+use BenTools\ETL\Iterator\PregSplitIterator;
+use BenTools\ETL\Iterator\StrTokIterator;
 use EmptyIterator;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 

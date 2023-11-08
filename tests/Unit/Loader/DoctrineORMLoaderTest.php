@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace BenTools\ETL\Tests\Unit\Loader;
 
-use Bentools\ETL\EtlConfiguration;
-use Bentools\ETL\EtlExecutor;
-use Bentools\ETL\EtlState;
-use Bentools\ETL\Exception\LoadException;
-use Bentools\ETL\Loader\DoctrineORMLoader;
+use BenTools\ETL\EtlConfiguration;
+use BenTools\ETL\EtlExecutor;
+use BenTools\ETL\EtlState;
+use BenTools\ETL\Exception\LoadException;
+use BenTools\ETL\Loader\DoctrineORMLoader;
 use BenTools\ETL\Tests\Unit\Loader\Doctrine\Book;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;

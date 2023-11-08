@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Bentools\ETL\Internal;
+namespace BenTools\ETL\Internal;
 
-use Bentools\ETL\EtlConfiguration;
-use Bentools\ETL\Extractor\CallableExtractor;
-use Bentools\ETL\Extractor\ExtractorInterface;
-use Bentools\ETL\Loader\CallableLoader;
-use Bentools\ETL\Loader\ChainLoader;
-use Bentools\ETL\Loader\LoaderInterface;
-use Bentools\ETL\Recipe\Recipe;
-use Bentools\ETL\Transformer\CallableTransformer;
-use Bentools\ETL\Transformer\ChainTransformer;
-use Bentools\ETL\Transformer\TransformerInterface;
+use BenTools\ETL\EtlConfiguration;
+use BenTools\ETL\Extractor\CallableExtractor;
+use BenTools\ETL\Extractor\ExtractorInterface;
+use BenTools\ETL\Loader\CallableLoader;
+use BenTools\ETL\Loader\ChainLoader;
+use BenTools\ETL\Loader\LoaderInterface;
+use BenTools\ETL\Recipe\Recipe;
+use BenTools\ETL\Transformer\CallableTransformer;
+use BenTools\ETL\Transformer\ChainTransformer;
+use BenTools\ETL\Transformer\TransformerInterface;
 
 use function count;
 

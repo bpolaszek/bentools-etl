@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Bentools\ETL\Extractor;
+namespace BenTools\ETL\Extractor;
 
-use Bentools\ETL\EtlState;
-use Bentools\ETL\Exception\ExtractException;
-use Bentools\ETL\Iterator\CSVIterator;
+use BenTools\ETL\EtlState;
+use BenTools\ETL\Exception\ExtractException;
+use BenTools\ETL\Iterator\CSVIterator;
 
 use function is_string;
 use function str_starts_with;

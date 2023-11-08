@@ -32,7 +32,7 @@ Let's cover the basic concepts:
 Now let's have a look on how simple it is:
 
 ```php
-use Bentools\ETL\EtlExecutor;
+use BenTools\ETL\EtlExecutor;
 
 $etl = (new EtlExecutor())
     ->transformWith(fn (string $name) => strtoupper($name));
@@ -55,7 +55,7 @@ Tokyo,東京,JP,Asia,13929286
 ```
 
 ```php
-use Bentools\ETL\EtlExecutor;
+use BenTools\ETL\EtlExecutor;
 
 $etl = (new EtlExecutor())
     ->extractFrom(new CSVExtractor(options: ['columns' => 'auto']))
@@ -198,8 +198,8 @@ Recipes are reusable configurations of an `EtlExecutor`.
 For example, to enable logging, use the `LoggerRecipe`:
 
 ```php
-use Bentools\ETL\EtlExecutor;
-use Bentools\ETL\Recipe\LoggerRecipe;
+use BenTools\ETL\EtlExecutor;
+use BenTools\ETL\Recipe\LoggerRecipe;
 use Monolog\Logger;
 
 $logger = new Logger();
@@ -209,7 +209,7 @@ $etl = (new EtlExecutor())
 
 This will basically listen to all events and fire log entries.
 
-You can create your own recipes by implementing `Bentools\ETL\Recipe\Recipe` or using a callable with the same signature.
+You can create your own recipes by implementing `BenTools\ETL\Recipe\Recipe` or using a callable with the same signature.
 
 Contribute
 ----------

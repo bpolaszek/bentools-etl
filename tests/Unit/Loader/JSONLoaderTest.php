@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace BenTools\ETL\Tests\Unit\Loader;
 
-use Bentools\ETL\EtlConfiguration;
-use Bentools\ETL\EtlExecutor;
-use Bentools\ETL\Loader\JSONLoader;
+use BenTools\ETL\EtlConfiguration;
+use BenTools\ETL\EtlExecutor;
+use BenTools\ETL\Loader\JSONLoader;
 use SplFileObject;
 
 use function dataset;

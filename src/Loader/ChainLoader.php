@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Bentools\ETL\Loader;
+namespace BenTools\ETL\Loader;
 
-use Bentools\ETL\EtlState;
-use Bentools\ETL\Internal\ConditionalLoaderTrait;
+use BenTools\ETL\EtlState;
+use BenTools\ETL\Internal\ConditionalLoaderTrait;
 
 final readonly class ChainLoader implements LoaderInterface
 {

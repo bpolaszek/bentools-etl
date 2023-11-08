@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace BenTools\ETL\Tests\Unit\Extractor;
 
-use Bentools\ETL\EtlState;
-use Bentools\ETL\Extractor\CallableExtractor;
+use BenTools\ETL\EtlState;
+use BenTools\ETL\Extractor\CallableExtractor;
 
 it('converts a callable to an extractor', function () {
     // Given

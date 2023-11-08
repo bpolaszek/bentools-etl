@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bentools\ETL;
+namespace BenTools\ETL;
 
 use InvalidArgumentException;
 

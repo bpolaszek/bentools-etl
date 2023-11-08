@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Bentools\ETL\Transformer;
+namespace BenTools\ETL\Transformer;
 
-use Bentools\ETL\EtlState;
+use BenTools\ETL\EtlState;
 
 interface TransformerInterface
 {

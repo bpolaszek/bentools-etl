@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bentools\ETL\Exception;
+namespace BenTools\ETL\Exception;
 
 final class FlushException extends EtlException
 {

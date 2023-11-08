@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace BenTools\ETL\Tests\Behavior;
 
-use Bentools\ETL\EtlConfiguration;
-use Bentools\ETL\EtlExecutor;
-use Bentools\ETL\EtlState;
-use Bentools\ETL\Exception\FlushException;
-use Bentools\ETL\Loader\LoaderInterface;
+use BenTools\ETL\EtlConfiguration;
+use BenTools\ETL\EtlExecutor;
+use BenTools\ETL\EtlState;
+use BenTools\ETL\Exception\FlushException;
+use BenTools\ETL\Loader\LoaderInterface;
 use Exception;
 use RuntimeException;
 

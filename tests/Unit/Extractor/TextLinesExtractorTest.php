@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace BenTools\ETL\Tests\Unit\Extractor;
 
-use Bentools\ETL\EtlState;
-use Bentools\ETL\Extractor\TextLinesExtractor;
+use BenTools\ETL\EtlState;
+use BenTools\ETL\Extractor\TextLinesExtractor;
 
 use function expect;
 

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace BenTools\ETL\Tests\Unit\EventDispatcher;
 
-use Bentools\ETL\EventDispatcher\EventDispatcher;
-use Bentools\ETL\EventDispatcher\PrioritizedListenerProvider;
-use Bentools\ETL\EventDispatcher\StoppableEventTrait;
+use BenTools\ETL\EventDispatcher\EventDispatcher;
+use BenTools\ETL\EventDispatcher\PrioritizedListenerProvider;
+use BenTools\ETL\EventDispatcher\StoppableEventTrait;
 use Psr\EventDispatcher\StoppableEventInterface;
 
 use function count;
