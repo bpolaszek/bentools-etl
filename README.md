@@ -118,7 +118,7 @@ $etl = (new EtlExecutor())
     })
     ->loadInto(function (array $query, EtlState $state) {
         /** @var \PDO $pdo */
-        $pdo = $state->destination;
+        $pdo = $state->destination; // See below - $state->destination corresponds to the $destination argument of the $etl->process() method.
         [$sql, $params] = $query;
         $stmt = $pdo->prepare($sql);
         $stmt->execute($params);
@@ -131,6 +131,20 @@ As you can see:
 - You can use `EtlState.destination` to retrieve the second argument you passed yo `$etl->process()`.
 
 The `EtlState` object contains all elements relative to the state of your ETL workflow being running.
+
+Difference between `yield` and `return` in transformers
+------------------------------------------------------
+
+The `EtlExecutor::transformWith()` method accepts an unlimited number of transformers as arguments.
+
+When you chain transformers, keep in mind that every transformer will get:
+- Either the returned value passed from the previous transformer
+- Either an array of every yielded value from the previous transformer
+
+But the last transformer of the chain (or your only one transformer) is deterministic to know what will be passed to the loader (either a return  value, or a generator):
+- If your transformer `returns` a value, this value will be passed to the loader.
+- If your transformer `returns` an array of values (or whatever iterable), that return value will be passed to the loader.
+- If your transformer `yields` values, each yielded value will be passed to the loader.
 
 Using events
 ------------

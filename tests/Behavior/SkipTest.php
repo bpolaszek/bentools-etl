@@ -63,7 +63,7 @@ it('skips items during transformation', function () {
             $cities[] = $city;
         })
         ->onTransform(function (TransformEvent $event) {
-            if ('Tokyo' === [...$event->items][0]) {
+            if ('Tokyo' === [...$event->transformResult][0]) {
                 $event->state->skip();
             }
         });

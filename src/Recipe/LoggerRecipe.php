@@ -83,7 +83,7 @@ final class LoggerRecipe extends Recipe
                     [
                         'key' => $event->state->currentItemKey,
                         'state' => $event->state,
-                        'items' => $event->items,
+                        'items' => $event->transformResult,
                     ],
                 ),
                 $this->priorities[TransformEvent::class] ?? $this->defaultPriority,
