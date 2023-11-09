@@ -148,6 +148,10 @@ The `EtlExecutor` emits various events during the workflow:
 - `FlushExceptionEvent` when something wrong occured during flush (the exception can be dismissed)
 - `EndEvent` whenever the workflow is complete.
 
+All events give you access to the `EtlState` object, the state of the running ETL process, which allows you to read what's going on 
+(total number of items, number of loaded items, current extracted item index), write any arbitrary data into the `$state->context` array, 
+[skip items](#skipping-items), [stop the workflow](#stopping-the-workflow), and [trigger an early flush](#flush-frequency-and-early-flushes).
+
 You can hook to those events during `EtlExecutor` instantiation, i.e.:
 
 ```php
