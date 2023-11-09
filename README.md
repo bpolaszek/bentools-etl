@@ -209,6 +209,23 @@ $etl = (new EtlExecutor(options: new EtlConfiguration(flushFrequency: 10)))
     );
 ```
 
+Next tick
+---------
+
+You can also access the `EtlState` instance of the next item to be processed, for example to trigger
+an early flush on the next item, or to stop the whole process once the current item will be loaded.
+
+Example:
+```php
+$etl = $etl->onExtract(function (ExtractEvent $event) {
+    if (/* some reason */) {
+        $event->state->flush();
+        // $event->state->stop(); // This would actually stop immediately
+        $event->state->nextTick(fn (EtlState $state) => $state->stop()); // Stop at the next iteration instead
+    }
+});
+```
+
 Recipes
 -------
 
