@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BenTools\ETL\Transformer;
 
 use BenTools\ETL\EtlState;
+use BenTools\ETL\Internal\TransformResult;
 
 final readonly class ChainTransformer implements TransformerInterface
 {
@@ -35,7 +36,7 @@ final readonly class ChainTransformer implements TransformerInterface
     {
         $output = $item;
         foreach ($this->transformers as $transformer) {
-            $output = $transformer->transform($output, $state);
+            $output = TransformResult::create($transformer->transform($output, $state))->value;
         }
 
         return $output;

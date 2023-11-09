@@ -12,12 +12,9 @@ final class TransformEvent extends Event implements StoppableEventInterface
 {
     use StoppableEventTrait;
 
-    /**
-     * @param list<mixed> $items
-     */
     public function __construct(
         public readonly EtlState $state,
-        public array $items,
+        public mixed $transformResult,
     ) {
     }
 }

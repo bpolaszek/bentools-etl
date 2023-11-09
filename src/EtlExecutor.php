@@ -22,6 +22,7 @@ use BenTools\ETL\Internal\ConditionalLoaderTrait;
 use BenTools\ETL\Internal\EtlBuilderTrait;
 use BenTools\ETL\Internal\EtlExceptionsTrait;
 use BenTools\ETL\Internal\Ref;
+use BenTools\ETL\Internal\TransformResult;
 use BenTools\ETL\Loader\InMemoryLoader;
 use BenTools\ETL\Loader\LoaderInterface;
 use BenTools\ETL\Transformer\NullTransformer;
@@ -137,10 +138,12 @@ final class EtlExecutor
     private function transform(mixed $item, EtlState $state): array
     {
         try {
-            $transformed = $this->transformer->transform($item, $state);
-            $items = $transformed instanceof Generator ? [...$transformed] : [$transformed];
+            $transformResult = TransformResult::create($this->transformer->transform($item, $state));
 
-            return $this->dispatch(new TransformEvent($state, $items))->items;
+            $event = $this->dispatch(new TransformEvent($state, $transformResult));
+            $transformResult = TransformResult::create($event->transformResult);
+
+            return [...$transformResult];
         } catch (SkipRequest|StopRequest $e) {
             throw $e;
         } catch (Throwable $e) {

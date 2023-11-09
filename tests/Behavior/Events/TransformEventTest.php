@@ -19,7 +19,7 @@ it('fires a transform event', function () {
         yield strtoupper($value);
     })
         ->onTransform(function (TransformEvent $e) use (&$transformedItems) {
-            $transformedItems = [...$transformedItems, ...$e->items];
+            $transformedItems = [...$transformedItems, ...$e->transformResult];
         });
 
     // When

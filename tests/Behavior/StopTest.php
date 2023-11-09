@@ -58,7 +58,7 @@ it('stops the process during transformation', function () {
             $cities[] = $city;
         })
         ->onTransform(function (TransformEvent $event) {
-            if ('Shanghai' === [...$event->items][0]) {
+            if ('Shanghai' === [...$event->transformResult][0]) {
                 $event->state->stop();
             }
         });
