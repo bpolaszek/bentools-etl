@@ -250,7 +250,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 $output = new SymfonyStyle($input, $output);
 $progressBar = $output->createProgressBar();
-$executor = (new EtlExecutor())->withRecipe(new ProgressBarRecipe());
+$executor = (new EtlExecutor())->withRecipe(new ProgressBarRecipe($progressBar));
 ```
 
 Contribute
