@@ -6,6 +6,9 @@ namespace BenTools\ETL\Extractor;
 
 use BenTools\ETL\EtlState;
 use Closure;
+use EmptyIterator;
+
+use function is_iterable;
 
 final readonly class CallableExtractor implements ExtractorInterface
 {
@@ -16,6 +19,16 @@ final readonly class CallableExtractor implements ExtractorInterface
 
     public function extract(EtlState $state): iterable
     {
-        return ($this->closure)($state);
+        $extracted = ($this->closure)($state);
+
+        if (null === $extracted) {
+            return new EmptyIterator();
+        }
+
+        if (!is_iterable($extracted)) {
+            return [$extracted];
+        }
+
+        return $extracted;
     }
 }
