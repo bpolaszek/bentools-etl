@@ -216,12 +216,18 @@ You can also access the `EtlState` instance of the next item to be processed, fo
 an early flush on the next item, or to stop the whole process once the current item will be loaded.
 
 Example:
+
 ```php
-$etl = $etl->onExtract(function (ExtractEvent $event) {
+use BenTools\ETL\EventDispatcher\Event\LoadEvent;
+
+$etl = $etl->onLoad(function (LoadEvent $event) {
+    $item = $event->item;
     if (/* some reason */) {
-        $event->state->flush();
-        // $event->state->stop(); // This would actually stop immediately
-        $event->state->nextTick(fn (EtlState $state) => $state->stop()); // Stop at the next iteration instead
+        $event->state->flush(); // Request early flush after loading
+        $event->state->nextTick(function (EtlState $state)  use ($item) {
+            // $item will be flushed, so we can do something with it
+            var_dump($item->id);
+        });
     }
 });
 ```
