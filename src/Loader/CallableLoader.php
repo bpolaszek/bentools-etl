@@ -23,8 +23,7 @@ final readonly class CallableLoader implements LoaderInterface
         if (!is_callable($callback)) {
             throw new LoadException('Invalid destination.');
         }
-        $state->context['output'] = $callback($item, $state);
-        $state->flush();
+        $state->context[__CLASS__]['loaded'][] = $callback($item, $state);
     }
 
     /**
@@ -32,6 +31,11 @@ final readonly class CallableLoader implements LoaderInterface
      */
     public function flush(bool $isPartial, EtlState $state): mixed
     {
-        return $state->context['output'];
+        foreach ($state->context[__CLASS__]['loaded'] ?? [] as $i => $item) {
+            $state->context[__CLASS__]['output'][] = $item;
+            unset($state->context[__CLASS__]['loaded'][$i]);
+        }
+
+        return $state->context[__CLASS__]['output'] ?? [];
     }
 }
