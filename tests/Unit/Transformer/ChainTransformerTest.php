@@ -23,6 +23,7 @@ it('chains transformers', function () {
             yield strtoupper($item);
         },
     ))
+        ->with(fn (Generator $items): array => [...$items])
         ->with(function (array $items): array {
             $items[] = 'hey';
 
@@ -52,12 +53,13 @@ it('silently chains transformers', function () {
                 yield $item;
                 yield strtoupper($item);
             },
+            fn (Generator $items): array => [...$items],
             function (array $items): array {
                 $items[] = 'hey';
 
                 return $items;
             },
-            fn (array $items): string => implode('-', $items)
+            fn (array $items) => yield implode('-', $items)
         );
 
     // When
