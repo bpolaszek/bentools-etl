@@ -92,10 +92,10 @@ final class EtlState
     public function shouldFlush(): bool
     {
         return match (true) {
+            $this->earlyFlush => true,
             INF === $this->options->flushFrequency => false,
             0 === $this->nbLoadedItemsSinceLastFlush => false,
             0 === ($this->nbLoadedItemsSinceLastFlush % $this->options->flushFrequency) => true,
-            $this->earlyFlush => true,
             default => false,
         };
     }

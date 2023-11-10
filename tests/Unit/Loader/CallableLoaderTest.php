@@ -16,7 +16,7 @@ it('converts a callable to a loader', function () {
     $loader = new CallableLoader(function (mixed $item) use (&$items) {
         $items[] = $item;
 
-        return $items;
+        return $item;
     });
 
     // When
