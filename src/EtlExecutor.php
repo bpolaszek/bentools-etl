@@ -76,7 +76,11 @@ final class EtlExecutor
         try {
             $this->dispatch(new InitEvent($state));
 
-            foreach ($this->extract($stateHolder) as $extractedItem) {
+            foreach ($this->extract($stateHolder) as $e => $extractedItem) {
+                $state = unref($stateHolder);
+                if (0 !== $e) {
+                    $this->consumeNextTick($state);
+                }
                 try {
                     $transformedItems = $this->transform($extractedItem, $state);
                     $this->load($transformedItems, $stateHolder);
@@ -86,6 +90,7 @@ final class EtlExecutor
         } catch (StopRequest) {
         }
 
+        $this->consumeNextTick($state);
         $output = $this->flush($stateHolder, false);
 
         $state = unref($stateHolder);
@@ -101,6 +106,15 @@ final class EtlExecutor
         gc_collect_cycles();
 
         return $state;
+    }
+
+    private function consumeNextTick(EtlState $state): void
+    {
+        if (null === $state->nextTickCallback) {
+            return;
+        }
+
+        ($state->nextTickCallback)($state);
     }
 
     /**

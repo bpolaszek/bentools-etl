@@ -7,11 +7,20 @@ namespace BenTools\ETL;
 use BenTools\ETL\Exception\SkipRequest;
 use BenTools\ETL\Exception\StopRequest;
 use BenTools\ETL\Internal\ClonableTrait;
+use Closure;
 use DateTimeImmutable;
 
 final class EtlState
 {
     use ClonableTrait;
+
+    /**
+     * @internal
+     */
+    public ?Closure $nextTickCallback = null;
+
+    private int $nbLoadedItemsSinceLastFlush = 0;
+    private bool $earlyFlush = false;
 
     /**
      * @param array<string, mixed> $context
@@ -29,9 +38,21 @@ final class EtlState
         public readonly DateTimeImmutable $startedAt = new DateTimeImmutable(),
         public readonly ?DateTimeImmutable $endedAt = null,
         public readonly mixed $output = null,
-        private readonly int $nbLoadedItemsSinceLastFlush = 0,
-        private bool $earlyFlush = false,
     ) {
+    }
+
+    public function nextTick(?callable $callback): void
+    {
+        if (null === $callback) {
+            $this->nextTickCallback = null;
+
+            return;
+        }
+
+        $this->nextTickCallback = static function (EtlState $state) use ($callback) {
+            $callback($state);
+            $state->nextTick(null);
+        };
     }
 
     /**
@@ -58,21 +79,25 @@ final class EtlState
         throw new StopRequest();
     }
 
-    public function shouldFlush(): bool
-    {
-        if (INF === $this->options->flushFrequency) {
-            return false;
-        }
-
-        return $this->earlyFlush
-                || (0 === ($this->nbLoadedItemsSinceLastFlush % $this->options->flushFrequency));
-    }
-
     public function getDuration(): float
     {
         $endedAt = $this->endedAt ?? new DateTimeImmutable();
 
         return (float) ($endedAt->format('U.u') - $this->startedAt->format('U.u'));
+    }
+
+    /**
+     * @internal
+     */
+    public function shouldFlush(): bool
+    {
+        return match (true) {
+            INF === $this->options->flushFrequency => false,
+            0 === $this->nbLoadedItemsSinceLastFlush => false,
+            0 === ($this->nbLoadedItemsSinceLastFlush % $this->options->flushFrequency) => true,
+            $this->earlyFlush => true,
+            default => false,
+        };
     }
 
     /**
