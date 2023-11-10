@@ -6,6 +6,7 @@ namespace BenTools\ETL\Internal;
 
 use BenTools\ETL\EtlConfiguration;
 use BenTools\ETL\Extractor\CallableExtractor;
+use BenTools\ETL\Extractor\ChainExtractor;
 use BenTools\ETL\Extractor\ExtractorInterface;
 use BenTools\ETL\Loader\CallableLoader;
 use BenTools\ETL\Loader\ChainLoader;
@@ -29,13 +30,21 @@ trait EtlBuilderTrait
      */
     use EtlEventListenersTrait;
 
-    public function extractFrom(ExtractorInterface|callable $extractor): self
+    public function extractFrom(ExtractorInterface|callable $extractor, ExtractorInterface|callable ...$extractors): self
     {
-        if (!$extractor instanceof ExtractorInterface) {
-            $extractor = new CallableExtractor($extractor(...));
+        $extractors = [$extractor, ...$extractors];
+
+        foreach ($extractors as $e => $_extractor) {
+            if (!$_extractor instanceof ExtractorInterface) {
+                $extractors[$e] = new CallableExtractor($_extractor(...));
+            }
         }
 
-        return $this->cloneWith(['extractor' => $extractor]);
+        if (count($extractors) > 1) {
+            return $this->cloneWith(['extractor' => new ChainExtractor(...$extractors)]);
+        }
+
+        return $this->cloneWith(['extractor' => $extractors[0]]);
     }
 
     public function transformWith(TransformerInterface|callable $transformer, TransformerInterface|callable ...$transformers): self
