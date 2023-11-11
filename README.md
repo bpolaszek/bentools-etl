@@ -296,6 +296,27 @@ $progressBar = $output->createProgressBar();
 $executor = (new EtlExecutor())->withRecipe(new ProgressBarRecipe($progressBar));
 ```
 
+Instantiators
+-------------
+
+You can use the `extractFrom()`, `transformWith()`, `loadInto()` and `withRecipe()` functions 
+to instantiate an `EtlExecutor`.
+
+Example:
+
+```php
+use BenTools\ETL\Recipe\LoggerRecipe;
+use Monolog\Logger;
+
+use function BenTools\ETL\withRecipe;
+
+$logger = new Logger();
+$report = withRecipe(new LoggerRecipe($logger))
+    ->transformWith(fn ($value) => strtoupper($value))
+    ->process(['foo', 'bar']);
+```
+
+
 Contribute
 ----------
 
