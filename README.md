@@ -10,6 +10,8 @@ and you're looking for a PHP library to do the stuff.
 
 Alright, let's go!
 
+`bentools-etl` is a versatile PHP library for implementing the Extract, Transform, Load (ETL) pattern, designed to streamline data processing tasks.
+
 Installation
 ------------
 
@@ -17,9 +19,11 @@ Installation
 composer require bentools/etl:^4.0@alpha
 ```
 
-_Warning: version  4.0 is a complete rewrite and a involves important BC breaks._
+> **Warning #1**: Version 4.0 is a complete rewrite and introduces significant BC (backward compatibility) breaks.
+> Avoid upgrading from `^2.0` or `^3.0` unless you're fully aware of the changes.
 
-_Don't upgrade from `^2.0` or `^3.0` unless you know what you're doing!_
+> **Warning #2**: Version 4.0 is still at an alpha stage. BC breaks might occur between alpha releases.
+
 
 Usage
 -----
@@ -34,16 +38,22 @@ Now let's have a look on how simple it is:
 ```php
 use BenTools\ETL\EtlExecutor;
 
+// Given
+$singers = ['Bob Marley', 'Amy Winehouse'];
+
+// Transform each singer's name to uppercase and process the array
 $etl = (new EtlExecutor())
     ->transformWith(fn (string $name) => strtoupper($name));
 
-$singers = ['Bob Marley', 'Amy Winehouse'];
+// When
 $report = $etl->process($singers);
-dump($report->output); // ["BOB MARLEY", "AMY WINEHOUSE"]
+
+// Then
+var_dump($report->output); // ["BOB MARLEY", "AMY WINEHOUSE"]
 ```
 
-OK, that wasn't really hard, here we basically don't have to extract anything (we can already iterate on `$singers`),
-and we're not loading anywhere, except into PHP's memory.
+OK, that wasn't really hard, here we basically don't have to _extract_ anything (we can already iterate on `$singers`),
+and we're not _loading_ anywhere, except into PHP's memory.
 
 Now let's take this to the next level:
 
@@ -99,7 +109,8 @@ The `CSVExtractor` has some options to _read_ the data, such as considering that
 Creating your own Extractor / Transformers / Loaders
 --------------------------------------------------
 
-You can implement `ExtractorInterface`, `TransformerInterface` and `LoaderInterface`, or basically use simple `callable` with the same signatures.
+You can implement `ExtractorInterface`, `TransformerInterface`, and `LoaderInterface`. 
+Alternatively, use simple `callable` functions with the same signatures.
 
 Here's another example:
 ```php
@@ -151,7 +162,8 @@ But the last transformer of the chain (or your only one transformer) is determin
 Using events
 ------------
 
-The `EtlExecutor` emits various events during the workflow:
+The `EtlExecutor` emits a variety of events during the ETL workflow, providing insights and control over the process.
+
 - `InitEvent` when `process()` was just called
 - `StartEvent` when extraction just started (we might know the total number of items to extract at this time, if the extractor provides this)
 - `ExtractEvent` upon each extracted item
@@ -197,7 +209,7 @@ Flush frequency and early flushes
 By default, the `flush()` method of your loader will be invoked at the end of the ETL, 
 meaning it will likely keep all loaded items in memory before dumping them to their final destination.
 
-Feel free to adjust a `flushFrequency` that fits your needs 
+Feel free to adjust a `flushFrequency` that fits your needs to manage memory usage and data processing efficiency
 and optionally trigger an early flush at any time during the ETL process:
 
 ```php
@@ -237,8 +249,8 @@ $etl = $etl->onLoad(function (LoadEvent $event) {
 Recipes
 -------
 
-Recipes are reusable configurations of an `EtlExecutor`.
-For example, to enable logging, use the `LoggerRecipe`:
+Recipes are pre-configured setups for `EtlExecutor`, facilitating reusable ETL configurations. 
+For instance, `LoggerRecipe` enables logging for all ETL events.
 
 ```php
 use BenTools\ETL\EtlExecutor;
@@ -321,7 +333,7 @@ Contribute
 ----------
 
 Contributions are welcome! 
-Before sending your PRs, run this command to ensure test pass and 100% of the code is covered.
+Please ensure to run tests using the command below and maintain 100% code coverage before submitting PRs.
 
 ```bash
 composer ci:check
