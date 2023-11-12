@@ -7,6 +7,7 @@ namespace BenTools\ETL\Tests\Unit\Extractor;
 use BenTools\ETL\EtlExecutor;
 use BenTools\ETL\Extractor\ChainExtractor;
 
+use function BenTools\ETL\extractFrom;
 use function expect;
 
 it('chains extractors', function () {
@@ -26,12 +27,11 @@ it('chains extractors', function () {
 
 it('silently chains extractors', function () {
     // Given
-    $executor = (new EtlExecutor())
-        ->extractFrom(
-            fn () => 'banana',
-            fn () => yield from ['apple', 'strawberry'],
-            fn () => ['raspberry', 'peach']
-        );
+    $executor = extractFrom(
+        fn () => 'banana',
+        fn () => yield from ['apple', 'strawberry'],
+        fn () => ['raspberry', 'peach']
+    );
 
     // When
     $report = $executor->process();

@@ -6,13 +6,14 @@ namespace BenTools\ETL\Tests\Unit\Recipe;
 
 use BenTools\ETL\EtlExecutor;
 
+use function BenTools\ETL\withRecipe;
 use function expect;
 
 it('uses a recipe', function () {
     // Given
     $hasReceivedInitEvent = false;
     $hasReceivedEndEvent = false;
-    $executor = (new EtlExecutor())->withRecipe(
+    $executor = withRecipe(
         function (EtlExecutor $executor) use (&$hasReceivedInitEvent, &$hasReceivedEndEvent) {
             return $executor
                 ->onInit(function () use (&$hasReceivedInitEvent) {

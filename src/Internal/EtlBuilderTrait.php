@@ -86,12 +86,15 @@ trait EtlBuilderTrait
         return $this->cloneWith(['options' => $configuration]);
     }
 
-    public function withRecipe(Recipe|callable $recipe): self
+    public function withRecipe(Recipe|callable $recipe, Recipe|callable ...$recipes): self
     {
-        if (!$recipe instanceof Recipe) {
-            $recipe = Recipe::fromCallable($recipe);
+        foreach ([$recipe, ...$recipes] as $_recipe) {
+            if (!$_recipe instanceof Recipe) {
+                $_recipe = Recipe::fromCallable($_recipe);
+            }
+            $executor = $_recipe->decorate($this);
         }
 
-        return $recipe->decorate($this);
+        return $executor;
     }
 }
