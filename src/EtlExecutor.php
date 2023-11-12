@@ -110,11 +110,10 @@ final class EtlExecutor
 
     private function consumeNextTick(EtlState $state): void
     {
-        if (null === $state->nextTickCallback) {
-            return;
+        foreach ($state->nextTickCallbacks as $callback) {
+            ($callback)($state);
+            $state->nextTickCallbacks->detach($callback);
         }
-
-        ($state->nextTickCallback)($state);
     }
 
     /**

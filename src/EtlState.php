@@ -9,6 +9,7 @@ use BenTools\ETL\Exception\StopRequest;
 use BenTools\ETL\Internal\ClonableTrait;
 use Closure;
 use DateTimeImmutable;
+use SplObjectStorage;
 
 final class EtlState
 {
@@ -16,8 +17,10 @@ final class EtlState
 
     /**
      * @internal
+     *
+     * @var SplObjectStorage<Closure, Closure>
      */
-    public ?Closure $nextTickCallback = null;
+    public SplObjectStorage $nextTickCallbacks;
 
     private int $nbLoadedItemsSinceLastFlush = 0;
     private bool $earlyFlush = false;
@@ -39,20 +42,12 @@ final class EtlState
         public readonly ?DateTimeImmutable $endedAt = null,
         public readonly mixed $output = null,
     ) {
+        $this->nextTickCallbacks ??= new SplObjectStorage();
     }
 
-    public function nextTick(?callable $callback): void
+    public function nextTick(callable $callback): void
     {
-        if (null === $callback) {
-            $this->nextTickCallback = null;
-
-            return;
-        }
-
-        $this->nextTickCallback = static function (EtlState $state) use ($callback) {
-            $callback($state);
-            $state->nextTick(null);
-        };
+        $this->nextTickCallbacks->attach(static fn (EtlState $state) => $callback($state));
     }
 
     /**
