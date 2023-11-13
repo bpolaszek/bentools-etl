@@ -16,6 +16,8 @@ use BenTools\ETL\Transformer\CallableTransformer;
 use BenTools\ETL\Transformer\ChainTransformer;
 use BenTools\ETL\Transformer\TransformerInterface;
 
+use function count;
+
 /**
  * @internal
  *
@@ -40,7 +42,11 @@ trait EtlBuilderTrait
             }
         }
 
-        return $this->cloneWith(['extractor' => new ChainExtractor(...$extractors)]);
+        if (count($extractors) > 1) {
+            return $this->cloneWith(['extractor' => new ChainExtractor(...$extractors)]);
+        }
+
+        return $this->cloneWith(['extractor' => $extractors[0]]);
     }
 
     public function transformWith(
@@ -55,7 +61,11 @@ trait EtlBuilderTrait
             }
         }
 
-        return $this->cloneWith(['transformer' => new ChainTransformer(...$transformers)]);
+        if (count($transformers) > 1) {
+            return $this->cloneWith(['transformer' => new ChainTransformer(...$transformers)]);
+        }
+
+        return $this->cloneWith(['transformer' => $transformers[0]]);
     }
 
     public function loadInto(LoaderInterface|callable $loader, LoaderInterface|callable ...$loaders): self
@@ -68,7 +78,11 @@ trait EtlBuilderTrait
             }
         }
 
-        return $this->cloneWith(['loader' => new ChainLoader(...$loaders)]);
+        if (count($loaders) > 1) {
+            return $this->cloneWith(['loader' => new ChainLoader(...$loaders)]);
+        }
+
+        return $this->cloneWith(['loader' => $loaders[0]]);
     }
 
     public function withOptions(EtlConfiguration $configuration): self
