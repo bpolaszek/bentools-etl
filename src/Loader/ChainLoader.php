@@ -29,9 +29,11 @@ final readonly class ChainLoader implements LoaderInterface
         $this->loaders = $loaders;
     }
 
-    public function with(LoaderInterface|callable $loader): self
-    {
-        return new self(...[...$this->loaders, $loader]);
+    public function with(
+        LoaderInterface|callable $loader,
+        LoaderInterface|callable ...$loaders,
+    ): self {
+        return new self(...[...$this->loaders, $loader, ...$loaders]);
     }
 
     public function load(mixed $item, EtlState $state): void
