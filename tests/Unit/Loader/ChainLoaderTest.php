@@ -7,9 +7,10 @@ namespace BenTools\ETL\Tests\Unit\Loader;
 use ArrayObject;
 use BenTools\ETL\EtlExecutor;
 use BenTools\ETL\EtlState;
-use BenTools\ETL\Loader\ChainLoader;
+use BenTools\ETL\Loader\CallableLoader;
 use BenTools\ETL\Loader\ConditionalLoaderInterface;
 
+use function BenTools\ETL\chain;
 use function expect;
 
 it('chains loaders', function () {
@@ -17,36 +18,39 @@ it('chains loaders', function () {
     $a = new ArrayObject();
     $b = new ArrayObject();
     $c = new ArrayObject();
-    $loader = (new ChainLoader(
+
+    $executor = new EtlExecutor(loader: new CallableLoader(
         fn (string $item) => $a[] = $item, // @phpstan-ignore-line
-        fn (string $item) => $b[] = $item, // @phpstan-ignore-line
-    ))
-        ->with(
-            new class() implements ConditionalLoaderInterface {
-                public function supports(mixed $item, EtlState $state): bool
-                {
-                    return 'foo' !== $item;
-                }
-
-                public function load(mixed $item, EtlState $state): void
-                {
-                    $state->context[__CLASS__][] = $item;
-                }
-
-                public function flush(bool $isPartial, EtlState $state): mixed
-                {
-                    foreach ($state->context[__CLASS__] as $item) {
-                        $state->context['storage'][] = $item;
+    ));
+    $executor = $executor->loadInto(
+        chain($executor->loader)
+            ->with(fn (string $item) => $b[] = $item) // @phpstan-ignore-line
+            ->with(
+                new class() implements ConditionalLoaderInterface {
+                    public function supports(mixed $item, EtlState $state): bool
+                    {
+                        return 'foo' !== $item;
                     }
 
-                    return $state->context['storage'];
-                }
-            },
-        );
+                    public function load(mixed $item, EtlState $state): void
+                    {
+                        $state->context[__CLASS__][] = $item;
+                    }
+
+                    public function flush(bool $isPartial, EtlState $state): mixed
+                    {
+                        foreach ($state->context[__CLASS__] as $item) {
+                            $state->context['storage'][] = $item;
+                        }
+
+                        return $state->context['storage'];
+                    }
+                },
+            )
+    );
 
     // Given
     $input = ['foo', 'bar'];
-    $executor = new EtlExecutor(loader: $loader);
 
     // When
     $executor->process($input, context: ['storage' => $c]);

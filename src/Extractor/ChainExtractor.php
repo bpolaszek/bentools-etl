@@ -39,4 +39,12 @@ final readonly class ChainExtractor implements ExtractorInterface
             }
         }
     }
+
+    public static function from(ExtractorInterface $extractor): self
+    {
+        return match ($extractor instanceof self) {
+            true => $extractor,
+            false => new self($extractor),
+        };
+    }
 }

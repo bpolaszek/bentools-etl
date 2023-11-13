@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace BenTools\ETL\Tests\Unit\Transformer;
 
 use BenTools\ETL\EtlExecutor;
-use BenTools\ETL\Transformer\ChainTransformer;
+use BenTools\ETL\Transformer\CallableTransformer;
 use Generator;
 
+use function BenTools\ETL\chain;
 use function expect;
 use function implode;
 use function strrev;
@@ -16,24 +17,26 @@ use function strtoupper;
 it('chains transformers', function () {
     // Given
     $input = ['foo', 'bar'];
-    $transformer = (new ChainTransformer(
-        fn (string $item): string => strrev($item),
-        function (string $item): Generator {
-            yield $item;
-            yield strtoupper($item);
-        },
-    ))
-        ->with(fn (Generator $items): array => [...$items])
-        ->with(function (array $items): array {
-            $items[] = 'hey';
+    $executor = new EtlExecutor(transformer: new CallableTransformer(
+        fn (string $item): string => strrev($item)
+    ));
+    $executor = $executor->transformWith(
+        chain($executor->transformer)
+            ->with(function (string $item): Generator {
+                yield $item;
+                yield strtoupper($item);
+            })
+            ->with(fn (Generator $items): array => [...$items])
+            ->with(function (array $items): array {
+                $items[] = 'hey';
 
-            return $items;
-        })
-        ->with(fn (array $items): string => implode('-', $items));
+                return $items;
+            })
+            ->with(fn (array $items): string => implode('-', $items)),
+    );
 
     // When
-    $report = (new EtlExecutor(transformer: $transformer))
-        ->process($input);
+    $report = $executor->process($input);
 
     // Then
     expect($report->output)->toBe([

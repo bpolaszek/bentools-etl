@@ -16,8 +16,6 @@ use BenTools\ETL\Transformer\CallableTransformer;
 use BenTools\ETL\Transformer\ChainTransformer;
 use BenTools\ETL\Transformer\TransformerInterface;
 
-use function count;
-
 /**
  * @internal
  *
@@ -30,8 +28,10 @@ trait EtlBuilderTrait
      */
     use EtlEventListenersTrait;
 
-    public function extractFrom(ExtractorInterface|callable $extractor, ExtractorInterface|callable ...$extractors): self
-    {
+    public function extractFrom(
+        ExtractorInterface|callable $extractor,
+        ExtractorInterface|callable ...$extractors
+    ): self {
         $extractors = [$extractor, ...$extractors];
 
         foreach ($extractors as $e => $_extractor) {
@@ -40,15 +40,13 @@ trait EtlBuilderTrait
             }
         }
 
-        if (count($extractors) > 1) {
-            return $this->cloneWith(['extractor' => new ChainExtractor(...$extractors)]);
-        }
-
-        return $this->cloneWith(['extractor' => $extractors[0]]);
+        return $this->cloneWith(['extractor' => new ChainExtractor(...$extractors)]);
     }
 
-    public function transformWith(TransformerInterface|callable $transformer, TransformerInterface|callable ...$transformers): self
-    {
+    public function transformWith(
+        TransformerInterface|callable $transformer,
+        TransformerInterface|callable ...$transformers
+    ): self {
         $transformers = [$transformer, ...$transformers];
 
         foreach ($transformers as $t => $_transformer) {
@@ -57,11 +55,7 @@ trait EtlBuilderTrait
             }
         }
 
-        if (count($transformers) > 1) {
-            return $this->cloneWith(['transformer' => new ChainTransformer(...$transformers)]);
-        }
-
-        return $this->cloneWith(['transformer' => $transformers[0]]);
+        return $this->cloneWith(['transformer' => new ChainTransformer(...$transformers)]);
     }
 
     public function loadInto(LoaderInterface|callable $loader, LoaderInterface|callable ...$loaders): self
@@ -74,11 +68,7 @@ trait EtlBuilderTrait
             }
         }
 
-        if (count($loaders) > 1) {
-            return $this->cloneWith(['loader' => new ChainLoader(...$loaders)]);
-        }
-
-        return $this->cloneWith(['loader' => $loaders[0]]);
+        return $this->cloneWith(['loader' => new ChainLoader(...$loaders)]);
     }
 
     public function withOptions(EtlConfiguration $configuration): self
