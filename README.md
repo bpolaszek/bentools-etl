@@ -328,6 +328,44 @@ $report = withRecipe(new LoggerRecipe($logger))
     ->process(['foo', 'bar']);
 ```
 
+Chaining extractors / transformers / loaders
+-------------------------------------------
+
+Instead of replacing existing extractors / transformers / loaders inside your `EtlExecutor`, 
+you can decorate them by using the `chain` function:
+
+```php
+use BenTools\ETL\EtlExecutor;
+use ArrayObject;
+
+use function BenTools\ETL\chain;
+use function implode;
+use function str_split;
+use function strtoupper;
+
+$a = new ArrayObject();
+$executor = (new EtlExecutor())
+    ->extractFrom(fn () => yield 'foo')
+    ->transformWith(fn (string $value) => strtoupper($value))
+    ->loadInto(fn (string $value) => $a->append($value));
+
+$b = new ArrayObject();
+$executor = $executor
+    ->extractFrom(
+        chain($executor->extractor)->with(fn () => ['bar'])
+    )
+    ->transformWith(
+        chain($executor->transformer)->with(fn (string $value) => implode('-', str_split($value)))
+    )
+    ->loadInto(
+        chain($executor->loader)->with(fn (string $value) => $b->append($value))
+    );
+
+$executor->process();
+var_dump([...$a]); // ['F-O-O', 'B-A-R']
+var_dump([...$b]); // ['F-O-O', 'B-A-R']
+
+```
 
 Contribute
 ----------

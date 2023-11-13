@@ -51,4 +51,12 @@ final readonly class ChainTransformer implements TransformerInterface
 
         return $item;
     }
+
+    public static function from(TransformerInterface $transformer): self
+    {
+        return match ($transformer instanceof self) {
+            true => $transformer,
+            false => new self($transformer),
+        };
+    }
 }

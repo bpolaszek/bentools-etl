@@ -51,4 +51,12 @@ final readonly class ChainLoader implements LoaderInterface
 
         return $output ?? null;
     }
+
+    public static function from(LoaderInterface $loader): self
+    {
+        return match ($loader instanceof self) {
+            true => $loader,
+            false => new self($loader),
+        };
+    }
 }
