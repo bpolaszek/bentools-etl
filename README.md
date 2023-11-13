@@ -8,7 +8,7 @@
 Okay, so you heard about the [Extract / Transform / Load](https://en.wikipedia.org/wiki/Extract,_transform,_load) pattern,
 and you're looking for a PHP library to do the stuff. Alright, let's go!
 
-`bentools-etl` is a versatile PHP library for implementing the Extract, Transform, Load (ETL) pattern, designed to streamline data processing tasks.
+`bentools/etl` is a versatile PHP library for implementing the Extract, Transform, Load (ETL) pattern, designed to streamline data processing tasks.
 
 Table of Contents
 -----------------
