@@ -16,7 +16,7 @@ final readonly class ChainTransformer implements TransformerInterface
 
     public function __construct(
         TransformerInterface|callable $transformer,
-        TransformerInterface|callable ...$transformers
+        TransformerInterface|callable ...$transformers,
     ) {
         $transformers = [$transformer, ...$transformers];
         foreach ($transformers as $t => $_transformer) {
@@ -27,9 +27,11 @@ final readonly class ChainTransformer implements TransformerInterface
         $this->transformers = $transformers;
     }
 
-    public function with(TransformerInterface|callable $transformer): self
-    {
-        return new self(...[...$this->transformers, $transformer]);
+    public function with(
+        TransformerInterface|callable $transformer,
+        TransformerInterface|callable ...$transformers,
+    ): self {
+        return new self(...[...$this->transformers, $transformer, ...$transformers]);
     }
 
     public function transform(mixed $item, EtlState $state): Generator
@@ -43,10 +45,10 @@ final readonly class ChainTransformer implements TransformerInterface
         }
     }
 
-    public function doTransform(mixed $item, EtlState $state): mixed
+    private function doTransform(mixed $item, EtlState $state): mixed
     {
         foreach ($this->transformers as $transformer) {
-            $item = $items = $transformer->transform($item, $state);
+            $item = $transformer->transform($item, $state);
         }
 
         return $item;

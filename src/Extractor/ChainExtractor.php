@@ -26,9 +26,11 @@ final readonly class ChainExtractor implements ExtractorInterface
         $this->extractors = $extractors;
     }
 
-    public function with(ExtractorInterface|callable $extractor): self
-    {
-        return new self(...[...$this->extractors, $extractor]);
+    public function with(
+        ExtractorInterface|callable $extractor,
+        ExtractorInterface|callable ...$extractors,
+    ): self {
+        return new self(...[...$this->extractors, $extractor, ...$extractors]);
     }
 
     public function extract(EtlState $state): iterable
