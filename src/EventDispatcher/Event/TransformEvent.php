@@ -6,6 +6,7 @@ namespace BenTools\ETL\EventDispatcher\Event;
 
 use BenTools\ETL\EtlState;
 use BenTools\ETL\EventDispatcher\StoppableEventTrait;
+use BenTools\ETL\Internal\TransformResult;
 use Psr\EventDispatcher\StoppableEventInterface;
 
 final class TransformEvent extends Event implements StoppableEventInterface
@@ -14,7 +15,7 @@ final class TransformEvent extends Event implements StoppableEventInterface
 
     public function __construct(
         public readonly EtlState $state,
-        public mixed $transformResult,
+        public TransformResult $transformResult,
     ) {
     }
 }
