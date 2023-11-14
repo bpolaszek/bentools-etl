@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace BenTools\ETL\Tests\Unit\Loader;
 
-use BenTools\ETL\EtlConfiguration;
-use BenTools\ETL\EtlExecutor;
 use BenTools\ETL\EtlState;
 use BenTools\ETL\Exception\LoadException;
 use BenTools\ETL\Loader\DoctrineORMLoader;
@@ -15,6 +13,8 @@ use Doctrine\Persistence\ObjectManager;
 use Mockery;
 use stdClass;
 
+use function BenTools\ETL\loadInto;
+
 it('works', function () {
     $registry = Mockery::mock(ManagerRegistry::class);
     $manager = Mockery::mock(ObjectManager::class);
@@ -22,14 +22,9 @@ it('works', function () {
     $manager->shouldReceive('persist')->twice();
     $manager->shouldReceive('flush')->once();
 
-    $executor = (new EtlExecutor(options: new EtlConfiguration(flushEvery: 10)))
-        ->transformWith(function (array $book) {
-            yield new Book($book['id'], $book['name']);
-        })
-        ->loadInto(new DoctrineORMLoader($registry));
-    $executor->process([
-        ['id' => 1, 'name' => 'Holy Bible'],
-        ['id' => 2, 'name' => 'Fifty Shades of Grey'],
+    loadInto(new DoctrineORMLoader($registry))->process([
+        new Book(id: 1, name: 'Holy Bible'),
+        new Book(id: 2, name: 'Fifty Shades of Grey'),
     ]);
 });
 
