@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace BenTools\ETL\Tests;
+namespace BenTools\ETL\Tests\Stubs;
 
 use BenTools\ETL\EtlState;
 use BenTools\ETL\Loader\LoaderInterface;

@@ -10,7 +10,7 @@ use BenTools\ETL\EtlExecutor;
 use BenTools\ETL\EtlState;
 use BenTools\ETL\EventDispatcher\Event\ExtractEvent;
 use BenTools\ETL\EventDispatcher\Event\LoadEvent;
-use BenTools\ETL\Tests\InMemoryLoader;
+use BenTools\ETL\Tests\Stubs\InMemoryLoader;
 
 use function expect;
 

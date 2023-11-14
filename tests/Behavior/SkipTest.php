@@ -13,7 +13,7 @@ use function dirname;
 use function expect;
 
 it('skips items during extraction', function () {
-    $extractor = new CSVExtractor('file://'.dirname(__DIR__).'/data/10-biggest-cities.csv', [
+    $extractor = new CSVExtractor('file://'.dirname(__DIR__).'/Data/10-biggest-cities.csv', [
         'columns' => 'auto',
     ]);
     $cities = [];
@@ -49,7 +49,7 @@ it('skips items during extraction', function () {
 });
 
 it('skips items during transformation', function () {
-    $extractor = new CSVExtractor('file://'.dirname(__DIR__).'/data/10-biggest-cities.csv', [
+    $extractor = new CSVExtractor('file://'.dirname(__DIR__).'/Data/10-biggest-cities.csv', [
         'columns' => 'auto',
     ]);
     $cities = [];

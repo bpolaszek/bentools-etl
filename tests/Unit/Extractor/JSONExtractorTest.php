@@ -14,7 +14,7 @@ use function expect;
 use function file_get_contents;
 
 it('extracts JSON data', function (mixed $source, bool $useConstructor) {
-    $expected = require dirname(__DIR__, 2).'/data/10-biggest-cities.php';
+    $expected = require dirname(__DIR__, 2).'/Data/10-biggest-cities.php';
     $state = new EtlState(source: $useConstructor ? null : $source);
     $extractor = new JSONExtractor(source: $useConstructor ? $source : null);
 
@@ -24,7 +24,7 @@ it('extracts JSON data', function (mixed $source, bool $useConstructor) {
     // Then
     expect([...$items])->toBe(null === $source ? [] : $expected);
 })->with(function () {
-    $source = dirname(__DIR__, 2).'/data/10-biggest-cities.json';
+    $source = dirname(__DIR__, 2).'/Data/10-biggest-cities.json';
     $content = file_get_contents($source);
     yield ['source' => 'file://'.$source];
     yield ['source' => $content];
