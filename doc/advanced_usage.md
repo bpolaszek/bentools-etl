@@ -116,6 +116,22 @@ var_dump([...$a]); // ['F-O-O', 'B-A-R']
 var_dump([...$b]); // ['F-O-O', 'B-A-R']
 ```
 
+Reading from STDIN / Writing to STDOUT
+--------------------------------------
+
+Easy as hell.
+
+```php
+use function BenTools\ETL\stdIn;
+use function BenTools\ETL\stdOut;
+use function BenTools\ETL\transformWith;
+
+transformWith(fn (string $line) => strtoupper($line))
+    ->extractFrom(stdIn())
+    ->loadInto(stdOut())
+    ->process();
+```
+
 Recipes
 -------
 

@@ -10,6 +10,7 @@ use BenTools\ETL\Extractor\STDINExtractor;
 use BenTools\ETL\Internal\Ref;
 use BenTools\ETL\Loader\ChainLoader;
 use BenTools\ETL\Loader\LoaderInterface;
+use BenTools\ETL\Loader\STDOUTLoader;
 use BenTools\ETL\Recipe\Recipe;
 use BenTools\ETL\Transformer\ChainTransformer;
 use BenTools\ETL\Transformer\TransformerInterface;
@@ -98,4 +99,9 @@ function chain(ExtractorInterface|TransformerInterface|LoaderInterface $service,
 function stdIn(): STDINExtractor
 {
     return new STDINExtractor();
+}
+
+function stdOut(): STDOUTLoader
+{
+    return new STDOUTLoader();
 }

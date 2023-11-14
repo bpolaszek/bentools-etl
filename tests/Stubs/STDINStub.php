@@ -13,6 +13,11 @@ use function stream_wrapper_unregister;
 use function strlen;
 use function substr;
 
+/**
+ * Inspired by @KEINOS.
+ *
+ * @see https://github.com/KEINOS/Practice_PHPUnit-test-of-STDIN
+ */
 final class STDINStub
 {
     private string $bufferFilename;
