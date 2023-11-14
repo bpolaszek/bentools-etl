@@ -12,7 +12,7 @@ use function expect;
 use function Safe\file_get_contents;
 
 it('iterates over CSV data', function () {
-    $content = file_get_contents(dirname(__DIR__, 2).'/data/10-biggest-cities.csv');
+    $content = file_get_contents(dirname(__DIR__, 2).'/Data/10-biggest-cities.csv');
     $rows = [...new CSVIterator(new StrTokIterator($content))];
 
     expect($rows)->toHaveCount(11)
@@ -33,7 +33,7 @@ it('iterates over CSV data', function () {
 });
 
 it('can make columns automatically', function () {
-    $content = file_get_contents(dirname(__DIR__, 2).'/data/10-biggest-cities.csv');
+    $content = file_get_contents(dirname(__DIR__, 2).'/Data/10-biggest-cities.csv');
     $rows = [...new CSVIterator(new StrTokIterator($content), ['columns' => 'auto'])];
 
     expect($rows)->toHaveCount(10)
@@ -54,7 +54,7 @@ it('can make columns automatically', function () {
 });
 
 it('can map user-defined columns', function () {
-    $content = file_get_contents(dirname(__DIR__, 2).'/data/10-biggest-cities.csv');
+    $content = file_get_contents(dirname(__DIR__, 2).'/Data/10-biggest-cities.csv');
     $rows = [
         ...new CSVIterator(new StrTokIterator($content), [
             'columns' => [
@@ -84,7 +84,7 @@ it('can map user-defined columns', function () {
 });
 
 it('adds fields when the row has not enough columns', function () {
-    $content = file_get_contents(dirname(__DIR__, 2).'/data/10-biggest-cities.csv');
+    $content = file_get_contents(dirname(__DIR__, 2).'/Data/10-biggest-cities.csv');
     $rows = [
         ...new CSVIterator(new StrTokIterator($content), [
             'columns' => [
@@ -117,7 +117,7 @@ it('adds fields when the row has not enough columns', function () {
 });
 
 it('removes extra data whenever there are more fields than columns', function () {
-    $content = file_get_contents(dirname(__DIR__, 2).'/data/10-biggest-cities.csv');
+    $content = file_get_contents(dirname(__DIR__, 2).'/Data/10-biggest-cities.csv');
     $rows = [
         ...new CSVIterator(new StrTokIterator($content), [
             'columns' => [

@@ -7,7 +7,7 @@ namespace BenTools\ETL\Tests\Behavior;
 use BenTools\ETL\EtlConfiguration;
 use BenTools\ETL\EtlExecutor;
 use BenTools\ETL\EventDispatcher\Event\ExtractEvent;
-use BenTools\ETL\Tests\InMemoryLoader;
+use BenTools\ETL\Tests\Stubs\InMemoryLoader;
 
 use function expect;
 

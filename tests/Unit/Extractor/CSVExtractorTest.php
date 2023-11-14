@@ -21,8 +21,8 @@ it('yells if source is not a string', function () {
 
 it('iterates over a string containing CSV data', function () {
     $state = new EtlState();
-    $content = file_get_contents(dirname(__DIR__, 2).'/data/10-biggest-cities.csv');
-    $expected = require dirname(__DIR__, 2).'/data/10-biggest-cities.php';
+    $content = file_get_contents(dirname(__DIR__, 2).'/Data/10-biggest-cities.csv');
+    $expected = require dirname(__DIR__, 2).'/Data/10-biggest-cities.php';
     $extractor = new CSVExtractor($content, ['columns' => 'auto']);
 
     // When
@@ -36,7 +36,7 @@ it('iterates over a file containing CSV data', function () {
     $extractor = new CSVExtractor(options: ['columns' => 'auto']);
 
     // When
-    $state = new EtlState(source: 'file://'.dirname(__DIR__, 2).'/data/10-biggest-cities.csv');
+    $state = new EtlState(source: 'file://'.dirname(__DIR__, 2).'/Data/10-biggest-cities.csv');
     $extractedItems = [...$extractor->extract($state)];
 
     // Then

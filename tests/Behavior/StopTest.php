@@ -14,7 +14,7 @@ use function dirname;
 use function expect;
 
 it('stops the process during extraction', function () {
-    $extractor = new CSVExtractor('file://'.dirname(__DIR__).'/data/10-biggest-cities.csv', [
+    $extractor = new CSVExtractor('file://'.dirname(__DIR__).'/Data/10-biggest-cities.csv', [
         'columns' => 'auto',
     ]);
     $cities = [];
@@ -44,7 +44,7 @@ it('stops the process during extraction', function () {
 });
 
 it('stops the process during transformation', function () {
-    $extractor = new CSVExtractor('file://'.dirname(__DIR__).'/data/10-biggest-cities.csv', [
+    $extractor = new CSVExtractor('file://'.dirname(__DIR__).'/Data/10-biggest-cities.csv', [
         'columns' => 'auto',
     ]);
     $cities = [];
@@ -75,7 +75,7 @@ it('stops the process during transformation', function () {
 });
 
 it('stops the process during loading', function () {
-    $extractor = new CSVExtractor('file://'.dirname(__DIR__).'/data/10-biggest-cities.csv', [
+    $extractor = new CSVExtractor('file://'.dirname(__DIR__).'/Data/10-biggest-cities.csv', [
         'columns' => 'auto',
     ]);
     $cities = [];

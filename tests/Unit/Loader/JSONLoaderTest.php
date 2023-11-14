@@ -24,7 +24,7 @@ dataset('config', [
 ]);
 
 it('loads items to a JSON file', function (EtlConfiguration $options) {
-    $cities = require dirname(__DIR__, 2).'/data/10-biggest-cities.php';
+    $cities = require dirname(__DIR__, 2).'/Data/10-biggest-cities.php';
     $destination = 'file://'.sys_get_temp_dir().'/'.uniqid('10-biggest-cities_').'.json';
     $executor = new EtlExecutor(loader: new JSONLoader($destination), options: $options);
     $output = $executor->process($cities)->output;
@@ -33,18 +33,18 @@ it('loads items to a JSON file', function (EtlConfiguration $options) {
     // @phpstan-ignore-next-line
     $writtenContent = implode('', [...new SplFileObject($output, 'r')]);
     // @phpstan-ignore-next-line
-    $expectedContent = implode('', [...new SplFileObject(dirname(__DIR__, 2).'/data/10-biggest-cities.json', 'r')]);
+    $expectedContent = implode('', [...new SplFileObject(dirname(__DIR__, 2).'/Data/10-biggest-cities.json', 'r')]);
 
     expect($writtenContent)->toBe($expectedContent);
 })->with('config');
 
 it('loads items to a JSON string', function (EtlConfiguration $options) {
-    $cities = require dirname(__DIR__, 2).'/data/10-biggest-cities.php';
+    $cities = require dirname(__DIR__, 2).'/Data/10-biggest-cities.php';
     $executor = new EtlExecutor(loader: new JSONLoader(), options: $options);
     $output = $executor->process($cities)->output;
 
     // @phpstan-ignore-next-line
-    $expectedContent = implode('', [...new SplFileObject(dirname(__DIR__, 2).'/data/10-biggest-cities.json', 'r')]);
+    $expectedContent = implode('', [...new SplFileObject(dirname(__DIR__, 2).'/Data/10-biggest-cities.json', 'r')]);
 
     expect($output)->toBe($expectedContent);
 })->with('config');
