@@ -6,6 +6,7 @@ namespace BenTools\ETL;
 
 use BenTools\ETL\Extractor\ChainExtractor;
 use BenTools\ETL\Extractor\ExtractorInterface;
+use BenTools\ETL\Extractor\STDINExtractor;
 use BenTools\ETL\Internal\Ref;
 use BenTools\ETL\Loader\ChainLoader;
 use BenTools\ETL\Loader\LoaderInterface;
@@ -92,4 +93,9 @@ function chain(ExtractorInterface|TransformerInterface|LoaderInterface $service,
         $service instanceof TransformerInterface => ChainTransformer::from($service),
         $service instanceof LoaderInterface => ChainLoader::from($service),
     };
+}
+
+function stdIn(): STDINExtractor
+{
+    return new STDINExtractor();
 }
