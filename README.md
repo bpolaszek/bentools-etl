@@ -26,6 +26,7 @@ Table of Contents
     - [Difference between yield and return in transformers](doc/advanced_usage.md#difference-between-yield-and-return-in-transformers)
     - [Next tick](doc/advanced_usage.md#next-tick)
     - [Chaining extractors / transformers / loaders](doc/advanced_usage.md#chaining-extractors--transformers--loaders)
+    - [Reading from STDIN / Writing to STDOUT](doc/advanced_usage.md#reading-from-stdin--writing-to-stdout)
     - [Instantiators](doc/advanced_usage.md#instantiators)
 - [Recipes](doc/recipes.md)
 - [Contributing](#contribute)
