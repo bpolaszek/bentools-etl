@@ -90,25 +90,13 @@ final class EtlExecutor
         } catch (StopRequest) {
         }
 
-        $this->consumeNextTick($state);
-        $output = $this->flush($stateHolder, false);
-
-        $state = unref($stateHolder);
-        if (!$state->nbTotalItems) {
-            $state = $state->withNbTotalItems($state->nbLoadedItems);
-            $stateHolder->update($state);
-        }
-
-        $state = $state->withOutput($output);
-        $stateHolder->update($state);
-        $this->dispatch(new EndEvent($state));
-
-        gc_collect_cycles();
-
-        return $state;
+        return $this->terminate($stateHolder);
     }
 
-    private function consumeNextTick(EtlState $state): void
+    /**
+     * @internal
+     */
+    public function consumeNextTick(EtlState $state): void
     {
         foreach ($state->nextTickCallbacks as $callback) {
             ($callback)($state);
@@ -146,9 +134,11 @@ final class EtlExecutor
     }
 
     /**
+     * @internal
+     *
      * @return list<mixed>
      */
-    private function transform(mixed $item, EtlState $state): array
+    public function transform(mixed $item, EtlState $state): array
     {
         try {
             $transformResult = TransformResult::create($this->transformer->transform($item, $state));
@@ -169,6 +159,8 @@ final class EtlExecutor
     /**
      * @param list<mixed>   $items
      * @param Ref<EtlState> $stateHolder
+     *
+     * @internal
      */
     private function load(array $items, Ref $stateHolder): void
     {
@@ -193,9 +185,11 @@ final class EtlExecutor
     }
 
     /**
+     * @internal
+     *
      * @param Ref<EtlState> $stateHolder
      */
-    private function flush(Ref $stateHolder, bool $isPartial): mixed
+    public function flush(Ref $stateHolder, bool $isPartial): mixed
     {
         $state = unref($stateHolder);
         if ($isPartial && !$state->shouldFlush()) {
@@ -220,13 +214,41 @@ final class EtlExecutor
     }
 
     /**
+     * @internal
+     *
+     * @param Ref<EtlState> $stateHolder
+     */
+    public function terminate(Ref $stateHolder): EtlState
+    {
+        $state = unref($stateHolder);
+        $this->consumeNextTick($state);
+        $output = $this->flush($stateHolder, false);
+
+        $state = unref($stateHolder);
+        if (!$state->nbTotalItems) {
+            $state = $state->withNbTotalItems($state->nbLoadedItems);
+            $stateHolder->update($state);
+        }
+
+        $state = $state->withOutput($output);
+        $stateHolder->update($state);
+        $this->dispatch(new EndEvent($state));
+
+        gc_collect_cycles();
+
+        return $state;
+    }
+
+    /**
+     * @internal
+     *
      * @template T of object
      *
      * @param T $event
      *
      * @return T
      */
-    private function dispatch(object $event): object
+    public function dispatch(object $event): object
     {
         $this->eventDispatcher->dispatch($event);
 
