@@ -11,7 +11,7 @@ use SplFileObject;
 /**
  * @implements Iterator<int, string>
  */
-final class STDINExtractor implements Iterator, ExtractorInterface
+final class STDINExtractor implements Iterator, IterableExtractorInterface
 {
     private SplFileObject $stdIn;
 

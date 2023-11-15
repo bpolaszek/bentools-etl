@@ -11,7 +11,7 @@ use SplFileObject;
 
 use function is_string;
 
-final readonly class FileExtractor implements ExtractorInterface
+final readonly class FileExtractor implements IterableExtractorInterface
 {
     /**
      * @param array{skipEmptyLines?: bool} $options

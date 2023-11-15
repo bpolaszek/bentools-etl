@@ -13,7 +13,7 @@ use function is_iterable;
 use function is_string;
 use function substr;
 
-final readonly class JSONExtractor implements ExtractorInterface
+final readonly class JSONExtractor implements IterableExtractorInterface
 {
     public function __construct(
         public mixed $source = null,

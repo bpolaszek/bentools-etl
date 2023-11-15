@@ -8,8 +8,5 @@ use BenTools\ETL\EtlState;
 
 interface ExtractorInterface
 {
-    /**
-     * @return iterable<mixed>
-     */
-    public function extract(EtlState $state): iterable;
+    public function extract(EtlState $state): mixed;
 }

@@ -10,7 +10,7 @@ use BenTools\ETL\Iterator\StrTokIterator;
 use EmptyIterator;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-final readonly class TextLinesExtractor implements ExtractorInterface
+final readonly class TextLinesExtractor implements IterableExtractorInterface
 {
     /**
      * @var array{skipEmptyLines: bool}

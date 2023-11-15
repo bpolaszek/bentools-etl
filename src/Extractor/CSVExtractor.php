@@ -12,7 +12,7 @@ use function is_string;
 use function str_starts_with;
 use function substr;
 
-final readonly class CSVExtractor implements ExtractorInterface
+final readonly class CSVExtractor implements IterableExtractorInterface
 {
     /**
      * @param array{delimiter?: string, enclosure?: string, escapeString?: string, skipEmptyLines?: bool, columns?: 'auto'|string[]|null} $options
