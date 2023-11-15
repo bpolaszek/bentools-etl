@@ -7,6 +7,7 @@ namespace BenTools\ETL;
 use BenTools\ETL\Exception\SkipRequest;
 use BenTools\ETL\Exception\StopRequest;
 use BenTools\ETL\Internal\ClonableTrait;
+use BenTools\ETL\Internal\StateHolder;
 use Closure;
 use DateTimeImmutable;
 use SplObjectStorage;
@@ -14,6 +15,11 @@ use SplObjectStorage;
 final class EtlState
 {
     use ClonableTrait;
+
+    /**
+     * @internal
+     */
+    // public readonly StateHolder $stateHolder;
 
     /**
      * @internal
@@ -41,8 +47,28 @@ final class EtlState
         public readonly DateTimeImmutable $startedAt = new DateTimeImmutable(),
         public readonly ?DateTimeImmutable $endedAt = null,
         public readonly mixed $output = null,
+        public readonly StateHolder $stateHolder = new StateHolder(),
     ) {
         $this->nextTickCallbacks ??= new SplObjectStorage();
+        $this->stateHolder->state ??= $this;
+    }
+
+    /**
+     * @internal
+     */
+    public function getLastVersion(): self
+    {
+        return $this->stateHolder->state;
+    }
+
+    /**
+     * @internal
+     */
+    public function update(self $state): self
+    {
+        $this->stateHolder->state = $state;
+
+        return $state;
     }
 
     public function nextTick(callable $callback): void

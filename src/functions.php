@@ -7,7 +7,6 @@ namespace BenTools\ETL;
 use BenTools\ETL\Extractor\ChainExtractor;
 use BenTools\ETL\Extractor\ExtractorInterface;
 use BenTools\ETL\Extractor\STDINExtractor;
-use BenTools\ETL\Internal\Ref;
 use BenTools\ETL\Loader\ChainLoader;
 use BenTools\ETL\Loader\LoaderInterface;
 use BenTools\ETL\Loader\STDOUTLoader;
@@ -35,34 +34,6 @@ function array_fill_from(array $keys, array $values, array ...$extraValues): arr
     $values = array_replace($values, ...$extraValues);
 
     return array_intersect_key($values, $defaults);
-}
-
-/**
- * @param T $value
- *
- * @return Ref<T>
- *
- * @internal
- *
- * @template T
- */
-function ref(mixed $value): Ref
-{
-    return Ref::create($value);
-}
-
-/**
- * @param Ref<T> $ref
- *
- * @return T
- *
- * @internal
- *
- * @template T
- */
-function unref(Ref $ref): mixed
-{
-    return $ref->value;
 }
 
 function extractFrom(ExtractorInterface|callable $extractor, ExtractorInterface|callable ...$extractors): EtlExecutor

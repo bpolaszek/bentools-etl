@@ -24,7 +24,6 @@ use BenTools\ETL\Extractor\IterableExtractor;
 use BenTools\ETL\Internal\ClonableTrait;
 use BenTools\ETL\Internal\ConditionalLoaderTrait;
 use BenTools\ETL\Internal\EtlBuilderTrait;
-use BenTools\ETL\Internal\Ref;
 use BenTools\ETL\Internal\TransformResult;
 use BenTools\ETL\Loader\InMemoryLoader;
 use BenTools\ETL\Loader\LoaderInterface;
@@ -69,26 +68,25 @@ final class EtlExecutor
     public function process(mixed $source = null, mixed $destination = null, array $context = []): EtlState
     {
         $state = new EtlState(options: $this->options, source: $source, destination: $destination, context: $context);
-        $stateHolder = ref($state);
 
         try {
             $this->dispatch(new InitEvent($state));
 
-            foreach ($this->extract($stateHolder) as $e => $extractedItem) {
-                $state = unref($stateHolder);
+            foreach ($this->extract($state) as $e => $extractedItem) {
+                $state = $state->getLastVersion();
                 if (0 !== $e) {
                     $this->consumeNextTick($state);
                 }
                 try {
                     $transformedItems = $this->transform($extractedItem, $state);
-                    $this->load($transformedItems, $stateHolder);
+                    $this->load($transformedItems, $state);
                 } catch (SkipRequest) {
                 }
             }
         } catch (StopRequest) {
         }
 
-        return $this->terminate($stateHolder);
+        return $this->terminate($state->getLastVersion());
     }
 
     /**
@@ -102,23 +100,18 @@ final class EtlExecutor
         }
     }
 
-    /**
-     * @param Ref<EtlState> $stateHolder
-     */
-    private function extract(Ref $stateHolder): Generator
+    private function extract(EtlState $state): Generator
     {
-        $state = unref($stateHolder);
+        $state = $state->getLastVersion();
         try {
             $items = $this->extractor->extract($state);
             if (is_countable($items)) {
-                $state = $state->withNbTotalItems(count($items));
-                $stateHolder->update($state);
+                $state = $state->update($state->withNbTotalItems(count($items)));
             }
             $this->dispatch(new StartEvent($state));
             foreach ($items as $key => $value) {
                 try {
-                    $state = unref($stateHolder)->withUpdatedItemKey($key);
-                    $stateHolder->update($state);
+                    $state = $state->update($state->getLastVersion()->withUpdatedItemKey($key));
                     $event = $this->dispatch(new ExtractEvent($state, $value));
                     yield $event->item;
                 } catch (SkipRequest) {
@@ -127,7 +120,7 @@ final class EtlExecutor
         } catch (StopRequest) {
             return;
         } catch (Throwable $exception) {
-            ExtractException::emit($this->eventDispatcher, $exception, unref($stateHolder));
+            ExtractException::emit($this->eventDispatcher, $exception, $state->getLastVersion());
         }
     }
 
@@ -155,41 +148,35 @@ final class EtlExecutor
     }
 
     /**
-     * @param list<mixed>   $items
-     * @param Ref<EtlState> $stateHolder
+     * @param list<mixed> $items
      *
      * @internal
      */
-    private function load(array $items, Ref $stateHolder): void
+    private function load(array $items, EtlState $state): void
     {
-        $state = unref($stateHolder);
         try {
             foreach ($items as $item) {
                 if (!self::shouldLoad($this->loader, $item, $state)) {
                     continue;
                 }
                 $this->loader->load($item, $state);
-                $state = $state->withIncrementedNbLoadedItems();
-                $stateHolder->update($state);
+                $state = $state->update($state->getLastVersion()->withIncrementedNbLoadedItems());
                 $this->dispatch(new LoadEvent($state, $item));
             }
         } catch (SkipRequest|StopRequest $e) {
             throw $e;
         } catch (Throwable $e) {
-            LoadException::emit($this->eventDispatcher, $e, unref($stateHolder));
+            LoadException::emit($this->eventDispatcher, $e, $state->getLastVersion());
         }
 
-        $this->flush($stateHolder, true);
+        $this->flush($state->getLastVersion(), true);
     }
 
     /**
-     * @param Ref<EtlState> $stateHolder
-     *
      * @internal
      */
-    public function flush(Ref $stateHolder, bool $isPartial): mixed
+    public function flush(EtlState $state, bool $isPartial): mixed
     {
-        $state = unref($stateHolder);
         if ($isPartial && !$state->shouldFlush()) {
             return null;
         }
@@ -206,31 +193,26 @@ final class EtlExecutor
             FlushException::emit($this->eventDispatcher, $e, $state);
         }
         $this->dispatch(new FlushEvent($state, $isPartial, $output));
-        $stateHolder->update($state->withClearedFlush());
+        $state->update($state->withClearedFlush());
 
         return $output;
     }
 
     /**
-     * @param Ref<EtlState> $stateHolder
-     *
      * @internal
      */
-    public function terminate(Ref $stateHolder): EtlState
+    public function terminate(EtlState $state): EtlState
     {
-        $state = unref($stateHolder);
         $this->consumeNextTick($state);
-        $output = $this->flush($stateHolder, false);
+        $output = $this->flush($state->getLastVersion(), false);
 
-        $state = unref($stateHolder);
+        $state = $state->getLastVersion();
         if (!$state->nbTotalItems) {
-            $state = $state->withNbTotalItems($state->nbLoadedItems);
-            $stateHolder->update($state);
+            $state = $state->update($state->withNbTotalItems($state->nbLoadedItems));
         }
 
-        $state = $state->withOutput($output);
-        $stateHolder->update($state);
-        $this->dispatch(new EndEvent($state));
+        $state = $state->update($state->withOutput($output));
+        $this->dispatch(new EndEvent($state->getLastVersion()));
 
         gc_collect_cycles();
 
