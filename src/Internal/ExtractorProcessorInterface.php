@@ -11,5 +11,8 @@ interface ExtractorProcessorInterface
 {
     public function supports(mixed $extracted): bool;
 
+    /**
+     * @param Ref<EtlState> $stateHolder
+     */
     public function process(EtlExecutor $executor, Ref $stateHolder, mixed $extracted): EtlState;
 }

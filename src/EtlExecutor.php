@@ -5,15 +5,12 @@ declare(strict_types=1);
 namespace BenTools\ETL;
 
 use BenTools\ETL\EventDispatcher\Event\EndEvent;
-use BenTools\ETL\EventDispatcher\Event\ExtractEvent;
 use BenTools\ETL\EventDispatcher\Event\FlushEvent;
 use BenTools\ETL\EventDispatcher\Event\InitEvent;
 use BenTools\ETL\EventDispatcher\Event\LoadEvent;
-use BenTools\ETL\EventDispatcher\Event\StartEvent;
 use BenTools\ETL\EventDispatcher\Event\TransformEvent;
 use BenTools\ETL\EventDispatcher\EventDispatcher;
 use BenTools\ETL\EventDispatcher\PrioritizedListenerProvider;
-use BenTools\ETL\Exception\ExtractException;
 use BenTools\ETL\Exception\FlushException;
 use BenTools\ETL\Exception\LoadException;
 use BenTools\ETL\Exception\SkipRequest;
@@ -24,18 +21,16 @@ use BenTools\ETL\Extractor\IterableExtractor;
 use BenTools\ETL\Internal\ClonableTrait;
 use BenTools\ETL\Internal\ConditionalLoaderTrait;
 use BenTools\ETL\Internal\EtlBuilderTrait;
+use BenTools\ETL\Internal\IterableProcessor;
 use BenTools\ETL\Internal\TransformResult;
 use BenTools\ETL\Loader\InMemoryLoader;
 use BenTools\ETL\Loader\LoaderInterface;
 use BenTools\ETL\Transformer\NullTransformer;
 use BenTools\ETL\Transformer\TransformerInterface;
-use Generator;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Throwable;
 
-use function count;
 use function gc_collect_cycles;
-use function is_countable;
 
 final class EtlExecutor implements EventDispatcherInterface
 {
@@ -69,30 +64,24 @@ final class EtlExecutor implements EventDispatcherInterface
     {
         $state = new EtlState(options: $this->options, source: $source, destination: $destination, context: $context);
 
+        $processor = new IterableProcessor();
+
         try {
             $this->dispatch(new InitEvent($state));
 
             $items = $this->extractor->extract($state);
-            if (is_countable($items)) {
-                $state = $state->update($state->withNbTotalItems(count($items)));
-            }
-            $this->dispatch(new StartEvent($state));
 
-            foreach ($this->extract($state, $items) as $e => $extractedItem) {
-                $state = $state->getLastVersion();
-                if (0 !== $e) {
-                    $this->consumeNextTick($state);
-                }
-                try {
-                    $transformedItems = $this->transform($extractedItem, $state);
-                    $this->load($transformedItems, $state);
-                } catch (SkipRequest) {
-                }
-            }
+            $processor->process($this, $state->stateHolder, $items);
         } catch (StopRequest) {
         }
 
         return $this->terminate($state->getLastVersion());
+    }
+
+    public function processItem(mixed $item, EtlState $state): void
+    {
+        $itemsToLoad = $this->transform($item, $state);
+        $this->load($itemsToLoad, $state);
     }
 
     /**
@@ -106,30 +95,12 @@ final class EtlExecutor implements EventDispatcherInterface
         }
     }
 
-    private function extract(EtlState $state, iterable $items): Generator
-    {
-        try {
-            foreach ($items as $key => $value) {
-                try {
-                    $state = $state->update($state->withUpdatedItemKey($key));
-                    $event = $this->dispatch(new ExtractEvent($state, $value));
-                    yield $event->item;
-                } catch (SkipRequest) {
-                }
-            }
-        } catch (StopRequest) {
-            return;
-        } catch (Throwable $exception) {
-            ExtractException::emit($this->eventDispatcher, $exception, $state->getLastVersion());
-        }
-    }
-
     /**
      * @return list<mixed>
      *
      * @internal
      */
-    public function transform(mixed $item, EtlState $state): array
+    private function transform(mixed $item, EtlState $state): array
     {
         try {
             $transformResult = TransformResult::create($this->transformer->transform($item, $state));
@@ -152,7 +123,7 @@ final class EtlExecutor implements EventDispatcherInterface
      *
      * @internal
      */
-    public function load(array $items, EtlState $state): void
+    private function load(array $items, EtlState $state): void
     {
         try {
             foreach ($items as $item) {
@@ -175,7 +146,7 @@ final class EtlExecutor implements EventDispatcherInterface
     /**
      * @internal
      */
-    public function flush(EtlState $state, bool $isPartial): mixed
+    private function flush(EtlState $state, bool $isPartial): mixed
     {
         if ($isPartial && !$state->shouldFlush()) {
             return null;
