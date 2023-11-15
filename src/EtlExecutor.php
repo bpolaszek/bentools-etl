@@ -202,7 +202,7 @@ final class EtlExecutor implements EventDispatcherInterface
         }
 
         $state = $state->update($state->withOutput($output));
-        $this->dispatch(new EndEvent($state->getLastVersion()));
+        $this->dispatch(new EndEvent($state));
 
         gc_collect_cycles();
 
@@ -210,11 +210,11 @@ final class EtlExecutor implements EventDispatcherInterface
     }
 
     /**
+     * @internal
+     *
      * @param T $event
      *
      * @return T
-     *
-     * @internal
      *
      * @template T of object
      */
