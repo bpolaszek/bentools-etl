@@ -37,7 +37,7 @@ use function count;
 use function gc_collect_cycles;
 use function is_countable;
 
-final class EtlExecutor
+final class EtlExecutor implements EventDispatcherInterface
 {
     use ClonableTrait;
 
@@ -48,7 +48,7 @@ final class EtlExecutor
 
     use ConditionalLoaderTrait;
 
-    private EventDispatcherInterface $eventDispatcher;
+    private EventDispatcher $eventDispatcher;
 
     public function __construct(
         public readonly ExtractorInterface $extractor = new IterableExtractor(),
@@ -72,7 +72,13 @@ final class EtlExecutor
         try {
             $this->dispatch(new InitEvent($state));
 
-            foreach ($this->extract($state) as $e => $extractedItem) {
+            $items = $this->extractor->extract($state);
+            if (is_countable($items)) {
+                $state = $state->update($state->withNbTotalItems(count($items)));
+            }
+            $this->dispatch(new StartEvent($state));
+
+            foreach ($this->extract($state, $items) as $e => $extractedItem) {
                 $state = $state->getLastVersion();
                 if (0 !== $e) {
                     $this->consumeNextTick($state);
@@ -100,18 +106,12 @@ final class EtlExecutor
         }
     }
 
-    private function extract(EtlState $state): Generator
+    private function extract(EtlState $state, iterable $items): Generator
     {
-        $state = $state->getLastVersion();
         try {
-            $items = $this->extractor->extract($state);
-            if (is_countable($items)) {
-                $state = $state->update($state->withNbTotalItems(count($items)));
-            }
-            $this->dispatch(new StartEvent($state));
             foreach ($items as $key => $value) {
                 try {
-                    $state = $state->update($state->getLastVersion()->withUpdatedItemKey($key));
+                    $state = $state->update($state->withUpdatedItemKey($key));
                     $event = $this->dispatch(new ExtractEvent($state, $value));
                     yield $event->item;
                 } catch (SkipRequest) {
@@ -152,7 +152,7 @@ final class EtlExecutor
      *
      * @internal
      */
-    private function load(array $items, EtlState $state): void
+    public function load(array $items, EtlState $state): void
     {
         try {
             foreach ($items as $item) {
