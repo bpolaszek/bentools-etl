@@ -11,6 +11,7 @@
   },
   "require-dev": {
     "bentools/iterable-functions": "^2.1",
+    "clue/reactphp-csv": "^1.2",
     "doctrine/orm": "^2.16",
     "friendsofphp/php-cs-fixer": "^3.35",
     "mockery/mockery": "^1.6",
@@ -18,6 +19,7 @@
     "pestphp/pest": "^2.24",
     "phpstan/phpstan": "^1.10",
     "phpstan/phpstan-mockery": "^1.1",
+    "react/stream": "^1.3",
     "symfony/var-dumper": "*"
   },
   "license": "MIT",

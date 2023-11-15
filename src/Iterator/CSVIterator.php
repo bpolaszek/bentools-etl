@@ -32,10 +32,11 @@ final readonly class CSVIterator implements IteratorAggregate
     private array $options;
 
     /**
+     * @param Traversable<string>                                                                                                                            $text
      * @param array{delimiter?: string, enclosure?: string, escapeString?: string, columns?: 'auto'|string[]|null, normalizers?: ValueNormalizerInterface[]} $options
      */
     public function __construct(
-        private PregSplitIterator|StrTokIterator|FileIterator $text,
+        private Traversable $text,
         array $options = [],
     ) {
         $resolver = (new OptionsResolver())->setIgnoreUndefined();
