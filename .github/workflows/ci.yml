@@ -3,7 +3,6 @@ on:
   push:
     branches: [ master, '4.0' ]
   pull_request:
-    branches: [ master, '4.0' ]
 
 jobs:
   tests:
