@@ -13,6 +13,9 @@ use Throwable;
 
 use function is_iterable;
 
+/**
+ * @internal
+ */
 final readonly class IterableExtractorProcessor implements ExtractorProcessorInterface
 {
     public function supports(mixed $extracted): bool
