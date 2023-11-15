@@ -10,7 +10,7 @@ use EmptyIterator;
 
 use function is_iterable;
 
-final readonly class CallableExtractor implements ExtractorInterface
+final readonly class CallableExtractor implements IterableExtractorInterface
 {
     public function __construct(
         public Closure $closure,

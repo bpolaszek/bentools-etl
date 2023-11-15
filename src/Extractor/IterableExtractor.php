@@ -10,7 +10,7 @@ use EmptyIterator;
 
 use function is_iterable;
 
-final readonly class IterableExtractor implements ExtractorInterface
+final readonly class IterableExtractor implements IterableExtractorInterface
 {
     /**
      * @param iterable<mixed> $source

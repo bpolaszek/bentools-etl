@@ -6,7 +6,7 @@ namespace BenTools\ETL\Extractor;
 
 use BenTools\ETL\EtlState;
 
-final readonly class ChainExtractor implements ExtractorInterface
+final readonly class ChainExtractor implements IterableExtractorInterface
 {
     /**
      * @var ExtractorInterface[]
