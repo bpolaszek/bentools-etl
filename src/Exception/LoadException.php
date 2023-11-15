@@ -17,7 +17,7 @@ final class LoadException extends EtlException
             $exception = new self('Error during loading.', previous: $exception);
         }
 
-        $exception = $bus->dispatch(new LoadExceptionEvent($state, $exception))->exception;
+        $exception = $bus->dispatch(new LoadExceptionEvent($state->getLastVersion(), $exception))->exception;
 
         if ($exception) {
             throw $exception;

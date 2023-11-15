@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace BenTools\ETL\Internal;
+namespace BenTools\ETL\Extractor;
 
 use BenTools\ETL\EtlExecutor;
 use BenTools\ETL\EtlState;
@@ -11,8 +11,5 @@ interface ExtractorProcessorInterface
 {
     public function supports(mixed $extracted): bool;
 
-    /**
-     * @param Ref<EtlState> $stateHolder
-     */
-    public function process(EtlExecutor $executor, Ref $stateHolder, mixed $extracted): EtlState;
+    public function process(EtlExecutor $executor, EtlState $state, mixed $extracted): EtlState;
 }

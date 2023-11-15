@@ -17,6 +17,6 @@ final class ExtractException extends EtlException
             $exception = new self('Error during extraction.', previous: $exception);
         }
 
-        throw $bus->dispatch(new ExtractExceptionEvent($state, $exception))->exception;
+        throw $bus->dispatch(new ExtractExceptionEvent($state->getLastVersion(), $exception))->exception;
     }
 }

@@ -25,7 +25,7 @@ trait ClonableTrait
      *
      * @param array<string, mixed> $cloneArgs
      */
-    public function cloneWith(array $cloneArgs = []): self
+    public function cloneWith(array $cloneArgs = []): static
     {
         static $refl, $writableProps, $writablePropNames, $constructorParamNames;
         $refl ??= new ReflectionClass($this);
@@ -36,7 +36,7 @@ trait ClonableTrait
         );
         $writablePropNames ??= array_diff(array_column($writableProps, 'name'), $constructorParamNames);
 
-        $clone = new self(...array_fill_from($constructorParamNames, get_object_vars($this), $cloneArgs));
+        $clone = new static(...array_fill_from($constructorParamNames, get_object_vars($this), $cloneArgs));
         $notPromotedProps = array_fill_from($writablePropNames, get_object_vars($this), $cloneArgs);
         foreach ($notPromotedProps as $prop => $value) {
             $clone->{$prop} = $value;

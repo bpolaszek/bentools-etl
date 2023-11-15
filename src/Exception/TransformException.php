@@ -17,7 +17,7 @@ final class TransformException extends EtlException
             $exception = new self('Error during transformation.', previous: $exception);
         }
 
-        $exception = $bus->dispatch(new TransformExceptionEvent($state, $exception))->exception;
+        $exception = $bus->dispatch(new TransformExceptionEvent($state->getLastVersion(), $exception))->exception;
 
         if ($exception) {
             throw $exception;

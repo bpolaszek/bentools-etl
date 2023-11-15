@@ -8,7 +8,11 @@ use BenTools\ETL\EtlConfiguration;
 use BenTools\ETL\EtlExecutor;
 use BenTools\ETL\EtlState;
 use BenTools\ETL\EventDispatcher\Event\FlushEvent;
+use BenTools\ETL\Exception\ExtractException;
+use BenTools\ETL\Extractor\ExtractorProcessorInterface;
 use BenTools\ETL\Loader\ConditionalLoaderInterface;
+use LogicException;
+use Pest\Exceptions\ShouldNotHappen;
 
 use function expect;
 use function strtoupper;
@@ -90,3 +94,23 @@ it('loads conditionally', function () {
     // Then
     expect($report->output)->toBe(['bar', 'baz']);
 });
+
+it('yells if it cannot process extracted data', function () {
+    // Given
+    $executor = (new EtlExecutor())->withProcessor(
+        new class() implements ExtractorProcessorInterface {
+            public function supports(mixed $extracted): bool
+            {
+                return false;
+            }
+
+            public function process(EtlExecutor $executor, EtlState $state, mixed $extracted): EtlState
+            {
+                throw new ShouldNotHappen(new LogicException());
+            }
+        },
+    );
+
+    // When
+    $executor->process([]);
+})->throws(ExtractException::class);

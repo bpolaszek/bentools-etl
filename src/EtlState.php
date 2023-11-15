@@ -18,11 +18,6 @@ final class EtlState
 
     /**
      * @internal
-     */
-    // public readonly StateHolder $stateHolder;
-
-    /**
-     * @internal
      *
      * @var SplObjectStorage<Closure, Closure>
      */
