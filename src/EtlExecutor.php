@@ -13,14 +13,17 @@ use BenTools\ETL\EventDispatcher\Event\StartEvent;
 use BenTools\ETL\EventDispatcher\Event\TransformEvent;
 use BenTools\ETL\EventDispatcher\EventDispatcher;
 use BenTools\ETL\EventDispatcher\PrioritizedListenerProvider;
+use BenTools\ETL\Exception\ExtractException;
+use BenTools\ETL\Exception\FlushException;
+use BenTools\ETL\Exception\LoadException;
 use BenTools\ETL\Exception\SkipRequest;
 use BenTools\ETL\Exception\StopRequest;
+use BenTools\ETL\Exception\TransformException;
 use BenTools\ETL\Extractor\ExtractorInterface;
 use BenTools\ETL\Extractor\IterableExtractor;
 use BenTools\ETL\Internal\ClonableTrait;
 use BenTools\ETL\Internal\ConditionalLoaderTrait;
 use BenTools\ETL\Internal\EtlBuilderTrait;
-use BenTools\ETL\Internal\EtlExceptionsTrait;
 use BenTools\ETL\Internal\Ref;
 use BenTools\ETL\Internal\TransformResult;
 use BenTools\ETL\Loader\InMemoryLoader;
@@ -43,11 +46,6 @@ final class EtlExecutor
      * @use EtlBuilderTrait<self>
      */
     use EtlBuilderTrait;
-
-    /**
-     * @use EtlExceptionsTrait<self>
-     */
-    use EtlExceptionsTrait;
 
     use ConditionalLoaderTrait;
 
@@ -129,14 +127,14 @@ final class EtlExecutor
         } catch (StopRequest) {
             return;
         } catch (Throwable $exception) {
-            $this->throwExtractException($exception, unref($stateHolder));
+            ExtractException::emit($this->eventDispatcher, $exception, unref($stateHolder));
         }
     }
 
     /**
-     * @internal
-     *
      * @return list<mixed>
+     *
+     * @internal
      */
     public function transform(mixed $item, EtlState $state): array
     {
@@ -150,7 +148,7 @@ final class EtlExecutor
         } catch (SkipRequest|StopRequest $e) {
             throw $e;
         } catch (Throwable $e) {
-            $this->throwTransformException($e, $state);
+            TransformException::emit($this->eventDispatcher, $e, $state);
         }
 
         return [];
@@ -178,16 +176,16 @@ final class EtlExecutor
         } catch (SkipRequest|StopRequest $e) {
             throw $e;
         } catch (Throwable $e) {
-            $this->throwLoadException($e, unref($stateHolder));
+            LoadException::emit($this->eventDispatcher, $e, unref($stateHolder));
         }
 
         $this->flush($stateHolder, true);
     }
 
     /**
-     * @internal
-     *
      * @param Ref<EtlState> $stateHolder
+     *
+     * @internal
      */
     public function flush(Ref $stateHolder, bool $isPartial): mixed
     {
@@ -205,7 +203,7 @@ final class EtlExecutor
         try {
             $output = $this->loader->flush($isPartial, $state);
         } catch (Throwable $e) {
-            $this->throwFlushException($e, $state);
+            FlushException::emit($this->eventDispatcher, $e, $state);
         }
         $this->dispatch(new FlushEvent($state, $isPartial, $output));
         $stateHolder->update($state->withClearedFlush());
@@ -214,9 +212,9 @@ final class EtlExecutor
     }
 
     /**
-     * @internal
-     *
      * @param Ref<EtlState> $stateHolder
+     *
+     * @internal
      */
     public function terminate(Ref $stateHolder): EtlState
     {
@@ -240,13 +238,13 @@ final class EtlExecutor
     }
 
     /**
-     * @internal
-     *
-     * @template T of object
-     *
      * @param T $event
      *
      * @return T
+     *
+     * @internal
+     *
+     * @template T of object
      */
     public function dispatch(object $event): object
     {
