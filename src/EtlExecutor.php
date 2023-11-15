@@ -210,11 +210,11 @@ final class EtlExecutor implements EventDispatcherInterface
     }
 
     /**
+     * @internal
+     *
      * @param T $event
      *
      * @return T
-     *
-     * @internal
      *
      * @template T of object
      */
