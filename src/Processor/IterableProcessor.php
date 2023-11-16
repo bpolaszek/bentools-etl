@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace BenTools\ETL\Extractor;
+namespace BenTools\ETL\Processor;
 
 use BenTools\ETL\EtlExecutor;
 use BenTools\ETL\EtlState;
@@ -16,7 +16,7 @@ use function is_iterable;
 /**
  * @internal
  */
-final readonly class IterableExtractorProcessor implements ExtractorProcessorInterface
+final readonly class IterableProcessor implements ProcessorInterface
 {
     public function supports(mixed $extracted): bool
     {

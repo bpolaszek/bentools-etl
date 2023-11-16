@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace BenTools\ETL\Extractor;
+namespace BenTools\ETL\Processor;
 
 use BenTools\ETL\EtlExecutor;
 use BenTools\ETL\EtlState;
 
-interface ExtractorProcessorInterface
+interface ProcessorInterface
 {
     public function supports(mixed $extracted): bool;
 

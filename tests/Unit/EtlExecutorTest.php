@@ -9,8 +9,8 @@ use BenTools\ETL\EtlExecutor;
 use BenTools\ETL\EtlState;
 use BenTools\ETL\EventDispatcher\Event\FlushEvent;
 use BenTools\ETL\Exception\ExtractException;
-use BenTools\ETL\Extractor\ExtractorProcessorInterface;
 use BenTools\ETL\Loader\ConditionalLoaderInterface;
+use BenTools\ETL\Processor\ProcessorInterface;
 use LogicException;
 use Pest\Exceptions\ShouldNotHappen;
 
@@ -98,7 +98,7 @@ it('loads conditionally', function () {
 it('yells if it cannot process extracted data', function () {
     // Given
     $executor = (new EtlExecutor())->withProcessor(
-        new class() implements ExtractorProcessorInterface {
+        new class() implements ProcessorInterface {
             public function supports(mixed $extracted): bool
             {
                 return false;

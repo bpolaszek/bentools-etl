@@ -8,10 +8,10 @@ use BenTools\ETL\EtlConfiguration;
 use BenTools\ETL\Extractor\CallableExtractor;
 use BenTools\ETL\Extractor\ChainExtractor;
 use BenTools\ETL\Extractor\ExtractorInterface;
-use BenTools\ETL\Extractor\ExtractorProcessorInterface;
 use BenTools\ETL\Loader\CallableLoader;
 use BenTools\ETL\Loader\ChainLoader;
 use BenTools\ETL\Loader\LoaderInterface;
+use BenTools\ETL\Processor\ProcessorInterface;
 use BenTools\ETL\Recipe\Recipe;
 use BenTools\ETL\Transformer\CallableTransformer;
 use BenTools\ETL\Transformer\ChainTransformer;
@@ -103,7 +103,7 @@ trait EtlBuilderTrait
         return $executor;
     }
 
-    public function withProcessor(ExtractorProcessorInterface $processor): self
+    public function withProcessor(ProcessorInterface $processor): self
     {
         return $this->cloneWith(['processor' => $processor]);
     }
