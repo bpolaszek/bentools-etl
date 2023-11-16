@@ -10,6 +10,7 @@ use BenTools\ETL\Extractor\STDINExtractor;
 use BenTools\ETL\Loader\ChainLoader;
 use BenTools\ETL\Loader\LoaderInterface;
 use BenTools\ETL\Loader\STDOUTLoader;
+use BenTools\ETL\Processor\ReactStreamProcessor;
 use BenTools\ETL\Recipe\Recipe;
 use BenTools\ETL\Transformer\ChainTransformer;
 use BenTools\ETL\Transformer\TransformerInterface;
@@ -75,4 +76,9 @@ function stdIn(): STDINExtractor
 function stdOut(): STDOUTLoader
 {
     return new STDOUTLoader();
+}
+
+function useReact(): EtlExecutor
+{
+    return withRecipe(new ReactStreamProcessor());
 }

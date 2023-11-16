@@ -15,6 +15,12 @@ use React\EventLoop\Loop;
 use React\Stream\ReadableStreamInterface;
 use Throwable;
 
+use function is_string;
+use function trim;
+
+/**
+ * @experimental
+ */
 final class ReactStreamProcessor extends Recipe implements ProcessorInterface
 {
     public function supports(mixed $extracted): bool
@@ -29,6 +35,9 @@ final class ReactStreamProcessor extends Recipe implements ProcessorInterface
     {
         $key = -1;
         $stream->on('data', function (mixed $item) use ($executor, &$key, $state, $stream) {
+            if (is_string($item)) {
+                $item = trim($item);
+            }
             try {
                 $executor->processItem($item, ++$key, $state);
             } catch (SkipRequest) {

@@ -158,3 +158,41 @@ $report = withRecipe(new LoggerRecipe($logger))
     ->transformWith(fn ($value) => strtoupper($value))
     ->process(['foo', 'bar']);
 ```
+
+Using React streams (experimental)
+----------------------------------
+
+You can plug your ETL dataflows to any [React Stream](https://github.com/reactphp/stream).
+
+Example with a TCP server:
+
+```php
+use BenTools\ETL\EtlConfiguration;
+use BenTools\ETL\EventDispatcher\Event\ExtractEvent;
+use BenTools\ETL\EventDispatcher\Event\InitEvent;
+use React\Socket\ConnectionInterface;
+use React\Socket\SocketServer;
+
+use function BenTools\ETL\stdOut;
+use function BenTools\ETL\useReact;
+
+$socket = new SocketServer('127.0.0.1:7000');
+
+$etl = useReact() // or (new EtlExecutor())->withRecipe(new ReactStreamProcessor());
+    ->loadInto(stdOut())
+    ->onInit(function (InitEvent $event) {
+        /** @var ConnectionInterface $stream */
+        $stream = $event->state->source;
+        $stream->on('close', function () use ($event) {
+            $event->state->stop(); // Will flush all pending items and gracefully stop the ETL for that connection
+        });
+    })
+    ->withOptions(new EtlConfiguration(flushEvery: 1)) // Optionally, flush on each data event
+    ->onExtract(function (ExtractEvent $event) {
+        if (!preg_match('//u', $event->item)) {
+            $event->state->skip(); // Ignore binary data
+        }
+    });
+
+$socket->on('connection', $etl->process(...));
+```
