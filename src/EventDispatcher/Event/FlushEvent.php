@@ -14,7 +14,7 @@ final class FlushEvent extends Event implements StoppableEventInterface
 
     public function __construct(
         public readonly EtlState $state,
-        public readonly bool $partial,
+        public readonly bool $early,
         public mixed $output,
     ) {
     }

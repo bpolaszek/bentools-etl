@@ -39,7 +39,7 @@ final readonly class JSONLoader implements LoaderInterface
         $file = $context['file'] ??= $this->resolveDestination($state->destination ?? $this->destination);
         // $this->writeOpeningBracketIfNotDoneYet($state, $file);
         match ($isPartial) {
-            true => $this->partialFlush($state, $file),
+            true => $this->earlyFlush($state, $file),
             false => $this->finalFlush($state, $file),
         };
         $context['pending'] = [];
@@ -53,7 +53,7 @@ final readonly class JSONLoader implements LoaderInterface
         return 'file://'.$file->getPathname();
     }
 
-    private function partialFlush(EtlState $state, SplFileObject $file): void
+    private function earlyFlush(EtlState $state, SplFileObject $file): void
     {
         $context = &$state->context[__CLASS__];
         $serialized = json_encode($context['pending'], JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
@@ -73,7 +73,7 @@ final readonly class JSONLoader implements LoaderInterface
 
     private function finalFlush(EtlState $state, SplFileObject $file): void
     {
-        $this->partialFlush($state, $file);
+        $this->earlyFlush($state, $file);
         if ($state->nbLoadedItems > 0) {
             $file->fwrite(PHP_EOL);
         }
