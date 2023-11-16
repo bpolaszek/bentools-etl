@@ -11,7 +11,6 @@
   },
   "require-dev": {
     "bentools/iterable-functions": "^2.1",
-    "clue/reactphp-csv": "^1.2",
     "doctrine/orm": "^2.16",
     "friendsofphp/php-cs-fixer": "^3.35",
     "mockery/mockery": "^1.6",
