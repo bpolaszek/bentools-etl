@@ -20,15 +20,15 @@ use BenTools\ETL\Exception\SkipRequest;
 use BenTools\ETL\Exception\StopRequest;
 use BenTools\ETL\Exception\TransformException;
 use BenTools\ETL\Extractor\ExtractorInterface;
-use BenTools\ETL\Extractor\ExtractorProcessorInterface;
 use BenTools\ETL\Extractor\IterableExtractor;
-use BenTools\ETL\Extractor\IterableExtractorProcessor;
 use BenTools\ETL\Internal\ClonableTrait;
 use BenTools\ETL\Internal\ConditionalLoaderTrait;
 use BenTools\ETL\Internal\EtlBuilderTrait;
 use BenTools\ETL\Internal\TransformResult;
 use BenTools\ETL\Loader\InMemoryLoader;
 use BenTools\ETL\Loader\LoaderInterface;
+use BenTools\ETL\Processor\IterableProcessor;
+use BenTools\ETL\Processor\ProcessorInterface;
 use BenTools\ETL\Transformer\NullTransformer;
 use BenTools\ETL\Transformer\TransformerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -57,7 +57,7 @@ final class EtlExecutor implements EventDispatcherInterface
         public readonly TransformerInterface $transformer = new NullTransformer(),
         public readonly LoaderInterface $loader = new InMemoryLoader(),
         public readonly EtlConfiguration $options = new EtlConfiguration(),
-        public readonly ExtractorProcessorInterface $processor = new IterableExtractorProcessor(),
+        public readonly ProcessorInterface $processor = new IterableProcessor(),
     ) {
         $this->listenerProvider = new PrioritizedListenerProvider();
         $this->eventDispatcher = new EventDispatcher($this->listenerProvider);

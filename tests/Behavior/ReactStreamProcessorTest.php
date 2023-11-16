@@ -6,7 +6,7 @@ namespace BenTools\ETL\Tests\Behavior;
 
 use BenTools\ETL\EventDispatcher\Event\ExtractEvent;
 use BenTools\ETL\Exception\ExtractException;
-use BenTools\ETL\Extractor\ReactStreamExtractorProcessor;
+use BenTools\ETL\Processor\ReactStreamProcessor;
 use React\EventLoop\Loop;
 use React\Stream\ReadableResourceStream;
 use RuntimeException;
@@ -20,7 +20,7 @@ it('processes React streams', function () {
     $stream = new ReadableResourceStream(fopen('php://temp', 'rb'));
     Loop::futureTick(fn () => $stream->emit('data', ['hello']));
     Loop::futureTick(fn () => $stream->emit('data', ['world']));
-    $executor = withRecipe(new ReactStreamExtractorProcessor());
+    $executor = withRecipe(new ReactStreamProcessor());
 
     // When
     $state = $executor->process($stream);
@@ -36,7 +36,7 @@ it('can skip items and stop the workflow', function () {
     foreach ($fruits as $fruit) {
         Loop::futureTick(fn () => $stream->emit('data', [$fruit]));
     }
-    $executor = withRecipe(new ReactStreamExtractorProcessor())
+    $executor = withRecipe(new ReactStreamProcessor())
         ->onExtract(function (ExtractEvent $event) {
             match ($event->item) {
                 'apple' => $event->state->skip(),
@@ -57,7 +57,7 @@ it('throws ExtractExceptions', function () {
     // Given
     $stream = new ReadableResourceStream(fopen('php://temp', 'rb'));
     Loop::futureTick(fn () => $stream->emit('data', ['hello']));
-    $executor = withRecipe(new ReactStreamExtractorProcessor())
+    $executor = withRecipe(new ReactStreamProcessor())
         ->onExtract(fn () => throw new RuntimeException());
 
     // When

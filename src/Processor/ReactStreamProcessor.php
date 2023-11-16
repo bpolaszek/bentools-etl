@@ -2,19 +2,20 @@
 
 declare(strict_types=1);
 
-namespace BenTools\ETL\Extractor;
+namespace BenTools\ETL\Processor;
 
 use BenTools\ETL\EtlExecutor;
 use BenTools\ETL\EtlState;
 use BenTools\ETL\Exception\ExtractException;
 use BenTools\ETL\Exception\SkipRequest;
 use BenTools\ETL\Exception\StopRequest;
+use BenTools\ETL\Extractor\ReactStreamExtractor;
 use BenTools\ETL\Recipe\Recipe;
 use React\EventLoop\Loop;
 use React\Stream\ReadableStreamInterface;
 use Throwable;
 
-final class ReactStreamExtractorProcessor extends Recipe implements ExtractorProcessorInterface
+final class ReactStreamProcessor extends Recipe implements ProcessorInterface
 {
     public function supports(mixed $extracted): bool
     {
