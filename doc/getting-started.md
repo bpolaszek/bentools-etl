@@ -71,6 +71,22 @@ If you use callables, it will be injected as well.
 The `ETLState` object is also injected into all events.
 Most of its properties are read-only, except `context`.
 
+> [!TIP]
+> Your executor can provide a default context (see example below).
+
+```php
+it('accepts a default context', function () {
+    // Given
+    $executor = (new EtlExecutor())->withContext(['foo' => 'bar']);
+
+    // When
+    $report = $executor->process([], context: ['bar' => 'baz']);
+
+    // Then
+    expect($report->context)->toBe(['foo' => 'bar', 'bar' => 'baz']);
+});
+```
+
 Skipping items
 --------------
 
