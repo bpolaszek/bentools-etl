@@ -1,4 +1,3 @@
-[![Latest Unstable Version](http://poser.pugx.org/bentools/etl/v/unstable)](https://packagist.org/packages/bentools/etl)
 [![Latest Stable Version](https://poser.pugx.org/bentools/etl/v/stable)](https://packagist.org/packages/bentools/etl)
 [![License](https://poser.pugx.org/bentools/etl/license)](https://packagist.org/packages/bentools/etl)
 [![CI Workflow](https://github.com/bpolaszek/bentools-etl/actions/workflows/ci.yml/badge.svg)](https://github.com/bpolaszek/bentools-etl/actions/workflows/ci.yml)
@@ -45,15 +44,12 @@ Installation
 ------------
 
 ```bash
-composer require bentools/etl:^4.0@alpha
+composer require bentools/etl
 ```
 
 > [!WARNING]
-> Version 4.0 is a complete rewrite and introduces significant BC (backward compatibility) breaks.
+> Current version (4.0) is a complete redesign and introduces significant BC (backward compatibility) breaks.
 > Avoid upgrading from `^2.0` or `^3.0` unless you're fully aware of the changes.
-
-> [!IMPORTANT]
-> Version 4.0 is still at an alpha stage. BC breaks might occur between alpha releases.
 
 Usage
 -----
