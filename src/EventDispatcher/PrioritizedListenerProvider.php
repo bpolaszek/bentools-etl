@@ -28,6 +28,11 @@ final class PrioritizedListenerProvider implements ListenerProviderInterface
         $this->flattenedListeners[$eventClass] = array_merge(...$this->prioritizedListeners[$eventClass]);
     }
 
+    public function hasListeners(string $eventClass): bool
+    {
+        return isset($this->flattenedListeners[$eventClass]);
+    }
+
     /**
      * @return iterable<callable>
      */

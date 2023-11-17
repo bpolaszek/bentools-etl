@@ -8,6 +8,9 @@ use BenTools\ETL\EtlState;
 use BenTools\ETL\Loader\ConditionalLoaderInterface;
 use BenTools\ETL\Loader\LoaderInterface;
 
+/**
+ * @internal
+ */
 trait ConditionalLoaderTrait
 {
     private static function shouldLoad(LoaderInterface $loader, mixed $item, EtlState $state): bool
