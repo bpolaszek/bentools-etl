@@ -31,9 +31,10 @@ $etl = (new EtlExecutor())
 $etl->process('file:///tmp/cities.csv', $pdo);
 ```
 
-As you can see:
-- Your transformer can _yield_ values, in case 1 extracted item becomes several items to load
-- You can use `EtlState.destination` to retrieve the second argument you passed yo `$etl->process()`.
+> [!IMPORTANT]
+> As you can see:
+> - Your transformer can _yield_ values, in case 1 extracted item becomes several items to load
+> - You can use `EtlState.destination` to retrieve the second argument you passed yo `$etl->process()`.
 
 The `EtlState` object contains all elements relative to the state of your ETL workflow being running.
 
@@ -52,7 +53,6 @@ But the last transformer of the chain (or your only one transformer) is determin
 - If your transformer `returns` a value, this value will be passed to the loader (and the loader will be called once for this value).
 - If your transformer `returns` an array of values (or whatever iterable), that return value will be passed to the loader (and the loader will be called once for this value).
 - If your transformer `yields` values, each yielded value will be passed to the loader (and the loader will be called for each yielded value).
-
 
 
 Next tick
