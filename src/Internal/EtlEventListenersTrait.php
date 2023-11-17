@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BenTools\ETL\Internal;
 
+use BenTools\ETL\EventDispatcher\Event\BeforeLoadEvent;
 use BenTools\ETL\EventDispatcher\Event\EndEvent;
 use BenTools\ETL\EventDispatcher\Event\ExtractEvent;
 use BenTools\ETL\EventDispatcher\Event\ExtractExceptionEvent;
@@ -72,6 +73,14 @@ trait EtlEventListenersTrait
     public function onTransformException(callable $callback, int $priority = 0): self
     {
         return $this->listenTo(TransformExceptionEvent::class, $callback, $priority);
+    }
+
+    /**
+     * @param callable(BeforeLoadEvent): void $callback
+     */
+    public function onBeforeLoad(callable $callback, int $priority = 0): self
+    {
+        return $this->listenTo(BeforeLoadEvent::class, $callback, $priority);
     }
 
     /**

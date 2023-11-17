@@ -94,8 +94,9 @@ The `EtlExecutor` emits a variety of events during the ETL workflow, providing i
 - `StartEvent` when extraction just started (we might know the total number of items to extract at this time, if the extractor provides this)
 - `ExtractEvent` upon each extracted item
 - `ExtractExceptionEvent` when something wrong occured during extraction (this is generally not recoverable)
-- `TransformEvent` upon each transformed item
+- `TransformEvent` upon each transformed item (exposes a `TransformResult` object, containing 0, one or more items to load)
 - `TransformExceptionEvent` when something wrong occured during transformation (the exception can be dismissed)
+- `BeforeLoadEvent` upon each item to be loaded
 - `LoadEvent` upon each loaded item
 - `LoadExceptionEvent` when something wrong occured during loading (the exception can be dismissed)
 - `FlushEvent` at each flush
