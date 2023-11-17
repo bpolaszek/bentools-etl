@@ -48,7 +48,8 @@ Then, let's have a look at `/tmp/cities.json`:
 ]
 ```
 
-Notice that we didn't _transform_ anything here, we just denormalized the CSV file to an array, then serialized that array to a JSON file.
+> [!NOTE]
+> We didn't _transform_ anything here, we just denormalized the CSV file to an array, then serialized that array to a JSON file.
 
 The `CSVExtractor` has some options to _read_ the data, such as considering that the 1st row is the column keys.
 
@@ -92,14 +93,16 @@ Skipping items
 
 You can skip items at any time.
 
-Use the `$state->skip()` method from the `EtlState` object as soon as your business logic requires it.
+> [!TIP]
+> Use the `skip()` method from the `EtlState` object as soon as your business logic requires it.
 
 Stopping the workflow
 ---------------------
 
 You can stop the workflow at any time.
 
-Use the `$state->stop()` method from the `EtlState` object as soon as your business logic requires it.
+> [!TIP]
+> Use the `stop()` method from the `EtlState` object as soon as your business logic requires it.
 
 Using Events
 ------------
@@ -119,9 +122,15 @@ The `EtlExecutor` emits a variety of events during the ETL workflow, providing i
 - `FlushExceptionEvent` when something wrong occured during flush (the exception can be dismissed)
 - `EndEvent` whenever the workflow is complete.
 
-All events give you access to the `EtlState` object, the state of the running ETL process, which allows you to read what's going on
-(total number of items, number of loaded items, current extracted item index), write any arbitrary data into the `$state->context` array,
-[skip items](#skipping-items), [stop the workflow](#stopping-the-workflow), and [trigger an early flush](#flush-frequency-and-early-flushes).
+> [!IMPORTANT]
+> All events give you access to the `EtlState` object, the state of the running ETL process.
+
+Accessing `$event->state` allows you to:
+- Read what's going on (total number of items, number of loaded items, current extracted item index)
+- Write any arbitrary data into the `$state->context` array
+- [Skip items](#skipping-items)
+- [Stop the workflow](#stopping-the-workflow)
+- [Trigger an early flush](#flush-frequency-and-early-flushes).
 
 You can hook to those events during `EtlExecutor` instantiation, i.e.:
 
@@ -138,8 +147,9 @@ Flush frequency and early flushes
 By default, the `flush()` method of your loader will be invoked at the end of the ETL,
 meaning it will likely keep all loaded items in memory before dumping them to their final destination.
 
-Feel free to adjust a `flushFrequency` that fits your needs to manage memory usage and data processing efficiency
-and optionally trigger an early flush at any time during the ETL process:
+> [!TIP]
+> - Feel free to adjust a `flushFrequency` that fits your needs to manage memory usage and data processing efficiency 
+> - Optionally, trigger an early flush at any time during the ETL process.
 
 ```php
 $etl = (new EtlExecutor(options: new EtlConfiguration(flushFrequency: 10)))

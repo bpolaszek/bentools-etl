@@ -48,10 +48,12 @@ Installation
 composer require bentools/etl:^4.0@alpha
 ```
 
-> **Warning #1**: Version 4.0 is a complete rewrite and introduces significant BC (backward compatibility) breaks.
+> [!WARNING]
+> Version 4.0 is a complete rewrite and introduces significant BC (backward compatibility) breaks.
 > Avoid upgrading from `^2.0` or `^3.0` unless you're fully aware of the changes.
 
-> **Warning #2**: Version 4.0 is still at an alpha stage. BC breaks might occur between alpha releases.
+> [!IMPORTANT]
+> Version 4.0 is still at an alpha stage. BC breaks might occur between alpha releases.
 
 Usage
 -----
