@@ -82,7 +82,7 @@ final class EtlState
     /**
      * Skip current item.
      */
-    public function skip(): void
+    public function skip(): never
     {
         throw new SkipRequest();
     }
@@ -90,7 +90,7 @@ final class EtlState
     /**
      * Stop after current item.
      */
-    public function stop(): void
+    public function stop(): never
     {
         throw new StopRequest();
     }
