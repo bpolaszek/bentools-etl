@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BenTools\ETL;
 
+use BenTools\ETL\EventDispatcher\Event\BeforeLoadEvent;
 use BenTools\ETL\EventDispatcher\Event\EndEvent;
 use BenTools\ETL\EventDispatcher\Event\ExtractEvent;
 use BenTools\ETL\EventDispatcher\Event\FlushEvent;
@@ -148,6 +149,13 @@ final class EtlExecutor implements EventDispatcherInterface
             foreach ($items as $item) {
                 if (!self::shouldLoad($this->loader, $item, $state)) {
                     continue;
+                }
+                try {
+                    $item = $this->dispatch(new BeforeLoadEvent($state, $item))->item;
+                } catch (SkipRequest) {
+                    continue;
+                } catch (StopRequest) {
+                    break;
                 }
                 $this->loader->load($item, $state);
                 $state = $state->update($state->getLastVersion()->withIncrementedNbLoadedItems());
