@@ -1,7 +1,11 @@
 # Recipes
 
 Recipes are pre-configured setups for `EtlExecutor`, facilitating reusable ETL configurations.
-For instance, `LoggerRecipe` enables logging for all ETL events.
+
+LoggerRecipe
+------------
+
+The `LoggerRecipe` enables logging for all ETL events.
 
 ```php
 use BenTools\ETL\EtlExecutor;
@@ -14,6 +18,25 @@ $etl = (new EtlExecutor())
 ```
 
 This will basically listen to all events and fire log entries.
+
+FilterRecipe
+------------
+
+The `FilterRecipe` gives you syntactic sugar for skipping items.
+
+```php
+use BenTools\ETL\EtlExecutor;
+use BenTools\ETL\Recipe\LoggerRecipe;
+use Monolog\Logger;
+
+use function BenTools\ETL\skipWhen;
+
+$logger = new Logger();
+$etl = (new EtlExecutor())->withRecipe(skipWhen(fn ($item) => 'apple' === $item));
+$report = $etl->process(['banana', 'apple', 'pinapple']);
+
+var_dump($report->output); // ['banana', 'pineapple']
+```
 
 Creating your own recipes
 -------------------------

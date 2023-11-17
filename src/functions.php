@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BenTools\ETL;
 
+use BenTools\ETL\EventDispatcher\Event\ExtractEvent;
 use BenTools\ETL\Extractor\ChainExtractor;
 use BenTools\ETL\Extractor\ExtractorInterface;
 use BenTools\ETL\Extractor\STDINExtractor;
@@ -11,6 +12,8 @@ use BenTools\ETL\Loader\ChainLoader;
 use BenTools\ETL\Loader\LoaderInterface;
 use BenTools\ETL\Loader\STDOUTLoader;
 use BenTools\ETL\Processor\ReactStreamProcessor;
+use BenTools\ETL\Recipe\FilterRecipe;
+use BenTools\ETL\Recipe\FilterRecipeMode;
 use BenTools\ETL\Recipe\Recipe;
 use BenTools\ETL\Transformer\ChainTransformer;
 use BenTools\ETL\Transformer\TransformerInterface;
@@ -59,6 +62,11 @@ function withRecipe(Recipe|callable $recipe): EtlExecutor
     return (new EtlExecutor())->withRecipe(...func_get_args());
 }
 
+function useReact(): EtlExecutor
+{
+    return withRecipe(new ReactStreamProcessor());
+}
+
 function chain(ExtractorInterface|TransformerInterface|LoaderInterface $service,
 ): ChainExtractor|ChainTransformer|ChainLoader {
     return match (true) {
@@ -78,7 +86,12 @@ function stdOut(): STDOUTLoader
     return new STDOUTLoader();
 }
 
-function useReact(): EtlExecutor
+function skipWhen(callable $filter, ?string $eventClass = ExtractEvent::class, int $priority = 0): Recipe
 {
-    return withRecipe(new ReactStreamProcessor());
+    return new FilterRecipe(
+        $filter(...),
+        $eventClass ?? ExtractEvent::class,
+        $priority,
+        FilterRecipeMode::EXCLUDE
+    );
 }
