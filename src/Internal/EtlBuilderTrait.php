@@ -108,4 +108,12 @@ trait EtlBuilderTrait
     {
         return $this->cloneWith(['processor' => $processor]);
     }
+
+    /**
+     * @param array<string, mixed> $context
+     */
+    public function withContext(array $context): self
+    {
+        return $this->cloneWith(['context' => $context]);
+    }
 }

@@ -56,12 +56,16 @@ final class EtlExecutor implements EventDispatcherInterface
 
     private EventDispatcher $eventDispatcher;
 
+    /**
+     * @param array<string, mixed> $context
+     */
     public function __construct(
         public readonly ExtractorInterface $extractor = new IterableExtractor(),
         public readonly TransformerInterface $transformer = new NullTransformer(),
         public readonly LoaderInterface $loader = new InMemoryLoader(),
         public readonly EtlConfiguration $options = new EtlConfiguration(),
         public readonly ProcessorInterface $processor = new IterableProcessor(),
+        public readonly array $context = [],
     ) {
         $this->listenerProvider = new PrioritizedListenerProvider();
         $this->eventDispatcher = new EventDispatcher($this->listenerProvider);
@@ -74,7 +78,12 @@ final class EtlExecutor implements EventDispatcherInterface
      */
     public function process(mixed $source = null, mixed $destination = null, array $context = []): EtlState
     {
-        $state = new EtlState(options: $this->options, source: $source, destination: $destination, context: $context);
+        $state = new EtlState(
+            options: $this->options,
+            source: $source,
+            destination: $destination,
+            context: [...$this->context, ...$context]
+        );
 
         try {
             $this->emit(InitEvent::class, $state);
