@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BenTools\ETL\Internal;
 
 use BenTools\ETL\EtlConfiguration;
+use BenTools\ETL\EtlExecutor;
 use BenTools\ETL\Extractor\CallableExtractor;
 use BenTools\ETL\Extractor\ChainExtractor;
 use BenTools\ETL\Extractor\ExtractorInterface;
@@ -22,12 +23,12 @@ use function count;
 /**
  * @internal
  *
- * @template T
+ * @template EtlExecutor
  */
 trait EtlBuilderTrait
 {
     /**
-     * @use EtlEventListenersTrait<T>
+     * @use EtlEventListenersTrait<EtlExecutor>
      */
     use EtlEventListenersTrait;
 

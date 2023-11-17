@@ -21,7 +21,7 @@ use BenTools\ETL\EventDispatcher\PrioritizedListenerProvider;
 /**
  * @internal
  *
- * @template T
+ * @template EtlExecutor
  */
 trait EtlEventListenersTrait
 {

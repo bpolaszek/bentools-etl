@@ -13,7 +13,7 @@ use BenTools\ETL\EventDispatcher\Event\TransformEvent;
 /**
  * @internal
  *
- * @template A
+ * @template EtlExecutor
  */
 trait DispatchEventsTrait
 {
