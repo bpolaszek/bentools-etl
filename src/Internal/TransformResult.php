@@ -36,8 +36,12 @@ final class TransformResult implements IteratorAggregate
         static $prototype;
         $prototype ??= new self();
 
+        if ($value instanceof self) {
+            return $value;
+        }
+
         $that = clone $prototype;
-        if ($value instanceof Generator || $value instanceof self) {
+        if ($value instanceof Generator) {
             $that->value = [...$value];
             $that->iterable = true;
         } else {
