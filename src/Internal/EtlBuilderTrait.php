@@ -18,6 +18,7 @@ use BenTools\ETL\Transformer\CallableTransformer;
 use BenTools\ETL\Transformer\ChainTransformer;
 use BenTools\ETL\Transformer\TransformerInterface;
 
+use function array_intersect_key;
 use function count;
 
 /**
@@ -112,8 +113,12 @@ trait EtlBuilderTrait
     /**
      * @param array<string, mixed> $context
      */
-    public function withContext(array $context): self
+    public function withContext(array $context, bool $clear = false, bool $overwrite = true): self
     {
-        return $this->cloneWith(['context' => $context]);
+        return $this->cloneWith(['context' => [
+            ...($clear ? [] : $this->context),
+            ...$context,
+            ...($overwrite ? [] : array_intersect_key($this->context, $context)),
+        ]]);
     }
 }

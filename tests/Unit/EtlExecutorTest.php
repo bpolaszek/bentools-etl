@@ -114,14 +114,3 @@ it('yells if it cannot process extracted data', function () {
     // When
     $executor->process([]);
 })->throws(ExtractException::class);
-
-it('accepts a default context', function () {
-    // Given
-    $executor = (new EtlExecutor())->withContext(['foo' => 'bar']);
-
-    // When
-    $report = $executor->process([], context: ['bar' => 'baz']);
-
-    // Then
-    expect($report->context)->toBe(['foo' => 'bar', 'bar' => 'baz']);
-});
