@@ -123,8 +123,8 @@ final class EtlExecutor implements EventDispatcherInterface
     private function consumeNextTick(EtlState $state): void
     {
         foreach ($state->nextTickCallbacks as $callback) {
-            ($callback)($state);
             $state->nextTickCallbacks->detach($callback);
+            ($callback)($state);
         }
     }
 
@@ -212,10 +212,14 @@ final class EtlExecutor implements EventDispatcherInterface
      */
     private function terminate(EtlState $state): EtlState
     {
-        try {
-            $this->consumeNextTick($state);
-        } catch (SkipRequest|StopRequest) {
+        // Ensure everything has been cleared
+        while (0 !== count($state->nextTickCallbacks)) {
+            try {
+                $this->consumeNextTick($state);
+            } catch (SkipRequest|StopRequest) {
+            }
         }
+
         $output = $this->flush($state->getLastVersion(), false);
 
         $state = $state->getLastVersion();
