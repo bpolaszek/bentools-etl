@@ -212,7 +212,10 @@ final class EtlExecutor implements EventDispatcherInterface
      */
     private function terminate(EtlState $state): EtlState
     {
-        $this->consumeNextTick($state);
+        try {
+            $this->consumeNextTick($state);
+        } catch (SkipRequest|StopRequest) {
+        }
         $output = $this->flush($state->getLastVersion(), false);
 
         $state = $state->getLastVersion();
