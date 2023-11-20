@@ -44,7 +44,49 @@ Creating your own recipes
 You can create your own recipes by implementing `BenTools\ETL\Recipe\Recipe` 
 or using a callable with the same signature.
 
-Example for displaying a progress bar when using the Symfony framework:
+### Example 1. Stop the workflow when a max number of items has been reached
+
+```php
+use BenTools\ETL\EtlExecutor;
+use BenTools\ETL\EtlState;
+use BenTools\ETL\EventDispatcher\Event\ExtractEvent;
+
+use const PHP_INT_MAX;
+
+final class MaxItemsRecipe extends Recipe
+{
+    public function __construct(
+        private readonly int $maxItems = PHP_INT_MAX,
+    ) {
+    }
+
+    public function decorate(EtlExecutor $executor): EtlExecutor
+    {
+        return $executor
+            ->withContext(['maxItems' => $this->maxItems])
+            ->onExtract($this);
+    }
+
+    public function __invoke(ExtractEvent $event): void
+    {
+        if ($event->state->nbExtractedItems >= $event->state->context['maxItems']) {
+            $event->state->nextTick(fn (EtlState $state) => $state->skip());
+        }
+    }
+}
+```
+
+Usage:
+
+```php
+use function BenTools\ETL\withRecipe;
+
+$etl = withRecipe(new MaxItemsRecipe(10)); // Set to 10 items max by default
+$report = $etl->process(['foo', 'bar', 'baz'], context: ['maxItems' => 2]); // Optionally overwrite here
+var_dump($report->output); // ['foo', 'bar']
+```
+
+### Example 2. Display a progress bar when using the Symfony framework:
 
 ```php
 use BenTools\ETL\EtlExecutor;
