@@ -17,6 +17,7 @@ use BenTools\ETL\Recipe\FilterRecipeMode;
 use BenTools\ETL\Recipe\Recipe;
 use BenTools\ETL\Transformer\ChainTransformer;
 use BenTools\ETL\Transformer\TransformerInterface;
+use Iterator;
 
 use function array_fill_keys;
 use function array_intersect_key;
@@ -38,6 +39,20 @@ function array_fill_from(array $keys, array $values, array ...$extraValues): arr
     $values = array_replace($values, ...$extraValues);
 
     return array_intersect_key($values, $defaults);
+}
+
+/**
+ * @internal
+ *
+ * @template T
+ *
+ * @param iterable<T> $items
+ *
+ * @return Iterator<T>
+ */
+function iterable_to_iterator(iterable $items): Iterator
+{
+    return $items instanceof Iterator ? $items : (fn () => yield from $items)();
 }
 
 function extractFrom(ExtractorInterface|callable $extractor, ExtractorInterface|callable ...$extractors): EtlExecutor

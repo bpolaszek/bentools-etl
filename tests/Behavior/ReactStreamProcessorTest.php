@@ -52,6 +52,25 @@ it('can skip items and stop the workflow', function () {
     expect($state->output)->toBe(['banana', 'strawberry', 'raspberry']);
 });
 
+it('allows iterables, which will be converted to readable streams', function () {
+    $fruits = ['banana', 'apple', 'strawberry', 'raspberry', 'peach'];
+    $executor = useReact()
+        ->onExtract(function (ExtractEvent $event) {
+            match ($event->item) {
+                'apple' => $event->state->skip(),
+                'peach' => $event->state->stop(),
+                default => null,
+            };
+        })
+    ;
+
+    // When
+    $state = $executor->process($fruits);
+
+    // Then
+    expect($state->output)->toBe(['banana', 'strawberry', 'raspberry']);
+});
+
 it('throws ExtractExceptions', function () {
     // Given
     $stream = new ReadableResourceStream(fopen('php://temp', 'rb'));
