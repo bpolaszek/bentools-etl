@@ -28,7 +28,7 @@ Table of Contents
     - [Chaining extractors / transformers / loaders](doc/advanced_usage.md#chaining-extractors--transformers--loaders)
     - [Reading from STDIN / Writing to STDOUT](doc/advanced_usage.md#reading-from-stdin--writing-to-stdout)
     - [Instantiators](doc/advanced_usage.md#instantiators)
-    - [Using React Streams (ReactPHP support)](doc/advanced_usage.md#using-react-streams-experimental)
+    - [Using ReactPHP](doc/advanced_usage.md#using-reactphp-experimental)
 - [Recipes](doc/recipes.md)
 - [Contributing](#contribute)
 - [License](#license)

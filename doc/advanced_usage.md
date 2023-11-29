@@ -159,10 +159,21 @@ $report = withRecipe(new LoggerRecipe($logger))
     ->process(['foo', 'bar']);
 ```
 
-Using React streams (experimental)
+Using ReactPHP (experimental)
 ----------------------------------
 
-You can plug your ETL dataflows to any [React Stream](https://github.com/reactphp/stream).
+By using the `ReactStreamProcessor` recipe, you can use ReactPHP as the processor of your data.
+
+> [!IMPORTANT]
+> `react/stream` and `react/event-loop` are required for this to work.
+
+With this processor, you can extract data from an `iterable` or a [React Stream](https://github.com/reactphp/stream): 
+each item will be iterated within a [Loop tick](https://github.com/reactphp/event-loop#futuretick) instead of a blocking `while` loop.
+
+This allows you, for example, to: 
+- [Periodically](https://github.com/reactphp/event-loop#addperiodictimer) perform some stuff (with `Loop::addPeriodicTimer()`)
+- Handle [POSIX signals](https://github.com/reactphp/event-loop#addsignal) (with `Loop::addSignal()`)
+- Use [React streams](https://github.com/reactphp/stream), like a TCP / HTTP server, a Redis / MySQL connection, or a file stream, for an event-oriented approach.
 
 Example with a TCP server:
 
