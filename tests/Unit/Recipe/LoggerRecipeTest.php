@@ -30,12 +30,12 @@ it('logs messages during ETL process', function () {
         fn ($record) => $record->message->toContain('Extracting item')->and($record->level->toBe(Level::Debug)),
         fn ($record) => $record->message->toContain('Transformed item')->and($record->level->toBe(Level::Debug)),
         fn ($record) => $record->message->toContain('Loaded item')->and($record->level->toBe(Level::Debug)),
-        fn ($record) => $record->message->toContain('Flushing items (early)...')->and($record->level->toBe(Level::Info)),
+        fn ($record) => $record->message->toContain('Flushing {nb} items (early)...')->and($record->level->toBe(Level::Info)),
         fn ($record) => $record->message->toContain('Extracting item')->and($record->level->toBe(Level::Debug)),
         fn ($record) => $record->message->toContain('Transformed item')->and($record->level->toBe(Level::Debug)),
         fn ($record) => $record->message->toContain('Loaded item')->and($record->level->toBe(Level::Debug)),
-        fn ($record) => $record->message->toContain('Flushing items (early)...')->and($record->level->toBe(Level::Info)),
-        fn ($record) => $record->message->toContain('Flushing items...')->and($record->level->toBe(Level::Info)),
+        fn ($record) => $record->message->toContain('Flushing {nb} items (early)...')->and($record->level->toBe(Level::Info)),
+        fn ($record) => $record->message->toContain('Flushing {nb} items...')->and($record->level->toBe(Level::Info)),
         fn ($record) => $record->message->toContain('ETL complete.')->and($record->level->toBe(Level::Info)),
     );
 });

@@ -127,9 +127,9 @@ final class LoggerRecipe extends Recipe
             ->onFlush(
                 fn (FlushEvent $event) => $this->log(
                     $event,
-                    $event->early ? 'Flushing items (early)...' : 'Flushing items...',
+                    $event->early ? 'Flushing {nb} items (early)...' : 'Flushing {nb} items...',
                     [
-                        'key' => $event->state->currentItemKey,
+                        'nb' => $event->state->nbLoadedItemsSinceLastFlush,
                         'state' => $event->state,
                     ],
                 ),
