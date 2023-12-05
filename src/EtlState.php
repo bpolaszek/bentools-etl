@@ -23,7 +23,6 @@ final class EtlState
      */
     public SplObjectStorage $nextTickCallbacks;
 
-    private int $nbLoadedItemsSinceLastFlush = 0;
     private bool $earlyFlush = false;
 
     /**
@@ -38,6 +37,7 @@ final class EtlState
         public readonly int $currentItemIndex = -1,
         public readonly int $nbExtractedItems = 0,
         public readonly int $nbLoadedItems = 0,
+        public readonly int $nbLoadedItemsSinceLastFlush = 0,
         public readonly ?int $nbTotalItems = null,
         public readonly DateTimeImmutable $startedAt = new DateTimeImmutable(),
         public readonly ?DateTimeImmutable $endedAt = null,
