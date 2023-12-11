@@ -23,12 +23,15 @@ it('uses a recipe', function () {
                     $hasReceivedEndEvent = true;
                 });
         },
+        fn (EtlExecutor $executor) => $executor->withContext(['foo' => 'bar'])
     );
 
     // When
-    $executor->process([]);
+    $report = $executor->process([]);
 
     // Then
     expect($hasReceivedInitEvent)->toBeTrue()
-        ->and($hasReceivedEndEvent)->toBeTrue();
+        ->and($hasReceivedEndEvent)->toBeTrue()
+        ->and($report->context)->toBe(['foo' => 'bar'])
+    ;
 });
