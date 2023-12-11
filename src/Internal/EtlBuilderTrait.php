@@ -95,11 +95,12 @@ trait EtlBuilderTrait
 
     public function withRecipe(Recipe|callable $recipe, Recipe|callable ...$recipes): self
     {
+        $executor = $this;
         foreach ([$recipe, ...$recipes] as $_recipe) {
             if (!$_recipe instanceof Recipe) {
                 $_recipe = Recipe::fromCallable($_recipe);
             }
-            $executor = $_recipe->decorate($this);
+            $executor = $_recipe->decorate($executor);
         }
 
         return $executor;
