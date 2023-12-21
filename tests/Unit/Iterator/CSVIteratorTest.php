@@ -90,6 +90,36 @@ it('can map user-defined columns', function (CSVIterator $iterator) {
     yield 'file' => new CSVIterator(new SplFileObject($filename), ['columns' => $columns]);
 });
 
+it('skips the 1st row when asked to', function (CSVIterator $iterator) {
+    $rows = [...$iterator];
+
+    expect($rows[0])->toBe([
+        'cityEnglishName' => 'New York',
+        'cityLocalName' => 'New York',
+        'countryIsoCode' => 'US',
+        'continent' => 'North America',
+        'population' => 8537673,
+    ])
+        ->and($rows[2])->toBe([
+            'cityEnglishName' => 'Tokyo',
+            'cityLocalName' => '東京',
+            'countryIsoCode' => 'JP',
+            'continent' => 'Asia',
+            'population' => 13929286,
+        ]);
+})->with(function () {
+    $columns = [
+        'cityEnglishName',
+        'cityLocalName',
+        'countryIsoCode',
+        'continent',
+        'population',
+    ];
+    $filename = dirname(__DIR__, 2).'/Data/10-biggest-cities.csv';
+    yield 'string content' => new CSVIterator(new StrTokIterator(file_get_contents($filename)), ['columns' => $columns, 'skipFirstRow' => true]);
+    yield 'file' => new CSVIterator(new SplFileObject($filename), ['columns' => $columns, 'skipFirstRow' => true]);
+});
+
 it('adds fields when the row has not enough columns', function (CSVIterator $iterator) {
     $rows = [...$iterator];
 
