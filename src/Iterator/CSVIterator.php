@@ -28,13 +28,27 @@ use function str_getcsv;
 final readonly class CSVIterator implements IteratorAggregate
 {
     /**
-     * @var array{delimiter: string, enclosure: string, escapeString: string, columns: 'auto'|string[]|null, normalizers: ValueNormalizerInterface[]}
+     * @var array{
+     *     delimiter: string,
+     *     enclosure: string,
+     *     escapeString: string,
+     *     columns: 'auto'|string[]|null,
+     *     normalizers: ValueNormalizerInterface[],
+     *     skipFirstRow: bool,
+     * }
      */
     private array $options;
 
     /**
-     * @param Traversable<string>                                                                                                                            $text
-     * @param array{delimiter?: string, enclosure?: string, escapeString?: string, columns?: 'auto'|string[]|null, normalizers?: ValueNormalizerInterface[]} $options
+     * @param Traversable<string> $text
+     * @param array{
+     *     delimiter?: string,
+     *     enclosure?: string,
+     *     escapeString?: string,
+     *     columns?: 'auto'|string[]|null,
+     *     normalizers?: ValueNormalizerInterface[],
+     *     skipFirstRow?: bool,
+     * } $options
      */
     public function __construct(
         private Traversable $text,
@@ -50,6 +64,7 @@ final readonly class CSVIterator implements IteratorAggregate
                 new NumericStringToNumberNormalizer(),
                 new EmptyStringToNullNormalizer(),
             ],
+            'skipFirstRow' => false,
         ]);
         $resolver->setAllowedTypes('delimiter', 'string');
         $resolver->setAllowedTypes('enclosure', 'string');
@@ -59,6 +74,7 @@ final readonly class CSVIterator implements IteratorAggregate
         $resolver->setAllowedValues('columns', function (array|string|null $value) {
             return 'auto' === $value || null === $value || is_array($value);
         });
+        $resolver->setAllowedTypes('skipFirstRow', 'bool');
         $this->options = $resolver->resolve($options);
     }
 
@@ -92,6 +108,11 @@ final readonly class CSVIterator implements IteratorAggregate
         return $this->iterateFromContent($this->text);
     }
 
+    private function shouldSkipFirstRow(): bool
+    {
+        return $this->options['skipFirstRow'] || 'auto' === $this->options['columns'];
+    }
+
     /**
      * @return Traversable<mixed>
      */
@@ -112,7 +133,7 @@ final readonly class CSVIterator implements IteratorAggregate
             if ([null] === $fields) {
                 continue;
             }
-            if ('auto' === $this->options['columns'] && 0 === $file->key()) {
+            if (0 === $file->key() && $this->shouldSkipFirstRow()) {
                 $columns ??= $fields;
                 continue;
             }
@@ -139,7 +160,7 @@ final readonly class CSVIterator implements IteratorAggregate
                 $this->options['enclosure'],
                 $this->options['escapeString'],
             );
-            if ('auto' === $this->options['columns'] && 0 === $r) {
+            if (0 === $r && $this->shouldSkipFirstRow()) {
                 $columns ??= $fields;
                 continue;
             }
