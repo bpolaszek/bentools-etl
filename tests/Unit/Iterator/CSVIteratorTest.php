@@ -6,14 +6,14 @@ namespace BenTools\ETL\Tests\Unit\Iterator;
 
 use BenTools\ETL\Iterator\CSVIterator;
 use BenTools\ETL\Iterator\StrTokIterator;
+use SplFileObject;
 
 use function dirname;
 use function expect;
 use function Safe\file_get_contents;
 
-it('iterates over CSV data', function () {
-    $content = file_get_contents(dirname(__DIR__, 2).'/Data/10-biggest-cities.csv');
-    $rows = [...new CSVIterator(new StrTokIterator($content))];
+it('iterates over CSV data', function (CSVIterator $iterator) {
+    $rows = [...$iterator];
 
     expect($rows)->toHaveCount(11)
         ->and($rows[0])->toBe([
@@ -30,11 +30,14 @@ it('iterates over CSV data', function () {
             3 => 'Asia',
             4 => 13929286,
         ]);
+})->with(function () {
+    $filename = dirname(__DIR__, 2).'/Data/10-biggest-cities.csv';
+    yield 'string content' => new CSVIterator(new StrTokIterator(file_get_contents($filename)));
+    yield 'file' => new CSVIterator(new SplFileObject($filename));
 });
 
-it('can make columns automatically', function () {
-    $content = file_get_contents(dirname(__DIR__, 2).'/Data/10-biggest-cities.csv');
-    $rows = [...new CSVIterator(new StrTokIterator($content), ['columns' => 'auto'])];
+it('can make columns automatically', function (CSVIterator $iterator) {
+    $rows = [...$iterator];
 
     expect($rows)->toHaveCount(10)
         ->and($rows[0])->toBe([
@@ -51,21 +54,14 @@ it('can make columns automatically', function () {
             'continent' => 'Asia',
             'population' => 13929286,
         ]);
+})->with(function () {
+    $filename = dirname(__DIR__, 2).'/Data/10-biggest-cities.csv';
+    yield 'string content' => new CSVIterator(new StrTokIterator(file_get_contents($filename)), ['columns' => 'auto']);
+    yield 'file' => new CSVIterator(new SplFileObject($filename), ['columns' => 'auto']);
 });
 
-it('can map user-defined columns', function () {
-    $content = file_get_contents(dirname(__DIR__, 2).'/Data/10-biggest-cities.csv');
-    $rows = [
-        ...new CSVIterator(new StrTokIterator($content), [
-            'columns' => [
-                'cityEnglishName',
-                'cityLocalName',
-                'countryIsoCode',
-                'continent',
-                'population',
-            ],
-        ]),
-    ];
+it('can map user-defined columns', function (CSVIterator $iterator) {
+    $rows = [...$iterator];
 
     expect($rows[1])->toBe([
         'cityEnglishName' => 'New York',
@@ -81,22 +77,21 @@ it('can map user-defined columns', function () {
             'continent' => 'Asia',
             'population' => 13929286,
         ]);
+})->with(function () {
+    $columns = [
+        'cityEnglishName',
+        'cityLocalName',
+        'countryIsoCode',
+        'continent',
+        'population',
+    ];
+    $filename = dirname(__DIR__, 2).'/Data/10-biggest-cities.csv';
+    yield 'string content' => new CSVIterator(new StrTokIterator(file_get_contents($filename)), ['columns' => $columns]);
+    yield 'file' => new CSVIterator(new SplFileObject($filename), ['columns' => $columns]);
 });
 
-it('adds fields when the row has not enough columns', function () {
-    $content = file_get_contents(dirname(__DIR__, 2).'/Data/10-biggest-cities.csv');
-    $rows = [
-        ...new CSVIterator(new StrTokIterator($content), [
-            'columns' => [
-                'cityEnglishName',
-                'cityLocalName',
-                'countryIsoCode',
-                'continent',
-                'population',
-                'misc',
-            ],
-        ]),
-    ];
+it('adds fields when the row has not enough columns', function (CSVIterator $iterator) {
+    $rows = [...$iterator];
 
     expect($rows[1])->toBe([
         'cityEnglishName' => 'New York',
@@ -114,20 +109,22 @@ it('adds fields when the row has not enough columns', function () {
             'population' => 13929286,
             'misc' => null,
         ]);
+})->with(function () {
+    $columns = [
+        'cityEnglishName',
+        'cityLocalName',
+        'countryIsoCode',
+        'continent',
+        'population',
+        'misc',
+    ];
+    $filename = dirname(__DIR__, 2).'/Data/10-biggest-cities.csv';
+    yield 'string content' => new CSVIterator(new StrTokIterator(file_get_contents($filename)), ['columns' => $columns]);
+    yield 'file' => new CSVIterator(new SplFileObject($filename), ['columns' => $columns]);
 });
 
-it('removes extra data whenever there are more fields than columns', function () {
-    $content = file_get_contents(dirname(__DIR__, 2).'/Data/10-biggest-cities.csv');
-    $rows = [
-        ...new CSVIterator(new StrTokIterator($content), [
-            'columns' => [
-                'cityEnglishName',
-                'cityLocalName',
-                'countryIsoCode',
-                'continent',
-            ],
-        ]),
-    ];
+it('removes extra data whenever there are more fields than columns', function (CSVIterator $iterator) {
+    $rows = [...$iterator];
 
     expect($rows[1])->toBe([
         'cityEnglishName' => 'New York',
@@ -141,4 +138,14 @@ it('removes extra data whenever there are more fields than columns', function ()
             'countryIsoCode' => 'JP',
             'continent' => 'Asia',
         ]);
+})->with(function () {
+    $columns = [
+        'cityEnglishName',
+        'cityLocalName',
+        'countryIsoCode',
+        'continent',
+    ];
+    $filename = dirname(__DIR__, 2).'/Data/10-biggest-cities.csv';
+    yield 'string content' => new CSVIterator(new StrTokIterator(file_get_contents($filename)), ['columns' => $columns]);
+    yield 'file' => new CSVIterator(new SplFileObject($filename), ['columns' => $columns]);
 });
