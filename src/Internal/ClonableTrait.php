@@ -8,7 +8,6 @@ use ReflectionClass;
 use ReflectionProperty;
 
 use function array_column;
-use function array_diff;
 use function array_filter;
 use function BenTools\ETL\array_fill_from;
 use function get_object_vars;
@@ -27,17 +26,19 @@ trait ClonableTrait
      */
     public function cloneWith(array $cloneArgs = []): static
     {
-        static $refl, $writableProps, $writablePropNames, $constructorParamNames;
+        static $refl, $notPromotedWritablePropNames, $constructorParamNames;
         $refl ??= new ReflectionClass($this);
         $constructorParamNames ??= array_column($refl->getConstructor()->getParameters(), 'name');
-        $writableProps ??= array_filter(
-            $refl->getProperties(),
-            fn (ReflectionProperty $property) => !$property->isReadOnly(),
+        $notPromotedWritablePropNames ??= array_column(
+            array_filter(
+                $refl->getProperties(),
+                fn (ReflectionProperty $property) => !$property->isReadOnly() && !$property->isPromoted(),
+            ),
+            'name'
         );
-        $writablePropNames ??= array_diff(array_column($writableProps, 'name'), $constructorParamNames);
 
         $clone = new static(...array_fill_from($constructorParamNames, get_object_vars($this), $cloneArgs));
-        $notPromotedProps = array_fill_from($writablePropNames, get_object_vars($this), $cloneArgs);
+        $notPromotedProps = array_fill_from($notPromotedWritablePropNames, get_object_vars($this), $cloneArgs);
         foreach ($notPromotedProps as $prop => $value) {
             $clone->{$prop} = $value;
         }
