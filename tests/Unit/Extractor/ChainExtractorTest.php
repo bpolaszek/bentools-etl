@@ -6,6 +6,7 @@ namespace BenTools\ETL\Tests\Unit\Extractor;
 
 use BenTools\ETL\EtlExecutor;
 use BenTools\ETL\Extractor\CallableExtractor;
+use BenTools\ETL\Extractor\ChainExtractor;
 
 use function BenTools\ETL\chain;
 use function BenTools\ETL\extractFrom;
@@ -39,4 +40,9 @@ it('silently chains extractors', function () {
 
     // Then
     expect($report->output)->toBe(['banana', 'apple', 'strawberry', 'raspberry', 'peach']);
+});
+
+it('returns self', function () {
+    $chainTransformer = new ChainExtractor(fn () => null);
+    expect(ChainExtractor::from($chainTransformer))->toBe($chainTransformer);
 });

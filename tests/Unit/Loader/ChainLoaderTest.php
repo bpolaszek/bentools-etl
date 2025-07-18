@@ -8,6 +8,7 @@ use ArrayObject;
 use BenTools\ETL\EtlExecutor;
 use BenTools\ETL\EtlState;
 use BenTools\ETL\Loader\CallableLoader;
+use BenTools\ETL\Loader\ChainLoader;
 use BenTools\ETL\Loader\ConditionalLoaderInterface;
 
 use function BenTools\ETL\chain;
@@ -79,4 +80,9 @@ it('silently chains loaders', function () {
     // Then
     expect([...$a])->toBe(['foo', 'bar'])
         ->and([...$b])->toBe(['foo', 'bar']);
+});
+
+it('returns self', function () {
+    $chainTransformer = new ChainLoader(fn () => null);
+    expect(ChainLoader::from($chainTransformer))->toBe($chainTransformer);
 });

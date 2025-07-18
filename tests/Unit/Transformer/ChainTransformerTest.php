@@ -6,6 +6,7 @@ namespace BenTools\ETL\Tests\Unit\Transformer;
 
 use BenTools\ETL\EtlExecutor;
 use BenTools\ETL\Transformer\CallableTransformer;
+use BenTools\ETL\Transformer\ChainTransformer;
 use Generator;
 
 use function BenTools\ETL\chain;
@@ -17,9 +18,11 @@ use function strtoupper;
 it('chains transformers', function () {
     // Given
     $input = ['foo', 'bar'];
-    $executor = new EtlExecutor(transformer: new CallableTransformer(
-        fn (string $item): string => strrev($item)
-    ));
+    $executor = new EtlExecutor(
+        transformer: new CallableTransformer(
+            fn (string $item): string => strrev($item),
+        ),
+    );
     $executor = $executor->transformWith(
         chain($executor->transformer)
             ->with(function (string $item): Generator {
@@ -62,7 +65,7 @@ it('silently chains transformers', function () {
 
                 return $items;
             },
-            fn (array $items) => yield implode('-', $items)
+            fn (array $items) => yield implode('-', $items),
         );
 
     // When
@@ -73,4 +76,9 @@ it('silently chains transformers', function () {
         'oof-OOF-hey',
         'rab-RAB-hey',
     ]);
+});
+
+it('returns self', function () {
+    $chainTransformer = new ChainTransformer(fn () => null);
+    expect(ChainTransformer::from($chainTransformer))->toBe($chainTransformer);
 });
