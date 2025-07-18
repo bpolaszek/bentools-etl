@@ -8,6 +8,7 @@ use ArrayObject;
 use BenTools\ETL\EtlExecutor;
 use BenTools\ETL\EtlState;
 use BenTools\ETL\Loader\CallableLoader;
+use BenTools\ETL\Loader\ChainLoader;
 use BenTools\ETL\Loader\ConditionalLoaderInterface;
 
 use function BenTools\ETL\chain;
@@ -26,7 +27,7 @@ it('chains loaders', function () {
         chain($executor->loader)
             ->with(fn (string $item) => $b[] = $item) // @phpstan-ignore-line
             ->with(
-                new class() implements ConditionalLoaderInterface {
+                new class implements ConditionalLoaderInterface {
                     public function supports(mixed $item, EtlState $state): bool
                     {
                         return 'foo' !== $item;
@@ -79,4 +80,9 @@ it('silently chains loaders', function () {
     // Then
     expect([...$a])->toBe(['foo', 'bar'])
         ->and([...$b])->toBe(['foo', 'bar']);
+});
+
+it('returns self', function () {
+    $chainTransformer = new ChainLoader(fn () => null);
+    expect(ChainLoader::from($chainTransformer))->toBe($chainTransformer);
 });

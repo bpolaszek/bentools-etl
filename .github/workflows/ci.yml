@@ -6,14 +6,16 @@ on:
 
 jobs:
   tests:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         php:
           - 8.2
           - 8.3
+          - 8.4
+          - 8.5
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -21,7 +23,12 @@ jobs:
           php-version: ${{ matrix.php }}
 
       - name: Install dependencies
-        run: composer install --prefer-dist --no-progress
+        run: |
+          if [[ "${{ matrix.php }}" == "8.5" ]]; then
+            composer install --prefer-dist --no-progress --ignore-platform-req=php
+          else
+            composer install --prefer-dist --no-progress
+          fi
 
       - name: Check types
         run: vendor/bin/phpstan analyse

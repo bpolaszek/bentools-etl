@@ -3,9 +3,5 @@ parameters:
     paths:
         - src/
         - tests/
-    ignoreErrors:
-        -
-          message: "#Access to an undefined property#"
-          path: "tests/Unit/Recipe/LoggerRecipeTest.php"
 includes:
     - vendor/phpstan/phpstan-mockery/extension.neon
