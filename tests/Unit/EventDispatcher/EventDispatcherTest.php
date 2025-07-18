@@ -29,10 +29,10 @@ trait EventVisitor
 it('dispatches events, to the appropriate listeners, in the correct order', function () {
     $listenerProvider = new PrioritizedListenerProvider();
     $bus = new EventDispatcher($listenerProvider);
-    $ignored = new class() {
+    $ignored = new class {
         use EventVisitor;
     };
-    $event = new class() {
+    $event = new class {
         use EventVisitor;
     };
 
@@ -55,7 +55,7 @@ it('dispatches events, to the appropriate listeners, in the correct order', func
 it('stops propagation of events', function () {
     $listenerProvider = new PrioritizedListenerProvider();
     $bus = new EventDispatcher($listenerProvider);
-    $event = new class() implements StoppableEventInterface {
+    $event = new class implements StoppableEventInterface {
         use EventVisitor;
     };
 

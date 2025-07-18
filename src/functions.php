@@ -42,13 +42,13 @@ function array_fill_from(array $keys, array $values, array ...$extraValues): arr
 }
 
 /**
- * @internal
- *
- * @template T
- *
  * @param iterable<T> $items
  *
  * @return Iterator<T>
+ *
+ * @internal
+ *
+ * @template T
  */
 function iterable_to_iterator(iterable $items): Iterator
 {
@@ -62,7 +62,7 @@ function extractFrom(ExtractorInterface|callable $extractor, ExtractorInterface|
 
 function transformWith(
     TransformerInterface|callable $transformer,
-    TransformerInterface|callable ...$transformers
+    TransformerInterface|callable ...$transformers,
 ): EtlExecutor {
     return (new EtlExecutor())->transformWith(...func_get_args());
 }
@@ -107,6 +107,6 @@ function skipWhen(callable $filter, ?string $eventClass = ExtractEvent::class, i
         $filter(...),
         $eventClass ?? ExtractEvent::class,
         $priority,
-        FilterRecipeMode::EXCLUDE
+        FilterRecipeMode::EXCLUDE,
     );
 }

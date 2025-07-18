@@ -63,7 +63,7 @@ it('passes the context throughout all the ETL steps', function () {
 
 it('loads conditionally', function () {
     // Background
-    $loader = new class() implements ConditionalLoaderInterface {
+    $loader = new class implements ConditionalLoaderInterface {
         public function supports(mixed $item, EtlState $state): bool
         {
             return 'foo' !== $item;
@@ -98,7 +98,7 @@ it('loads conditionally', function () {
 it('yells if it cannot process extracted data', function () {
     // Given
     $executor = (new EtlExecutor())->withProcessor(
-        new class() implements ProcessorInterface {
+        new class implements ProcessorInterface {
             public function supports(mixed $extracted): bool
             {
                 return false;

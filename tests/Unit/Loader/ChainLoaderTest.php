@@ -26,7 +26,7 @@ it('chains loaders', function () {
         chain($executor->loader)
             ->with(fn (string $item) => $b[] = $item) // @phpstan-ignore-line
             ->with(
-                new class() implements ConditionalLoaderInterface {
+                new class implements ConditionalLoaderInterface {
                     public function supports(mixed $item, EtlState $state): bool
                     {
                         return 'foo' !== $item;

@@ -35,7 +35,7 @@ trait EtlBuilderTrait
 
     public function extractFrom(
         ExtractorInterface|callable $extractor,
-        ExtractorInterface|callable ...$extractors
+        ExtractorInterface|callable ...$extractors,
     ): self {
         $extractors = [$extractor, ...$extractors];
 
@@ -54,7 +54,7 @@ trait EtlBuilderTrait
 
     public function transformWith(
         TransformerInterface|callable $transformer,
-        TransformerInterface|callable ...$transformers
+        TransformerInterface|callable ...$transformers,
     ): self {
         $transformers = [$transformer, ...$transformers];
 
