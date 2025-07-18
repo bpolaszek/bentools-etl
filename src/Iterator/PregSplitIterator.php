@@ -7,8 +7,8 @@ namespace BenTools\ETL\Iterator;
 use IteratorAggregate;
 use Traversable;
 
+use function preg_split;
 use function rtrim;
-use function Safe\preg_split;
 
 /**
  * @internal
