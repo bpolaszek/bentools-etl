@@ -14,7 +14,7 @@
     "friendsofphp/php-cs-fixer": "^3.35",
     "mockery/mockery": "^1.6",
     "monolog/monolog": "^3.5",
-    "pestphp/pest": "^2.24",
+    "pestphp/pest": "^3.8",
     "phpstan/phpstan": "^1.10",
     "phpstan/phpstan-mockery": "^1.1",
     "react/stream": "^1.3",
