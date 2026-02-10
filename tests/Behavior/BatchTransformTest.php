@@ -6,10 +6,14 @@ namespace BenTools\ETL\Tests\Behavior;
 
 use BenTools\ETL\EtlConfiguration;
 use BenTools\ETL\EtlExecutor;
+use BenTools\ETL\EtlState;
 use BenTools\ETL\EventDispatcher\Event\ExtractEvent;
 use BenTools\ETL\EventDispatcher\Event\TransformEvent;
+use BenTools\ETL\EventDispatcher\Event\TransformExceptionEvent;
+use BenTools\ETL\Exception\TransformException;
 use BenTools\ETL\Transformer\CallableBatchTransformer;
 use Generator;
+use RuntimeException;
 
 use function strtoupper;
 
@@ -285,4 +289,98 @@ it('handles batchSize larger than total items', function () {
     // Then - single batch with all items
     expect($report->output)->toBe(['FOO', 'BAR']);
     expect($batchSizes)->toBe([2]);
+});
+
+it('resumes processing when transform exception is dismissed', function () {
+    // Given
+    $items = ['foo', 'bar', 'baz', 'qux'];
+
+    $loaded = [];
+    $executor = (new EtlExecutor())
+        ->transformWith(new CallableBatchTransformer(
+            function (array $items) {
+                if (in_array('baz', $items, true)) {
+                    throw new RuntimeException('Batch failed');
+                }
+
+                return array_map(strtoupper(...), $items);
+            },
+        ))
+        ->loadInto(function (string $item) use (&$loaded) {
+            $loaded[] = $item;
+        })
+        ->onTransformException(function (TransformExceptionEvent $event) {
+            $event->removeException();
+        })
+        ->withOptions(new EtlConfiguration(batchSize: 2));
+
+    // When
+    $report = $executor->process($items);
+
+    // Then - first batch OK, second batch exception dismissed (returns []), third batch continues
+    expect($loaded)->toBe(['FOO', 'BAR']);
+});
+
+it('wraps transformer exceptions into TransformException', function () {
+    // Given
+    $executor = (new EtlExecutor())
+        ->transformWith(new CallableBatchTransformer(
+            function (array $items) {
+                throw new RuntimeException('API is down');
+            },
+        ))
+        ->withOptions(new EtlConfiguration(batchSize: 2));
+
+    // When / Then
+    $executor->process(['foo', 'bar']);
+})->throws(TransformException::class, 'Error during transformation.');
+
+it('propagates StopRequest thrown by batch transformer', function () {
+    // Given
+    $items = ['foo', 'bar', 'baz', 'qux'];
+
+    $loaded = [];
+    $executor = (new EtlExecutor())
+        ->transformWith(new CallableBatchTransformer(
+            function (array $items, EtlState $state) {
+                if (in_array('baz', $items, true)) {
+                    $state->stop();
+                }
+
+                return array_map(strtoupper(...), $items);
+            },
+        ))
+        ->loadInto(function (string $item) use (&$loaded) {
+            $loaded[] = $item;
+        })
+        ->withOptions(new EtlConfiguration(batchSize: 2));
+
+    // When
+    $report = $executor->process($items);
+
+    // Then - first batch processed, second batch triggers stop
+    expect($loaded)->toBe(['FOO', 'BAR']);
+});
+
+it('propagates SkipRequest thrown by batch transformer', function () {
+    // Given
+    $items = ['foo', 'bar', 'baz', 'qux'];
+
+    $executor = (new EtlExecutor())
+        ->transformWith(new CallableBatchTransformer(
+            function (array $items, EtlState $state) {
+                if (in_array('baz', $items, true)) {
+                    $state->skip();
+                }
+
+                return array_map(strtoupper(...), $items);
+            },
+        ))
+        ->withOptions(new EtlConfiguration(batchSize: 2));
+
+    // When
+    $report = $executor->process($items);
+
+    // Then - first batch loaded, second batch skipped entirely
+    expect($report->output)->toBe(['FOO', 'BAR']);
 });
