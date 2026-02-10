@@ -55,6 +55,74 @@ But the last transformer of the chain (or your only one transformer) is determin
 - If your transformer `yields` values, each yielded value will be passed to the loader (and the loader will be called for each yielded value).
 
 
+Batch transforms
+-----------------
+
+By default, transformers process items one-by-one. But sometimes you want to process multiple items at once — for example, sending concurrent HTTP requests instead of waiting for each response sequentially.
+
+The `BatchTransformerInterface` allows you to transform a batch of items in a single call:
+
+```php
+use BenTools\ETL\EtlConfiguration;
+use BenTools\ETL\EtlExecutor;
+use BenTools\ETL\EtlState;
+use BenTools\ETL\Transformer\CallableBatchTransformer;
+
+$executor = (new EtlExecutor())
+    ->extractFrom($urlExtractor)
+    ->transformWith(new CallableBatchTransformer(
+        function (array $items, EtlState $state): array {
+            // $items contains a batch of URLs (e.g., 10 at a time)
+            // Send all HTTP requests concurrently
+            $responses = $httpClient->sendConcurrent(
+                array_map(fn ($url) => new Request('GET', $url), $items)
+            );
+
+            return array_map(
+                fn ($response) => json_decode($response->getBody(), true),
+                $responses
+            );
+        }
+    ))
+    ->loadInto($loader)
+    ->withOptions(new EtlConfiguration(batchSize: 10))
+    ->process($urls);
+```
+
+The `batchSize` option in `EtlConfiguration` controls how many items are grouped into each batch. Each batch is passed as an array to your transformer's `transform(array $items, EtlState $state): Generator` method.
+
+> [!NOTE]
+> `BatchTransformerInterface` is a **separate interface** from `TransformerInterface` — it does not extend it.
+> When `batchSize` is configured but the transformer does not implement `BatchTransformerInterface`, batching is silently ignored.
+
+You can also implement `BatchTransformerInterface` directly for more complex use cases:
+
+```php
+use BenTools\ETL\Transformer\BatchTransformerInterface;
+use Generator;
+
+final class ConcurrentApiTransformer implements BatchTransformerInterface
+{
+    public function __construct(
+        private readonly HttpClientInterface $httpClient,
+    ) {}
+
+    public function transform(array $items, EtlState $state): Generator
+    {
+        $responses = $this->httpClient->sendConcurrent(
+            array_map(fn ($item) => new Request('GET', $item['url']), $items)
+        );
+
+        foreach ($responses as $i => $response) {
+            yield [...$items[$i], 'data' => json_decode($response->getBody(), true)];
+        }
+    }
+}
+```
+
+> [!TIP]
+> Each value yielded by the generator becomes an individual item for the load phase, so you can also implement fan-out (yielding more items than inputs).
+
 Next tick
 ---------
 
