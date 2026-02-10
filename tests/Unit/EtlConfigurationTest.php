@@ -14,3 +14,11 @@ it('denies float values', function () {
 it('denies negative values', function () {
     new EtlConfiguration(flushEvery: -10);
 })->throws(InvalidArgumentException::class);
+
+it('denies negative batchSize values', function () {
+    new EtlConfiguration(batchSize: -1);
+})->throws(InvalidArgumentException::class);
+
+it('denies zero batchSize', function () {
+    new EtlConfiguration(batchSize: 0);
+})->throws(InvalidArgumentException::class);

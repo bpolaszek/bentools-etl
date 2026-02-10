@@ -15,6 +15,7 @@ use BenTools\ETL\Processor\ReactStreamProcessor;
 use BenTools\ETL\Recipe\FilterRecipe;
 use BenTools\ETL\Recipe\FilterRecipeMode;
 use BenTools\ETL\Recipe\Recipe;
+use BenTools\ETL\Transformer\BatchTransformerInterface;
 use BenTools\ETL\Transformer\ChainTransformer;
 use BenTools\ETL\Transformer\TransformerInterface;
 use Iterator;
@@ -61,7 +62,7 @@ function extractFrom(ExtractorInterface|callable $extractor, ExtractorInterface|
 }
 
 function transformWith(
-    TransformerInterface|callable $transformer,
+    TransformerInterface|BatchTransformerInterface|callable $transformer,
     TransformerInterface|callable ...$transformers,
 ): EtlExecutor {
     return (new EtlExecutor())->transformWith(...func_get_args());

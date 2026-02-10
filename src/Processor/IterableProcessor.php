@@ -8,9 +8,11 @@ use BenTools\ETL\EtlExecutor;
 use BenTools\ETL\EtlState;
 use BenTools\ETL\Exception\ExtractException;
 use BenTools\ETL\Exception\SkipRequest;
+use BenTools\ETL\Transformer\BatchTransformerInterface;
 use Generator;
 use Throwable;
 
+use function BenTools\IterableFunctions\iterable_chunk;
 use function is_iterable;
 
 /**
@@ -28,10 +30,20 @@ final readonly class IterableProcessor implements ProcessorInterface
      */
     public function process(EtlExecutor $executor, EtlState $state, mixed $items): EtlState
     {
-        foreach ($this->extract($executor, $state, $items) as $key => $item) {
-            try {
-                $executor->processItem($item, $key, $state);
-            } catch (SkipRequest) {
+        if ($executor->transformer instanceof BatchTransformerInterface) {
+            $batchSize = $executor->options->batchSize;
+            foreach (iterable_chunk($this->extract($executor, $state, $items), $batchSize, true) as $chunk) {
+                try {
+                    $executor->processItemBatch($chunk, $state);
+                } catch (SkipRequest) {
+                }
+            }
+        } else {
+            foreach ($this->extract($executor, $state, $items) as $key => $item) {
+                try {
+                    $executor->processItem($item, $key, $state);
+                } catch (SkipRequest) {
+                }
             }
         }
 
