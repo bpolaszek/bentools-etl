@@ -134,12 +134,22 @@ final class EtlExecutor implements EventDispatcherInterface
     private function transform(mixed $item, EtlState $state): array
     {
         try {
-            $transformResult = $this->emitTransformEvent(
-                $state,
-                TransformResult::create($this->transformer->transform($item, $state)),
-            );
+            $rawResult = TransformResult::create($this->transformer->transform($item, $state));
 
-            return [...$transformResult];
+            $allItems = [];
+            foreach ($rawResult as $singleItem) {
+                try {
+                    $singleResult = $this->emitTransformEvent(
+                        $state,
+                        TransformResult::create($singleItem),
+                    );
+                    array_push($allItems, ...$singleResult);
+                } catch (SkipRequest) {
+                    continue;
+                }
+            }
+
+            return $allItems;
         } catch (SkipRequest|StopRequest $e) {
             throw $e;
         } catch (Throwable $e) {

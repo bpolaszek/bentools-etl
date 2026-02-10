@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BenTools\ETL\Transformer;
 
 use BenTools\ETL\EtlState;
+use Generator;
 
 final readonly class ChainTransformer implements TransformerInterface
 {
@@ -35,11 +36,30 @@ final readonly class ChainTransformer implements TransformerInterface
 
     public function transform(mixed $item, EtlState $state): mixed
     {
+        $items = [$item];
+        $fanned = false;
+
         foreach ($this->transformers as $transformer) {
-            $item = $transformer->transform($item, $state);
+            $nextItems = [];
+            foreach ($items as $currentItem) {
+                $result = $transformer->transform($currentItem, $state);
+                if ($result instanceof Generator) {
+                    $fanned = true;
+                    array_push($nextItems, ...$result);
+                } else {
+                    $nextItems[] = $result;
+                }
+            }
+            $items = $nextItems;
         }
 
-        return $item;
+        if (!$fanned) {
+            return $items[0];
+        }
+
+        return (static function (array $items): Generator {
+            yield from $items;
+        })($items);
     }
 
     public static function from(TransformerInterface $transformer): self
