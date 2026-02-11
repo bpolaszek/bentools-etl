@@ -14,6 +14,7 @@ use BenTools\ETL\Loader\ChainLoader;
 use BenTools\ETL\Loader\LoaderInterface;
 use BenTools\ETL\Processor\ProcessorInterface;
 use BenTools\ETL\Recipe\Recipe;
+use BenTools\ETL\Transformer\BatchTransformerInterface;
 use BenTools\ETL\Transformer\CallableTransformer;
 use BenTools\ETL\Transformer\ChainTransformer;
 use BenTools\ETL\Transformer\TransformerInterface;
@@ -53,9 +54,13 @@ trait EtlBuilderTrait
     }
 
     public function transformWith(
-        TransformerInterface|callable $transformer,
+        TransformerInterface|BatchTransformerInterface|callable $transformer,
         TransformerInterface|callable ...$transformers,
     ): self {
+        if ($transformer instanceof BatchTransformerInterface) {
+            return $this->cloneWith(['transformer' => $transformer]);
+        }
+
         $transformers = [$transformer, ...$transformers];
 
         foreach ($transformers as $t => $_transformer) {

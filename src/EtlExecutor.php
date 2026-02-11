@@ -28,6 +28,7 @@ use BenTools\ETL\Loader\InMemoryLoader;
 use BenTools\ETL\Loader\LoaderInterface;
 use BenTools\ETL\Processor\IterableProcessor;
 use BenTools\ETL\Processor\ProcessorInterface;
+use BenTools\ETL\Transformer\BatchTransformerInterface;
 use BenTools\ETL\Transformer\NullTransformer;
 use BenTools\ETL\Transformer\TransformerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -61,7 +62,7 @@ final class EtlExecutor implements EventDispatcherInterface
      */
     public function __construct(
         public readonly ExtractorInterface $extractor = new IterableExtractor(),
-        public readonly TransformerInterface $transformer = new NullTransformer(),
+        public readonly TransformerInterface|BatchTransformerInterface $transformer = new NullTransformer(),
         public readonly LoaderInterface $loader = new InMemoryLoader(),
         public readonly EtlConfiguration $options = new EtlConfiguration(),
         public readonly ProcessorInterface $processor = new IterableProcessor(),
@@ -118,6 +119,43 @@ final class EtlExecutor implements EventDispatcherInterface
     }
 
     /**
+     * @param array<mixed, mixed> $chunk Key-value pairs from extraction with preserved keys
+     */
+    public function processItemBatch(array $chunk, EtlState $state): void
+    {
+        $items = [];
+        $isFirstItem = true;
+        $stopped = false;
+
+        foreach ($chunk as $key => $item) {
+            $state = $state->update($state->getLastVersion()->withUpdatedItemKey($key));
+
+            if ($isFirstItem && $state->currentItemIndex > 0) {
+                $this->consumeNextTick($state);
+            }
+            $isFirstItem = false;
+
+            try {
+                $items[] = $this->emitExtractEvent($state, $item);
+            } catch (SkipRequest) {
+                continue;
+            } catch (StopRequest) {
+                $stopped = true;
+                break;
+            }
+        }
+
+        if ([] !== $items) {
+            $itemsToLoad = $this->batchTransform($items, $state);
+            $this->load($itemsToLoad, $state->getLastVersion());
+        }
+
+        if ($stopped) {
+            throw new StopRequest();
+        }
+    }
+
+    /**
      * @internal
      */
     private function consumeNextTick(EtlState $state): void
@@ -138,6 +176,40 @@ final class EtlExecutor implements EventDispatcherInterface
 
             $allItems = [];
             foreach ($rawResult as $singleItem) {
+                try {
+                    $singleResult = $this->emitTransformEvent(
+                        $state,
+                        TransformResult::create($singleItem),
+                    );
+                    array_push($allItems, ...$singleResult);
+                } catch (SkipRequest) {
+                    continue;
+                }
+            }
+
+            return $allItems;
+        } catch (SkipRequest|StopRequest $e) {
+            throw $e;
+        } catch (Throwable $e) {
+            TransformException::emit($this->eventDispatcher, $e, $state);
+        }
+
+        return [];
+    }
+
+    /**
+     * @param list<mixed> $items
+     *
+     * @return list<mixed>
+     */
+    private function batchTransform(array $items, EtlState $state): array
+    {
+        try {
+            assert($this->transformer instanceof BatchTransformerInterface);
+            $results = $this->transformer->transform($items, $state->getLastVersion());
+
+            $allItems = [];
+            foreach ($results as $singleItem) {
                 try {
                     $singleResult = $this->emitTransformEvent(
                         $state,

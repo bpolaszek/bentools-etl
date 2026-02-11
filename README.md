@@ -23,6 +23,7 @@ Table of Contents
 - [Advanced Usage](doc/advanced_usage.md)
     - [Creating your own Extractor / Transformers / Loaders](doc/advanced_usage.md#creating-your-own-extractor--transformers--loaders)
     - [Difference between yield and return in transformers](doc/advanced_usage.md#difference-between-yield-and-return-in-transformers)
+    - [Batch transforms](doc/advanced_usage.md#batch-transforms)
     - [Next tick](doc/advanced_usage.md#next-tick)
     - [Chaining extractors / transformers / loaders](doc/advanced_usage.md#chaining-extractors--transformers--loaders)
     - [Reading from STDIN / Writing to STDOUT](doc/advanced_usage.md#reading-from-stdin--writing-to-stdout)

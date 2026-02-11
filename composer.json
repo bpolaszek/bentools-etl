@@ -6,10 +6,10 @@
     "php": ">=8.2",
     "psr/event-dispatcher": "^1.0",
     "psr/log": "^3.0",
+    "bentools/iterable-functions": "^2.1",
     "symfony/options-resolver": "@stable"
   },
   "require-dev": {
-    "bentools/iterable-functions": "^2.1",
     "doctrine/orm": "^2.16",
     "friendsofphp/php-cs-fixer": "^3.35",
     "mockery/mockery": "^1.6",
